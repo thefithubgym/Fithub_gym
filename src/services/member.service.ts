@@ -33,13 +33,11 @@ export class MemberService {
         { firstName: { contains: search, mode: "insensitive" } },
         { lastName: { contains: search, mode: "insensitive" } },
         { phone: { contains: search, mode: "insensitive" } },
-        { id: { contains: search, mode: "insensitive" } },
+        { email: { contains: search, mode: "insensitive" } },
       ];
     }
 
     if (status) {
-      // Find members with at least one membership matching the status
-      // Note: for derived status, active is startDate <= now and endDate >= now
       const now = new Date();
       if (status === "active") {
         where.memberships = {
@@ -59,8 +57,10 @@ export class MemberService {
           },
         };
       } else if (status === "upcoming") {
+        // UPCOMING memberships have startDate in the future (status stored as UPCOMING in DB)
         where.memberships = {
           some: {
+            status: "UPCOMING",
             startDate: { gt: now },
           },
         };

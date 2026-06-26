@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect, useRef } from "react";
 import { Search, Filter } from "lucide-react";
 
 interface PlanOption {
@@ -22,6 +22,12 @@ export default function MembersTableControls({ plans }: MembersTableControlsProp
   const [status, setStatus] = useState(searchParams.get("status") || "");
   const [planId, setPlanId] = useState(searchParams.get("planId") || "");
 
+  // Ref to hold latest filter values for use inside the debounce closure
+  const statusRef = useRef(status);
+  const planIdRef = useRef(planId);
+  statusRef.current = status;
+  planIdRef.current = planId;
+
   const applyFilters = (newSearch: string, newStatus: string, newPlanId: string) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set("page", "1"); // Reset to page 1
@@ -40,15 +46,17 @@ export default function MembersTableControls({ plans }: MembersTableControlsProp
     });
   };
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value;
-    setSearch(val);
-  };
+  // Debounced search — fires 500ms after user stops typing
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      applyFilters(search, statusRef.current, planIdRef.current);
+    }, 500);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search]);
 
-  const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      applyFilters(search, status, planId);
-    }
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value);
   };
 
   return (
@@ -58,11 +66,10 @@ export default function MembersTableControls({ plans }: MembersTableControlsProp
         <Search className="text-on-surface-variant ml-sm w-5 h-5 shrink-0" />
         <input 
           className="w-full h-full bg-transparent border-none text-on-surface placeholder-on-surface-variant focus:outline-none focus:ring-0 font-body-md text-sm px-sm" 
-          placeholder="Filter by name, phone or ID... (Enter)" 
+          placeholder="Search by name, phone, email..." 
           type="text"
           value={search}
           onChange={handleSearchChange}
-          onKeyDown={handleSearchKeyDown}
         />
       </div>
 
