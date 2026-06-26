@@ -71,9 +71,6 @@ export default async function MemberDetailPage({ params }: PageProps) {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-lg">
         {/* Left Column: Member Card & Profile Details (7 columns) */}
         <div className="lg:col-span-7 flex flex-col gap-lg">
-          {/* Profile Overview Card */}
-
-          {/* Detailed Info Card */}
           <div className="bg-[#181818] border border-[#323232] rounded-xl p-xl flex flex-col gap-lg">
             <h3 className="font-headline-md text-lg font-bold text-white border-b border-[#323232] pb-sm">
               Personal Information
@@ -150,30 +147,29 @@ export default async function MemberDetailPage({ params }: PageProps) {
                 </span>
               </div>
             </div>
-          </div>
 
-          {/* Emergency Info Card */}
-          <div className="bg-[#181818] border border-[#323232] rounded-xl p-xl flex flex-col gap-lg">
-            <h3 className="font-headline-md text-lg font-bold text-white border-b border-[#323232] pb-sm">
-              Safety & Emergency
-            </h3>
+            <div className="flex flex-col gap-lg">
+              <h3 className="font-headline-md text-lg font-bold text-white border-b border-[#323232] pb-sm">
+                Safety & Emergency
+              </h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
-              <div className="flex flex-col gap-xs">
-                <span className="text-xs text-on-surface-variant uppercase tracking-wider font-semibold">Emergency Contact</span>
-                <span className="text-white text-sm">{member.emergencyContact || "Not Provided"}</span>
-              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
+                <div className="flex flex-col gap-xs">
+                  <span className="text-xs text-on-surface-variant uppercase tracking-wider font-semibold">Emergency Contact</span>
+                  <span className="text-white text-sm">{member.emergencyContact || "Not Provided"}</span>
+                </div>
 
-              <div className="flex flex-col gap-xs">
-                <span className="text-xs text-on-surface-variant uppercase tracking-wider font-semibold">Emergency Phone</span>
-                <span className="text-white text-sm">{member.emergencyPhone || "Not Provided"}</span>
-              </div>
+                <div className="flex flex-col gap-xs">
+                  <span className="text-xs text-on-surface-variant uppercase tracking-wider font-semibold">Emergency Phone</span>
+                  <span className="text-white text-sm">{member.emergencyPhone || "Not Provided"}</span>
+                </div>
 
-              <div className="flex flex-col gap-xs md:col-span-2">
-                <span className="text-xs text-on-surface-variant uppercase tracking-wider font-semibold">Health / Internal Notes</span>
-                <p className="text-secondary text-sm bg-surface-container p-sm rounded-lg border border-outline-variant mt-xs min-h-[50px] whitespace-pre-line">
-                  {member.notes || "No internal notes recorded."}
-                </p>
+                <div className="flex flex-col gap-xs md:col-span-2">
+                  <span className="text-xs text-on-surface-variant uppercase tracking-wider font-semibold">Health / Internal Notes</span>
+                  <p className="text-secondary text-sm bg-surface-container p-sm rounded-lg border border-outline-variant mt-xs min-h-[50px] whitespace-pre-line">
+                    {member.notes || "No internal notes recorded."}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -248,27 +244,49 @@ export default async function MemberDetailPage({ params }: PageProps) {
               {member.memberships.length === 0 ? (
                 <p className="text-secondary text-sm text-center py-lg">No membership history available.</p>
               ) : (
-                member.memberships.map((h) => (
-                  <div key={h.id} className="bg-surface-container border border-outline-variant p-sm rounded-lg flex flex-col gap-xs">
-                    <div className="flex justify-between items-start">
-                      <span className="text-white font-bold text-sm truncate max-w-[150px]">
-                        {h.membershipPlan?.name || h.customPlanName || "Custom Plan"}
-                      </span>
-                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${h.status === "ACTIVE"
-                        ? "bg-green-500/10 text-green-500 border-green-500/20"
-                        : h.status === "UPCOMING"
-                          ? "bg-primary-container/10 text-primary-container border-primary-container/20"
-                          : "bg-error/10 text-error border-error/20"
-                        }`}>
-                        {h.status}
-                      </span>
+                member.memberships.map((h) => {
+                  const today = new Date();
+                  today.setHours(0, 0, 0, 0);
+                  const start = new Date(h.startDate);
+                  start.setHours(0, 0, 0, 0);
+                  const end = new Date(h.endDate);
+                  end.setHours(0, 0, 0, 0);
+                  
+                  const diffTime = end.getTime() - today.getTime();
+                  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                  const isUpcoming = start > today;
+
+                  return (
+                    <div key={h.id} className="bg-surface-container border border-outline-variant p-sm rounded-lg flex flex-col gap-xs">
+                      <div className="flex justify-between items-start">
+                        <span className="text-white font-bold text-sm truncate max-w-[150px]">
+                          {h.membershipPlan?.name || h.customPlanName || "Custom Plan"}
+                        </span>
+                        {isUpcoming ? (
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold border bg-primary-container/10 text-primary-container border-primary-container/20">
+                            Upcoming
+                          </span>
+                        ) : diffDays < 0 ? (
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold border bg-error/10 text-error border-error/20">
+                            Expired
+                          </span>
+                        ) : diffDays === 0 ? (
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold border bg-primary-container/10 text-primary-container border-primary-container/20 animate-pulse">
+                            Expires Today
+                          </span>
+                        ) : (
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold border bg-green-500/10 text-green-500 border-green-500/20">
+                            {diffDays} {diffDays === 1 ? "day" : "days"} left
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex justify-between text-xs text-on-surface-variant mt-sm">
+                        <span>{new Date(h.startDate).toLocaleDateString()} to {new Date(h.endDate).toLocaleDateString()}</span>
+                        <span className="font-semibold text-white">₹{Number(h.amount).toLocaleString("en-IN")}</span>
+                      </div>
                     </div>
-                    <div className="flex justify-between text-xs text-on-surface-variant mt-sm">
-                      <span>{new Date(h.startDate).toLocaleDateString()} to {new Date(h.endDate).toLocaleDateString()}</span>
-                      <span className="font-semibold text-white">₹{Number(h.amount).toLocaleString("en-IN")}</span>
-                    </div>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
           </div>

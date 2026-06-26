@@ -10,7 +10,7 @@ interface PlanOption {
   memberType?: string;
 }
 
-interface MembersTableControlsProps {
+interface HistoryTableControlsProps {
   plans: PlanOption[];
 }
 
@@ -36,7 +36,6 @@ function sortByDuration(plans: PlanOption[]): PlanOption[] {
   return [...plans].sort((a, b) => planDurationDays(a.name) - planDurationDays(b.name));
 }
 
-// Generic dropdown component
 function FilterDropdown({
   trigger,
   children,
@@ -91,7 +90,7 @@ function FilterDropdown({
   );
 }
 
-export default function MembersTableControls({ plans }: MembersTableControlsProps) {
+export default function HistoryTableControls({ plans }: HistoryTableControlsProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
@@ -113,7 +112,7 @@ export default function MembersTableControls({ plans }: MembersTableControlsProp
     if (newSearch) params.set("search", newSearch); else params.delete("search");
     if (newStatus) params.set("status", newStatus); else params.delete("status");
     if (newPlanId) params.set("planId", newPlanId); else params.delete("planId");
-    startTransition(() => router.push(`/admin/members?${params.toString()}`));
+    startTransition(() => router.push(`/admin/membership-history?${params.toString()}`));
   };
 
   const clearFilters = () => {
@@ -160,7 +159,7 @@ export default function MembersTableControls({ plans }: MembersTableControlsProp
         )}
       </div>
 
-      {/* Filters */}
+      {/* Filters Toolbar */}
       <div className="flex items-center gap-sm w-full md:w-auto">
         {/* Status Dropdown */}
         <FilterDropdown

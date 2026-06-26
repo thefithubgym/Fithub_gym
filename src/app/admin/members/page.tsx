@@ -46,7 +46,7 @@ export default async function MembersPage({ searchParams }: PageProps) {
   // 2. Fetch active plans for dropdown
   const activePlans = await prisma.membershipPlan.findMany({
     where: { isActive: true },
-    select: { id: true, name: true },
+    select: { id: true, name: true, memberType: true },
   });
 
   // Pagination helpers
