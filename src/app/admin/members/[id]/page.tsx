@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MemberService } from "@/services/member.service";
-import DeleteMemberButton from "./DeleteMemberButton";
+// import DeleteMemberButton from "./DeleteMemberButton";
 import { 
   ArrowLeft, 
   Edit, 
@@ -63,7 +63,7 @@ export default async function MemberDetailPage({ params }: PageProps) {
             <Edit className="w-4 h-4" />
             Edit Profile
           </Link>
-          <DeleteMemberButton memberId={member.id} memberName={member.name} />
+          {/* <DeleteMemberButton memberId={member.id} memberName={member.name} /> */}
         </div>
       </div>
 
@@ -98,8 +98,9 @@ export default async function MemberDetailPage({ params }: PageProps) {
                 }`}></span>
                 {member.status}
               </span>
-              <h1 className="text-3xl font-extrabold text-white mt-xs">{member.name}</h1>
+              <h1 className="text-3xl font-extrabold text-white mt-xs capitalize">{member.name}</h1>
               <p className="text-on-surface-variant text-sm">Member ID: {member.id}</p>
+<p className="text-on-surface-variant text-sm">Join Date: {new Date(member.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}</p>
             </div>
           </div>
 

@@ -2,7 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useTransition, useEffect, useRef } from "react";
-import { Search, Filter } from "lucide-react";
+import { Search, ChevronDown, X, Check } from "lucide-react";
 
 interface PlanOption {
   id: string;
@@ -11,6 +11,83 @@ interface PlanOption {
 
 interface MembersTableControlsProps {
   plans: PlanOption[];
+}
+
+const STATUS_OPTIONS = [
+  { value: "active", label: "Active", dot: "bg-green-500" },
+  { value: "upcoming", label: "Upcoming", dot: "bg-yellow-400" },
+  { value: "expired", label: "Expired", dot: "bg-red-500" },
+];
+
+/** Extract approximate duration in days from a plan name for sorting (shortest first). */
+function planDurationDays(name: string): number {
+  const n = name.toLowerCase();
+  if (n.includes("daily"))       return 1;
+  if (n.includes("weekly"))      return 7;
+  if (n.includes("monthly"))     return 30;
+  if (n.includes("quarterly"))   return 90;
+  if (n.includes("half yearly") || n.includes("half-yearly")) return 180;
+  if (n.includes("yearly") || n.includes("annual")) return 365;
+  return 999; // unknown durations go last
+}
+
+function sortByDuration(plans: PlanOption[]): PlanOption[] {
+  return [...plans].sort((a, b) => planDurationDays(a.name) - planDurationDays(b.name));
+}
+
+// Generic dropdown component
+function FilterDropdown({
+  trigger,
+  children,
+  isActive,
+  align = "right",
+}: {
+  trigger: React.ReactNode;
+  children: React.ReactNode;
+  isActive?: boolean;
+  align?: "left" | "right";
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        type="button"
+        onClick={() => setOpen((p) => !p)}
+        className={`h-10 px-sm flex items-center gap-xs rounded-lg border text-sm font-medium transition-colors cursor-pointer min-w-[110px] justify-between ${
+          isActive
+            ? "border-primary text-primary bg-primary/10"
+            : "border-outline-variant text-on-surface bg-surface hover:bg-surface-container-high"
+        }`}
+      >
+        {trigger}
+        <ChevronDown
+          className={`w-4 h-4 transition-transform shrink-0 ${open ? "rotate-180" : ""}`}
+        />
+      </button>
+
+      {open && (
+        <div
+          className={`absolute z-50 top-[calc(100%+6px)] min-w-[220px] bg-surface border border-outline-variant rounded-xl shadow-xl overflow-hidden left-0 ${
+            align === "right" ? "md:left-auto md:right-0" : ""
+          }`}
+        >
+          {children}
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function MembersTableControls({ plans }: MembersTableControlsProps) {
@@ -22,31 +99,30 @@ export default function MembersTableControls({ plans }: MembersTableControlsProp
   const [status, setStatus] = useState(searchParams.get("status") || "");
   const [planId, setPlanId] = useState(searchParams.get("planId") || "");
 
-  // Ref to hold latest filter values for use inside the debounce closure
   const statusRef = useRef(status);
   const planIdRef = useRef(planId);
   statusRef.current = status;
   planIdRef.current = planId;
 
+  const hasFilter = !!status || !!planId;
+
   const applyFilters = (newSearch: string, newStatus: string, newPlanId: string) => {
     const params = new URLSearchParams(searchParams.toString());
-    params.set("page", "1"); // Reset to page 1
-
-    if (newSearch) params.set("search", newSearch);
-    else params.delete("search");
-
-    if (newStatus) params.set("status", newStatus);
-    else params.delete("status");
-
-    if (newPlanId) params.set("planId", newPlanId);
-    else params.delete("planId");
-
-    startTransition(() => {
-      router.push(`/admin/members?${params.toString()}`);
-    });
+    params.set("page", "1");
+    if (newSearch) params.set("search", newSearch); else params.delete("search");
+    if (newStatus) params.set("status", newStatus); else params.delete("status");
+    if (newPlanId) params.set("planId", newPlanId); else params.delete("planId");
+    startTransition(() => router.push(`/admin/members?${params.toString()}`));
   };
 
-  // Debounced search — fires 500ms after user stops typing
+  const clearFilters = () => {
+    setSearch("");
+    setStatus("");
+    setPlanId("");
+    applyFilters("", "", "");
+  };
+
+  // Debounced search
   useEffect(() => {
     const timer = setTimeout(() => {
       applyFilters(search, statusRef.current, planIdRef.current);
@@ -55,63 +131,210 @@ export default function MembersTableControls({ plans }: MembersTableControlsProp
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search]);
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(e.target.value);
-  };
+  const selectedStatusLabel =
+    STATUS_OPTIONS.find((s) => s.value === status)?.label ?? "Status";
+  const selectedPlanLabel =
+    plans.find((p) => p.id === planId)?.name ?? "Plan";
 
   return (
     <div className="p-lg border-b border-outline-variant flex flex-col md:flex-row gap-md items-center justify-between bg-surface-container-lowest">
       {/* Search Input */}
-      <div className="relative w-full md:w-80 h-10 flex items-center rounded-lg bg-surface border border-outline-variant focus-within:border-primary-container transition-colors">
+      <div className="relative w-full md:w-80 h-10 flex items-center rounded-lg bg-surface border border-outline-variant focus-within:border-primary transition-colors">
         <Search className="text-on-surface-variant ml-sm w-5 h-5 shrink-0" />
-        <input 
-          className="w-full h-full bg-transparent border-none text-on-surface placeholder-on-surface-variant focus:outline-none focus:ring-0 font-body-md text-sm px-sm" 
-          placeholder="Search by name, phone, email..." 
+        <input
+          className="w-full h-full bg-transparent border-none text-on-surface placeholder-on-surface-variant focus:outline-none focus:ring-0 font-body-md text-sm px-sm"
+          placeholder="Search by name, phone, email..."
           type="text"
           value={search}
-          onChange={handleSearchChange}
+          onChange={(e) => setSearch(e.target.value)}
         />
+        {search && (
+          <button
+            type="button"
+            onClick={() => { setSearch(""); applyFilters("", statusRef.current, planIdRef.current); }}
+            className="mr-sm text-on-surface-variant hover:text-on-surface transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        )}
       </div>
 
-      {/* Filters & Actions */}
-      <div className="grid grid-cols-2 md:flex md:items-center gap-sm w-full md:w-auto">
+      {/* Filters */}
+      <div className="flex items-center gap-sm w-full md:w-auto">
         {/* Status Dropdown */}
-        <select 
-          className="col-span-1 h-10 bg-surface border border-outline-variant text-on-surface rounded-lg font-label-md text-sm focus:border-primary-container focus:ring-0 cursor-pointer px-sm outline-none w-full md:w-36"
-          value={status}
-          onChange={(e) => {
-            setStatus(e.target.value);
-            applyFilters(search, e.target.value, planId);
-          }}
+        <FilterDropdown
+          isActive={!!status}
+          align="left"
+          trigger={
+            <span className="flex items-center gap-xs">
+              {status && (
+                <span
+                  className={`w-2 h-2 rounded-full ${
+                    STATUS_OPTIONS.find((s) => s.value === status)?.dot ?? ""
+                  }`}
+                />
+              )}
+              {selectedStatusLabel}
+            </span>
+          }
         >
-          <option value="">All Statuses</option>
-          <option value="active">Active</option>
-          <option value="upcoming">Upcoming</option>
-          <option value="expired">Expired</option>
-        </select>
+          {/* Label */}
+          <div className="px-sm pt-sm pb-xs">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant px-xs">
+              Membership Status
+            </p>
+          </div>
+          <div className="pb-sm">
+            {STATUS_OPTIONS.map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => {
+                  const newStatus = status === opt.value ? "" : opt.value;
+                  setStatus(newStatus);
+                  applyFilters(search, newStatus, planIdRef.current);
+                }}
+                className="w-full flex items-center gap-sm px-md py-sm text-sm text-on-surface hover:bg-surface-container-high transition-colors text-left"
+              >
+                <span className={`w-2 h-2 rounded-full ${opt.dot}`} />
+                <span className="flex-1">{opt.label}</span>
+                {status === opt.value && <Check className="w-3.5 h-3.5 text-primary" />}
+              </button>
+            ))}
+          </div>
+        </FilterDropdown>
 
-        {/* Plan Dropdown */}
-        <select 
-          className="col-span-1 h-10 bg-surface border border-outline-variant text-on-surface rounded-lg font-label-md text-sm focus:border-primary-container focus:ring-0 cursor-pointer px-sm outline-none w-full md:w-48"
-          value={planId}
-          onChange={(e) => {
-            setPlanId(e.target.value);
-            applyFilters(search, status, e.target.value);
-          }}
+        {/* Plan Dropdown — categorized into Single & Couple */}
+        <FilterDropdown
+          isActive={!!planId}
+          trigger={
+            <span className="truncate max-w-[120px]">{selectedPlanLabel}</span>
+          }
         >
-          <option value="">All Plans</option>
-          {plans.map((p) => (
-            <option key={p.id} value={p.id}>{p.name}</option>
-          ))}
-        </select>
+          <div className="px-sm pt-sm pb-xs">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant px-xs">
+              Membership Plan
+            </p>
+          </div>
+          <div className="pb-sm max-h-72 overflow-y-auto scrollbar-themed">
+            {/* All Plans option */}
+            <button
+              type="button"
+              onClick={() => {
+                setPlanId("");
+                applyFilters(search, statusRef.current, "");
+              }}
+              className="w-full flex items-center gap-sm px-md py-sm text-sm text-on-surface-variant hover:bg-surface-container-high transition-colors text-left italic"
+            >
+              <span className="flex-1">All Plans</span>
+              {!planId && <Check className="w-3.5 h-3.5 text-primary" />}
+            </button>
 
-        <button 
-          onClick={() => applyFilters(search, status, planId)}
-          className="col-span-2 md:col-span-1 h-10 px-md flex items-center justify-center rounded-lg border border-outline-variant text-on-surface-variant hover:bg-surface-container-high transition-colors font-label-md text-sm cursor-pointer w-full md:w-auto"
-        >
-          <Filter className="mr-xs w-4 h-4" />
-          {isPending ? "Filtering..." : "Filter"}
-        </button>
+            {/* Single plans */}
+            {plans.filter((p) => p.name.toLowerCase().includes("single")).length > 0 && (
+              <>
+                <div className="my-xs mx-md border-t border-outline-variant" />
+                <div className="px-sm py-xs">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant px-xs">
+                    Single
+                  </p>
+                </div>
+                {sortByDuration(plans.filter((p) => p.name.toLowerCase().includes("single")))
+                  .map((p) => (
+                    <button
+                      key={p.id}
+                      type="button"
+                      onClick={() => {
+                        const newPlan = planId === p.id ? "" : p.id;
+                        setPlanId(newPlan);
+                        applyFilters(search, statusRef.current, newPlan);
+                      }}
+                      className="w-full flex items-center gap-sm px-md py-sm text-sm text-on-surface hover:bg-surface-container-high transition-colors text-left"
+                    >
+                      <span className="flex-1">{p.name}</span>
+                      {planId === p.id && <Check className="w-3.5 h-3.5 text-primary" />}
+                    </button>
+                  ))}
+              </>
+            )}
+
+            {/* Couple plans */}
+            {plans.filter((p) => p.name.toLowerCase().includes("couple")).length > 0 && (
+              <>
+                <div className="my-xs mx-md border-t border-outline-variant" />
+                <div className="px-sm py-xs">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant px-xs">
+                    Couple
+                  </p>
+                </div>
+                {sortByDuration(plans.filter((p) => p.name.toLowerCase().includes("couple")))
+                  .map((p) => (
+                    <button
+                      key={p.id}
+                      type="button"
+                      onClick={() => {
+                        const newPlan = planId === p.id ? "" : p.id;
+                        setPlanId(newPlan);
+                        applyFilters(search, statusRef.current, newPlan);
+                      }}
+                      className="w-full flex items-center gap-sm px-md py-sm text-sm text-on-surface hover:bg-surface-container-high transition-colors text-left"
+                    >
+                      <span className="flex-1">{p.name}</span>
+                      {planId === p.id && <Check className="w-3.5 h-3.5 text-primary" />}
+                    </button>
+                  ))}
+              </>
+            )}
+
+            {/* Other plans (neither single nor couple) */}
+            {plans.filter(
+              (p) =>
+                !p.name.toLowerCase().includes("single") &&
+                !p.name.toLowerCase().includes("couple")
+            ).length > 0 && (
+              <>
+                <div className="my-xs mx-md border-t border-outline-variant" />
+                <div className="px-sm py-xs">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant px-xs">
+                    Other
+                  </p>
+                </div>
+                {sortByDuration(plans.filter(
+                    (p) =>
+                      !p.name.toLowerCase().includes("single") &&
+                      !p.name.toLowerCase().includes("couple")
+                  ))
+                  .map((p) => (
+                    <button
+                      key={p.id}
+                      type="button"
+                      onClick={() => {
+                        const newPlan = planId === p.id ? "" : p.id;
+                        setPlanId(newPlan);
+                        applyFilters(search, statusRef.current, newPlan);
+                      }}
+                      className="w-full flex items-center gap-sm px-md py-sm text-sm text-on-surface hover:bg-surface-container-high transition-colors text-left"
+                    >
+                      <span className="flex-1">{p.name}</span>
+                      {planId === p.id && <Check className="w-3.5 h-3.5 text-primary" />}
+                    </button>
+                  ))}
+              </>
+            )}
+          </div>
+        </FilterDropdown>
+
+        {/* Red clear icon — only visible when a filter is active */}
+        {hasFilter && (
+          <button
+            type="button"
+            onClick={clearFilters}
+            title="Clear all filters"
+            className="w-8 h-8 flex items-center justify-center rounded-lg bg-red-500/10 border border-red-500/30 text-red-500 hover:bg-red-500/20 transition-colors cursor-pointer"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        )}
       </div>
     </div>
   );

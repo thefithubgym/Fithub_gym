@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createSingleMemberAction, createCoupleMemberAction } from "@/features/members/actions";
 import { Gender, PaymentMethod, MemberType } from "@prisma/client";
-import { Plus, Trash, Check, User, ArrowRight } from "lucide-react";
+import { Plus, Trash, Check, User, ArrowRight, ArrowLeft } from "lucide-react";
 
 interface Plan {
   id: string;
@@ -43,7 +43,7 @@ export default function MemberForm({ plans }: MemberFormProps) {
       emergencyContact: "",
       emergencyPhone: "",
       notes: "",
-      
+
       // Partner fields (for Couple)
       partnerFirstName: "",
       partnerLastName: "",
@@ -80,7 +80,7 @@ export default function MemberForm({ plans }: MemberFormProps) {
     const plan = plans.find(p => p.id === planId);
     if (plan) {
       setValue("amount", plan.price);
-      
+
       // Calculate end date based on duration
       if (selectedStartDate) {
         const start = new Date(selectedStartDate);
@@ -178,6 +178,14 @@ export default function MemberForm({ plans }: MemberFormProps) {
     <div className="max-w-4xl mx-auto flex flex-col gap-lg pb-xl">
       {/* Header */}
       <div>
+        <button
+          type="button"
+          onClick={() => router.back()}
+          className="cursor-pointer inline-flex items-center gap-1 text-xs text-secondary hover:text-white transition-colors mb-2"
+        >
+          <ArrowLeft size={13} />
+          Back To Members
+        </button>
         <h2 className="font-display text-3xl font-extrabold text-white uppercase tracking-tight">Register New Member</h2>
         <p className="text-secondary text-sm">Add a new single member or a couple membership to the system.</p>
       </div>
@@ -192,9 +200,8 @@ export default function MemberForm({ plans }: MemberFormProps) {
             setValue("amount", 0);
             setValue("endDate", "");
           }}
-          className={`py-3 px-lg font-label-md text-sm font-bold border-b-2 cursor-pointer transition-colors ${
-            memberType === MemberType.SINGLE ? "border-primary text-primary" : "border-transparent text-secondary hover:text-white"
-          }`}
+          className={`py-3 px-lg font-label-md text-sm font-bold border-b-2 cursor-pointer transition-colors ${memberType === MemberType.SINGLE ? "border-primary text-primary" : "border-transparent text-secondary hover:text-white"
+            }`}
         >
           Single Member
         </button>
@@ -206,9 +213,8 @@ export default function MemberForm({ plans }: MemberFormProps) {
             setValue("amount", 0);
             setValue("endDate", "");
           }}
-          className={`py-3 px-lg font-label-md text-sm font-bold border-b-2 cursor-pointer transition-colors ${
-            memberType === MemberType.COUPLE ? "border-primary text-primary" : "border-transparent text-secondary hover:text-white"
-          }`}
+          className={`py-3 px-lg font-label-md text-sm font-bold border-b-2 cursor-pointer transition-colors ${memberType === MemberType.COUPLE ? "border-primary text-primary" : "border-transparent text-secondary hover:text-white"
+            }`}
         >
           Couple Membership
         </button>
@@ -236,7 +242,7 @@ export default function MemberForm({ plans }: MemberFormProps) {
               <User className="w-5 h-5 text-primary" />
               {memberType === MemberType.COUPLE ? "Primary Member Details" : "Member Details"}
             </h3>
-            
+
             <div className="grid grid-cols-2 gap-sm">
               <div className="flex flex-col gap-xs">
                 <label className="input-label" htmlFor="firstName">First Name</label>
@@ -264,7 +270,7 @@ export default function MemberForm({ plans }: MemberFormProps) {
               </div>
               <div className="flex flex-col gap-xs">
                 <label className="input-label" htmlFor="dateOfBirth">Date of Birth</label>
-                <input className="input-field h-[40px] text-sm py-2" id="dateOfBirth" type="date" {...register("dateOfBirth")} />
+                <input className="input-field h-[40px] text-sm py-2 [color-scheme:dark]" id="dateOfBirth" type="date" {...register("dateOfBirth")} />
               </div>
             </div>
 
@@ -286,7 +292,7 @@ export default function MemberForm({ plans }: MemberFormProps) {
                 <User className="w-5 h-5 text-primary" />
                 Partner Details
               </h3>
-              
+
               <div className="grid grid-cols-2 gap-sm">
                 <div className="flex flex-col gap-xs">
                   <label className="input-label" htmlFor="partnerFirstName">First Name</label>
@@ -314,7 +320,7 @@ export default function MemberForm({ plans }: MemberFormProps) {
                 </div>
                 <div className="flex flex-col gap-xs">
                   <label className="input-label" htmlFor="partnerDateOfBirth">Date of Birth</label>
-                  <input className="input-field h-[40px] text-sm py-2" id="partnerDateOfBirth" type="date" {...register("partnerDateOfBirth")} />
+                  <input className="input-field h-[40px] text-sm py-2 [color-scheme:dark]" id="partnerDateOfBirth" type="date" {...register("partnerDateOfBirth")} />
                 </div>
               </div>
 
@@ -348,9 +354,9 @@ export default function MemberForm({ plans }: MemberFormProps) {
           </div>
           <div className="flex flex-col gap-xs">
             <h3 className="font-headline-md text-base font-bold text-white mb-xs">Internal Notes</h3>
-            <textarea 
-              className="bg-[#181818] border border-[#323232] rounded-xl p-3 text-white placeholder:text-secondary focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-colors font-body-md text-sm resize-none flex-grow" 
-              id="notes" 
+            <textarea
+              className="bg-[#181818] border border-[#323232] rounded-xl p-3 text-white placeholder:text-secondary focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-colors font-body-md text-sm resize-none flex-grow"
+              id="notes"
               placeholder="Health conditions, weight goals, references..."
               {...register("notes")}
             />
@@ -364,9 +370,9 @@ export default function MemberForm({ plans }: MemberFormProps) {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-md">
             <div className="flex flex-col gap-xs">
               <label className="input-label" htmlFor="membershipPlanId">Select Package Plan</label>
-              <select 
-                className="input-field h-[40px] text-sm py-2 px-3 outline-none" 
-                id="membershipPlanId" 
+              <select
+                className="input-field h-[40px] text-sm py-2 px-3 outline-none"
+                id="membershipPlanId"
                 {...register("membershipPlanId")}
                 onChange={(e) => handlePlanChange(e.target.value)}
               >
@@ -386,10 +392,10 @@ export default function MemberForm({ plans }: MemberFormProps) {
 
             <div className="flex flex-col gap-xs">
               <label className="input-label" htmlFor="amount">Plan Price (₹)</label>
-              <input 
-                className="input-field h-[40px] text-sm py-2" 
-                id="amount" 
-                type="number" 
+              <input
+                className="input-field h-[40px] text-sm py-2"
+                id="amount"
+                type="number"
                 readOnly={!!selectedPlanId}
                 {...register("amount")}
               />
@@ -400,24 +406,31 @@ export default function MemberForm({ plans }: MemberFormProps) {
               <input className="input-field h-[40px] text-sm py-2" id="registrationFee" type="number" {...register("registrationFee")} />
             </div>
           </div>
-
           <div className="grid grid-cols-1 md:grid-cols-3 gap-md border-t border-[#323232] pt-md mt-sm">
             <div className="flex flex-col gap-xs">
               <label className="input-label" htmlFor="startDate">Start Date</label>
-              <input className="input-field h-[40px] text-sm py-2" id="startDate" type="date" {...register("startDate")} />
-            </div>
-            
-            <div className="flex flex-col gap-xs">
-              <label className="input-label" htmlFor="endDate">End Date</label>
-              <input 
-                className="input-field h-[40px] text-sm py-2" 
-                id="endDate" 
-                type="date" 
-                readOnly={!!selectedPlanId}
-                {...register("endDate")} 
-                required
+              <input
+                className="input-field h-[40px] text-sm py-2 [color-scheme:dark]"
+                id="startDate"
+                type="date"
+                {...register("startDate")}
+                onChange={(e) => {
+                  setValue("startDate", e.target.value);
+                  const planId = watch("membershipPlanId");
+                  if (planId) {
+                    const plan = plans.find(p => p.id === planId);
+                    if (plan && e.target.value) {
+                      const start = new Date(e.target.value);
+                      start.setMonth(start.getMonth() + plan.durationMonths);
+                      setValue("endDate", start.toISOString().split("T")[0]);
+                    }
+                  }
+                }}
               />
             </div>
+
+            {/* endDate computed automatically — not shown in UI */}
+            <input type="hidden" {...register("endDate")} />
 
             <div className="flex flex-col gap-xs">
               <label className="input-label" htmlFor="paymentMethod">Payment Method</label>
@@ -441,14 +454,14 @@ export default function MemberForm({ plans }: MemberFormProps) {
 
         {/* Submit Actions */}
         <div className="flex gap-md justify-end">
-          <button 
-            type="button" 
+          <button
+            type="button"
             onClick={() => router.back()}
             className="border border-[#323232] text-white font-bold rounded-xl px-lg py-3 hover:bg-surface-container-high transition-colors font-label-md text-sm cursor-pointer"
           >
             Cancel
           </button>
-          <button 
+          <button
             disabled={loading}
             className="bg-primary-container text-on-primary-container font-bold rounded-xl px-2xl py-3 hover:bg-primary transition-all font-label-md text-sm disabled:opacity-50 cursor-pointer"
             type="submit"

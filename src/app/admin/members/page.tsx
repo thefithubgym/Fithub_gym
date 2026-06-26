@@ -2,6 +2,8 @@ import Link from "next/link";
 import { MemberService } from "@/services/member.service";
 import { prisma } from "@/lib/prisma";
 import MembersTableControls from "./MembersTableControls";
+import MemberTableRow from "./MemberTableRow";
+
 import { 
   UserPlus, 
   Eye, 
@@ -77,15 +79,15 @@ export default async function MembersPage({ searchParams }: PageProps) {
 
         {/* Table Wrapper */}
         <div className="overflow-x-auto w-full max-w-full">
-          <table className="w-full text-left border-collapse min-w-[800px]">
+          <table className="w-full text-left border-collapse">
             {/* Sticky Header */}
             <thead className="bg-surface-container border-b border-outline-variant">
               <tr>
-                <th className="py-md px-lg font-label-sm text-xs text-on-surface-variant uppercase tracking-widest font-semibold w-1/3">Member</th>
-                <th className="py-md px-lg font-label-sm text-xs text-on-surface-variant uppercase tracking-widest font-semibold">Plan Type</th>
+                <th className="py-md px-lg font-label-sm text-xs text-on-surface-variant uppercase tracking-widest font-semibold">Member</th>
+                <th className="py-md px-lg font-label-sm text-xs text-on-surface-variant uppercase tracking-widest font-semibold hidden sm:table-cell">Plan Type</th>
                 <th className="py-md px-lg font-label-sm text-xs text-on-surface-variant uppercase tracking-widest font-semibold">Status</th>
-                <th className="py-md px-lg font-label-sm text-xs text-on-surface-variant uppercase tracking-widest font-semibold">Join Date</th>
-                <th className="py-md px-lg font-label-sm text-xs text-on-surface-variant uppercase tracking-widest font-semibold text-right">Actions</th>
+                <th className="py-md px-lg font-label-sm text-xs text-on-surface-variant uppercase tracking-widest font-semibold hidden lg:table-cell">Start Date</th>
+                <th className="py-md px-lg font-label-sm text-xs text-on-surface-variant uppercase tracking-widest font-semibold hidden lg:table-cell">End Date</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-outline-variant font-body-md text-sm bg-surface">
@@ -97,23 +99,23 @@ export default async function MembersPage({ searchParams }: PageProps) {
                 </tr>
               ) : (
                 result.data.map((member) => (
-                  <tr key={member.id} className="hover:bg-surface-container-lowest transition-colors group">
+                  <MemberTableRow key={member.id} memberId={member.id}>
                     <td className="py-md px-lg">
                       <div className="flex items-center gap-md">
                         <div className="w-10 h-10 rounded-full bg-surface-container border border-outline-variant flex items-center justify-center shrink-0 text-primary font-bold uppercase">
                           {member.firstName.substring(0, 1)}{member.lastName.substring(0, 1)}
                         </div>
-                        <div>
-                          <div className="text-on-background font-semibold">{member.name}</div>
-                          <div className="text-on-surface-variant text-xs mt-xs">ID: {member.id.substring(0, 8)}</div>
+                        <div className="min-w-0">
+                          <div className="text-on-background font-semibold capitalize truncate">{member.name}</div>
+                          <div className="text-on-surface-variant text-xs mt-xs truncate">{member.email || "No email"}</div>
                         </div>
                       </div>
                     </td>
-                    <td className="py-md px-lg">
+                    <td className="py-md px-lg hidden sm:table-cell">
                       <span className="text-on-background">{member.planName}</span>
                     </td>
                     <td className="py-md px-lg">
-                      <span className={`inline-flex items-center gap-xs px-sm py-xs rounded-full border text-xs font-semibold ${
+                      <span className={`inline-flex items-center gap-xs px-sm py-xs rounded-full border text-xs font-semibold whitespace-nowrap ${
                         member.status === "ACTIVE"
                           ? "border-primary text-primary bg-primary/10"
                           : member.status === "UPCOMING"
@@ -134,40 +136,13 @@ export default async function MembersPage({ searchParams }: PageProps) {
                         {member.status}
                       </span>
                     </td>
-                    <td className="py-md px-lg text-on-surface-variant">
-                      {new Date(member.createdAt).toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
-                      })}
+                    <td className="py-md px-lg text-on-surface-variant hidden lg:table-cell">
+                      {member.latestMembership?.startDate ? new Date(member.latestMembership.startDate).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : "-"}
                     </td>
-                    <td className="py-md px-lg text-right">
-                      <div className="flex items-center justify-end gap-sm md:opacity-0 group-hover:opacity-100 transition-opacity">
-                        {member.status === "EXPIRED" && (
-                          <Link 
-                            href={`/admin/members/${member.id}/renew`}
-                            className="px-sm py-xs border border-primary text-primary rounded-md font-label-sm text-xs hover:bg-primary/10 transition-colors mr-sm"
-                          >
-                            Renew
-                          </Link>
-                        )}
-                        <Link 
-                          href={`/admin/members/${member.id}`}
-                          className="p-sm text-on-surface-variant hover:text-primary transition-colors rounded-lg hover:bg-surface-container-high" 
-                          title="View Profile"
-                        >
-                          <Eye className="w-5 h-5" />
-                        </Link>
-                        <Link 
-                          href={`/admin/members/${member.id}/edit`}
-                          className="p-sm text-on-surface-variant hover:text-primary transition-colors rounded-lg hover:bg-surface-container-high" 
-                          title="Edit"
-                        >
-                          <Edit className="w-5 h-5" />
-                        </Link>
-                      </div>
+                    <td className="py-md px-lg text-on-surface-variant hidden lg:table-cell">
+                      {member.latestMembership?.endDate ? new Date(member.latestMembership.endDate).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : "-"}
                     </td>
-                  </tr>
+                  </MemberTableRow>
                 ))
               )}
             </tbody>
