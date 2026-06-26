@@ -6,6 +6,13 @@ import { useForm } from "react-hook-form";
 import { updateMemberAction } from "@/features/members/actions";
 import { Gender } from "@prisma/client";
 import { Check, ArrowLeft } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface Member {
   id: string;
@@ -32,7 +39,7 @@ export default function EditMemberForm({ member }: EditMemberFormProps) {
   const [success, setSuccess] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const { register, handleSubmit, formState: { errors } } = useForm({
+  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm({
     defaultValues: {
       firstName: member.firstName,
       lastName: member.lastName,
@@ -134,11 +141,19 @@ export default function EditMemberForm({ member }: EditMemberFormProps) {
           <div className="grid grid-cols-2 gap-sm">
             <div className="flex flex-col gap-xs">
               <label className="input-label" htmlFor="gender">Gender</label>
-              <select className="input-field h-[40px] text-sm py-2 px-3 outline-none" id="gender" {...register("gender")}>
-                <option value={Gender.MALE}>Male</option>
-                <option value={Gender.FEMALE}>Female</option>
-                <option value={Gender.OTHER}>Other</option>
-              </select>
+              <Select
+                value={watch("gender")}
+                onValueChange={(val) => setValue("gender", val as Gender)}
+              >
+                <SelectTrigger className="h-[40px]">
+                  <SelectValue placeholder="Select gender" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={Gender.MALE}>Male</SelectItem>
+                  <SelectItem value={Gender.FEMALE}>Female</SelectItem>
+                  <SelectItem value={Gender.OTHER}>Other</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div className="flex flex-col gap-xs">
               <label className="input-label" htmlFor="dateOfBirth">Date of Birth</label>

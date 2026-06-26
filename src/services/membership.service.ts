@@ -141,11 +141,74 @@ export class MembershipService {
     });
   }
 
-  static async getMembershipHistoryLog({ page = 1, limit = 10 }) {
+  static async getMembershipHistoryLog({
+    page = 1,
+    limit = 10,
+    search = "",
+    status = "",
+    planId = "",
+  }: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    status?: string;
+    planId?: string;
+  }) {
     const skip = (page - 1) * limit;
+
+    // Build filter conditions
+    const where: any = {};
+    const conditions: any[] = [];
+
+    if (search) {
+      conditions.push({
+        member: {
+          OR: [
+            { firstName: { contains: search, mode: "insensitive" } },
+            { lastName: { contains: search, mode: "insensitive" } },
+            { phone: { contains: search, mode: "insensitive" } },
+            { email: { contains: search, mode: "insensitive" } },
+          ],
+        },
+      });
+    }
+
+    if (status) {
+      const now = new Date();
+      if (status === "active") {
+        conditions.push({
+          status: "ACTIVE",
+          startDate: { lte: now },
+          endDate: { gte: now },
+        });
+      } else if (status === "expired") {
+        conditions.push({
+          OR: [
+            { status: "EXPIRED" },
+            { endDate: { lt: now } },
+          ],
+        });
+      } else if (status === "upcoming") {
+        conditions.push({
+          OR: [
+            { status: "UPCOMING" },
+            { startDate: { gt: now } },
+          ],
+        });
+      }
+    }
+
+    if (planId) {
+      conditions.push({ membershipPlanId: planId });
+    }
+
+    if (conditions.length > 0) {
+      where.AND = conditions;
+    }
 
     const [data, total] = await prisma.$transaction([
       prisma.membership.findMany({
+        where,
         orderBy: { createdAt: "desc" },
         skip,
         take: limit,
@@ -154,7 +217,7 @@ export class MembershipService {
           membershipPlan: true,
         },
       }),
-      prisma.membership.count(),
+      prisma.membership.count({ where }),
     ]);
 
     return {
