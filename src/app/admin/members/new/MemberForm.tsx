@@ -7,6 +7,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { createSingleMemberAction, createCoupleMemberAction } from "@/features/members/actions";
 import { Gender, PaymentMethod, MemberType } from "@prisma/client";
 import { Plus, Trash, Check, User, ArrowRight, ArrowLeft } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface Plan {
   id: string;
@@ -36,7 +43,7 @@ export default function MemberForm({ plans }: MemberFormProps) {
       firstName: "",
       lastName: "",
       phone: "",
-      gender: Gender.MALE,
+      gender: Gender.MALE as Gender,
       email: "",
       dateOfBirth: "",
       address: "",
@@ -48,7 +55,7 @@ export default function MemberForm({ plans }: MemberFormProps) {
       partnerFirstName: "",
       partnerLastName: "",
       partnerPhone: "",
-      partnerGender: Gender.FEMALE,
+      partnerGender: Gender.FEMALE as Gender,
       partnerEmail: "",
       partnerDateOfBirth: "",
       partnerAddress: "",
@@ -58,7 +65,7 @@ export default function MemberForm({ plans }: MemberFormProps) {
       customPlanName: "",
       amount: 0,
       registrationFee: 200, // Default fee
-      paymentMethod: PaymentMethod.UPI,
+      paymentMethod: PaymentMethod.UPI as PaymentMethod,
       paymentReference: "",
       startDate: new Date().toISOString().split("T")[0],
       endDate: "",
@@ -262,11 +269,19 @@ export default function MemberForm({ plans }: MemberFormProps) {
             <div className="grid grid-cols-2 gap-sm">
               <div className="flex flex-col gap-xs">
                 <label className="input-label" htmlFor="gender">Gender</label>
-                <select className="input-field h-[40px] text-sm py-2 px-3 outline-none" id="gender" {...register("gender")}>
-                  <option value={Gender.MALE}>Male</option>
-                  <option value={Gender.FEMALE}>Female</option>
-                  <option value={Gender.OTHER}>Other</option>
-                </select>
+                <Select
+                  value={watch("gender")}
+                  onValueChange={(val) => setValue("gender", val as Gender)}
+                >
+                  <SelectTrigger className="h-[40px]">
+                    <SelectValue placeholder="Select gender" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={Gender.MALE}>Male</SelectItem>
+                    <SelectItem value={Gender.FEMALE}>Female</SelectItem>
+                    <SelectItem value={Gender.OTHER}>Other</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div className="flex flex-col gap-xs">
                 <label className="input-label" htmlFor="dateOfBirth">Date of Birth</label>
@@ -312,11 +327,19 @@ export default function MemberForm({ plans }: MemberFormProps) {
               <div className="grid grid-cols-2 gap-sm">
                 <div className="flex flex-col gap-xs">
                   <label className="input-label" htmlFor="partnerGender">Gender</label>
-                  <select className="input-field h-[40px] text-sm py-2 px-3 outline-none" id="partnerGender" {...register("partnerGender")}>
-                    <option value={Gender.FEMALE}>Female</option>
-                    <option value={Gender.MALE}>Male</option>
-                    <option value={Gender.OTHER}>Other</option>
-                  </select>
+                  <Select
+                    value={watch("partnerGender")}
+                    onValueChange={(val) => setValue("partnerGender", val as Gender)}
+                  >
+                    <SelectTrigger className="h-[40px]">
+                      <SelectValue placeholder="Select gender" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={Gender.FEMALE}>Female</SelectItem>
+                      <SelectItem value={Gender.MALE}>Male</SelectItem>
+                      <SelectItem value={Gender.OTHER}>Other</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="flex flex-col gap-xs">
                   <label className="input-label" htmlFor="partnerDateOfBirth">Date of Birth</label>
@@ -370,17 +393,26 @@ export default function MemberForm({ plans }: MemberFormProps) {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-md">
             <div className="flex flex-col gap-xs">
               <label className="input-label" htmlFor="membershipPlanId">Select Package Plan</label>
-              <select
-                className="input-field h-[40px] text-sm py-2 px-3 outline-none"
-                id="membershipPlanId"
-                {...register("membershipPlanId")}
-                onChange={(e) => handlePlanChange(e.target.value)}
+              <Select
+                value={watch("membershipPlanId") || "custom"}
+                onValueChange={(val) => {
+                  const finalVal = val === "custom" ? "" : val;
+                  setValue("membershipPlanId", finalVal);
+                  handlePlanChange(finalVal);
+                }}
               >
-                <option value="">-- Custom Plan (No Template) --</option>
-                {availablePlans.map((p) => (
-                  <option key={p.id} value={p.id}>{p.name} (₹{p.price})</option>
-                ))}
-              </select>
+                <SelectTrigger className="h-[40px]">
+                  <SelectValue placeholder="Select plan" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="custom">-- Custom Plan (No Template) --</SelectItem>
+                  {availablePlans.map((p) => (
+                    <SelectItem key={p.id} value={p.id}>
+                      {p.name} (₹{Number(p.price).toLocaleString("en-IN")})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             {!selectedPlanId && (
@@ -434,10 +466,18 @@ export default function MemberForm({ plans }: MemberFormProps) {
 
             <div className="flex flex-col gap-xs">
               <label className="input-label" htmlFor="paymentMethod">Payment Method</label>
-              <select className="input-field h-[40px] text-sm py-2 px-3 outline-none" id="paymentMethod" {...register("paymentMethod")}>
-                <option value={PaymentMethod.UPI}>UPI (GPay / PhonePe / Paytm)</option>
-                <option value={PaymentMethod.CASH}>Cash Payment</option>
-              </select>
+              <Select
+                value={watch("paymentMethod")}
+                onValueChange={(val) => setValue("paymentMethod", val as PaymentMethod)}
+              >
+                <SelectTrigger className="h-[40px]">
+                  <SelectValue placeholder="Select payment method" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={PaymentMethod.UPI}>UPI (GPay / PhonePe / Paytm)</SelectItem>
+                  <SelectItem value={PaymentMethod.CASH}>Cash Payment</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="flex flex-col gap-xs">

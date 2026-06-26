@@ -6,6 +6,13 @@ import { useForm } from "react-hook-form";
 import { renewMembershipAction } from "@/features/members/actions";
 import { PaymentMethod, MemberType } from "@prisma/client";
 import { Check, ArrowLeft, Calendar, CreditCard } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface Plan {
   id: string;
@@ -56,7 +63,7 @@ export default function RenewForm({ member, plans }: RenewFormProps) {
       membershipPlanId: "",
       customPlanName: "",
       amount: 0,
-      paymentMethod: PaymentMethod.UPI,
+      paymentMethod: PaymentMethod.UPI as PaymentMethod,
       paymentReference: "",
       startDate: defaultStartDateStr,
       endDate: "",
@@ -160,18 +167,26 @@ export default function RenewForm({ member, plans }: RenewFormProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
             <div className="flex flex-col gap-xs">
               <label className="input-label" htmlFor="membershipPlanId">Select Package Plan</label>
-              <select 
-                className="input-field h-[40px] text-sm py-2 px-3 outline-none" 
-                id="membershipPlanId" 
-                {...register("membershipPlanId")}
-                onChange={(e) => handlePlanChange(e.target.value)}
-                required={!watch("customPlanName")}
+              <Select
+                value={watch("membershipPlanId") || "custom"}
+                onValueChange={(val) => {
+                  const finalVal = val === "custom" ? "" : val;
+                  setValue("membershipPlanId", finalVal);
+                  handlePlanChange(finalVal);
+                }}
               >
-                <option value="">-- Custom Plan (No Template) --</option>
-                {filteredPlans.map((p) => (
-                  <option key={p.id} value={p.id}>{p.name} (₹{p.price})</option>
-                ))}
-              </select>
+                <SelectTrigger className="h-[40px]">
+                  <SelectValue placeholder="Select plan" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="custom">-- Custom Plan (No Template) --</SelectItem>
+                  {filteredPlans.map((p) => (
+                    <SelectItem key={p.id} value={p.id}>
+                      {p.name} (₹{Number(p.price).toLocaleString("en-IN")})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             {!selectedPlanId && (
@@ -220,10 +235,18 @@ export default function RenewForm({ member, plans }: RenewFormProps) {
 
             <div className="flex flex-col gap-xs">
               <label className="input-label" htmlFor="paymentMethod">Payment Method</label>
-              <select className="input-field h-[40px] text-sm py-2 px-3 outline-none" id="paymentMethod" {...register("paymentMethod")}>
-                <option value={PaymentMethod.UPI}>UPI (GPay / PhonePe / Paytm)</option>
-                <option value={PaymentMethod.CASH}>Cash Payment</option>
-              </select>
+              <Select
+                value={watch("paymentMethod")}
+                onValueChange={(val) => setValue("paymentMethod", val as PaymentMethod)}
+              >
+                <SelectTrigger className="h-[40px]">
+                  <SelectValue placeholder="Select payment method" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={PaymentMethod.UPI}>UPI (GPay / PhonePe / Paytm)</SelectItem>
+                  <SelectItem value={PaymentMethod.CASH}>Cash Payment</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="flex flex-col gap-xs">
