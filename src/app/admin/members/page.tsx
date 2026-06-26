@@ -73,7 +73,7 @@ export default async function MembersPage({ searchParams }: PageProps) {
       </div>
 
       {/* Table Card Container */}
-      <div className="bg-surface border border-outline-variant rounded-xl flex flex-col shadow-sm mt-md overflow-hidden w-full max-w-full">
+      <div className="bg-surface border border-outline-variant rounded-xl flex flex-col shadow-sm mt-md w-full max-w-full">
         {/* Table Toolbar controls */}
         <MembersTableControls plans={activePlans} />
 
@@ -149,7 +149,7 @@ export default async function MembersPage({ searchParams }: PageProps) {
 
         {/* Pagination Toolbar */}
         {result.totalPages > 1 && (
-          <div className="p-lg border-t border-outline-variant bg-surface-container-lowest flex items-center justify-between">
+          <div className="p-lg border-t border-outline-variant bg-surface-container-lowest flex items-center justify-between rounded-b-xl">
             <p className="font-label-md text-label-md text-on-surface-variant">
               Showing <span className="text-on-background font-bold">{((page - 1) * 10) + 1}</span> to <span className="text-on-background font-bold">{Math.min(page * 10, result.total)}</span> of <span className="text-on-background font-bold">{result.total}</span> members
             </p>
