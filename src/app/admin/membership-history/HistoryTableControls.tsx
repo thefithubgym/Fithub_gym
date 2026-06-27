@@ -23,10 +23,10 @@ const STATUS_OPTIONS = [
 /** Extract approximate duration in days from a plan name for sorting (shortest first). */
 function planDurationDays(name: string): number {
   const n = name.toLowerCase();
-  if (n.includes("daily"))       return 1;
-  if (n.includes("weekly"))      return 7;
-  if (n.includes("monthly"))     return 30;
-  if (n.includes("quarterly"))   return 90;
+  if (n.includes("daily")) return 1;
+  if (n.includes("weekly")) return 7;
+  if (n.includes("monthly")) return 30;
+  if (n.includes("quarterly")) return 90;
   if (n.includes("half yearly") || n.includes("half-yearly")) return 180;
   if (n.includes("yearly") || n.includes("annual")) return 365;
   return 999; // unknown durations go last
@@ -65,11 +65,10 @@ function FilterDropdown({
       <button
         type="button"
         onClick={() => setOpen((p) => !p)}
-        className={`h-10 px-sm flex items-center gap-xs rounded-lg border text-sm font-medium transition-colors cursor-pointer min-w-[110px] justify-between ${
-          isActive
+        className={`h-10 px-sm flex items-center gap-xs rounded-lg border text-sm font-medium transition-colors cursor-pointer min-w-[110px] justify-between ${isActive
             ? "border-primary text-primary bg-primary/10"
             : "border-outline-variant text-on-surface bg-surface hover:bg-surface-container-high"
-        }`}
+          }`}
       >
         {trigger}
         <ChevronDown
@@ -79,9 +78,8 @@ function FilterDropdown({
 
       {open && (
         <div
-          className={`absolute z-50 top-[calc(100%+6px)] min-w-[220px] bg-surface border border-outline-variant rounded-xl shadow-xl overflow-hidden left-0 ${
-            align === "right" ? "md:left-auto md:right-0" : ""
-          }`}
+          className={`absolute z-50 top-[calc(100%+6px)] min-w-[220px] bg-surface border border-outline-variant rounded-xl shadow-xl overflow-hidden left-0 ${align === "right" ? "md:left-auto md:right-0" : ""
+            }`}
         >
           {children}
         </div>
@@ -143,7 +141,7 @@ export default function HistoryTableControls({ plans }: HistoryTableControlsProp
         <Search className="text-on-surface-variant ml-sm w-5 h-5 shrink-0" />
         <input
           className="w-full h-full bg-transparent border-none text-on-surface placeholder-on-surface-variant focus:outline-none focus:ring-0 font-body-md text-sm px-sm"
-          placeholder="Search by name, phone, email..."
+          placeholder="Search member..."
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -169,9 +167,8 @@ export default function HistoryTableControls({ plans }: HistoryTableControlsProp
             <span className="flex items-center gap-xs">
               {status && (
                 <span
-                  className={`w-2 h-2 rounded-full ${
-                    STATUS_OPTIONS.find((s) => s.value === status)?.dot ?? ""
-                  }`}
+                  className={`w-2 h-2 rounded-full ${STATUS_OPTIONS.find((s) => s.value === status)?.dot ?? ""
+                    }`}
                 />
               )}
               {selectedStatusLabel}
@@ -294,37 +291,37 @@ export default function HistoryTableControls({ plans }: HistoryTableControlsProp
                 !p.name.toLowerCase().includes("single") &&
                 !p.name.toLowerCase().includes("couple")
             ).length > 0 && (
-              <>
-                <div className="my-xs mx-md border-t border-outline-variant" />
-                <div className="px-sm py-xs">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant px-xs">
-                    Other
-                  </p>
-                </div>
-                {sortByDuration(plans.filter(
+                <>
+                  <div className="my-xs mx-md border-t border-outline-variant" />
+                  <div className="px-sm py-xs">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant px-xs">
+                      Other
+                    </p>
+                  </div>
+                  {sortByDuration(plans.filter(
                     (p) =>
                       p.memberType !== "SINGLE" &&
                       p.memberType !== "COUPLE" &&
                       !p.name.toLowerCase().includes("single") &&
                       !p.name.toLowerCase().includes("couple")
                   ))
-                  .map((p) => (
-                    <button
-                      key={p.id}
-                      type="button"
-                      onClick={() => {
-                        const newPlan = planId === p.id ? "" : p.id;
-                        setPlanId(newPlan);
-                        applyFilters(search, statusRef.current, newPlan);
-                      }}
-                      className="w-full flex items-center gap-sm px-md py-sm text-sm text-on-surface hover:bg-surface-container-high transition-colors text-left"
-                    >
-                      <span className="flex-1">{p.name}</span>
-                      {planId === p.id && <Check className="w-3.5 h-3.5 text-primary" />}
-                    </button>
-                  ))}
-              </>
-            )}
+                    .map((p) => (
+                      <button
+                        key={p.id}
+                        type="button"
+                        onClick={() => {
+                          const newPlan = planId === p.id ? "" : p.id;
+                          setPlanId(newPlan);
+                          applyFilters(search, statusRef.current, newPlan);
+                        }}
+                        className="w-full flex items-center gap-sm px-md py-sm text-sm text-on-surface hover:bg-surface-container-high transition-colors text-left"
+                      >
+                        <span className="flex-1">{p.name}</span>
+                        {planId === p.id && <Check className="w-3.5 h-3.5 text-primary" />}
+                      </button>
+                    ))}
+                </>
+              )}
           </div>
         </FilterDropdown>
 

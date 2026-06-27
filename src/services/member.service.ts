@@ -64,6 +64,19 @@ export class MemberService {
             startDate: { gt: now },
           },
         };
+      } else if (status === "expiring_soon") {
+        const fiveDaysFromNow = new Date();
+        fiveDaysFromNow.setDate(fiveDaysFromNow.getDate() + 5);
+        where.memberships = {
+          some: {
+            status: "ACTIVE",
+            startDate: { lte: now },
+            endDate: {
+              gte: now,
+              lte: fiveDaysFromNow,
+            },
+          },
+        };
       }
     }
 
@@ -102,6 +115,30 @@ export class MemberService {
     return {
       data: data.map((m) => {
         const latestMembership = m.memberships[0] || null;
+        let status = "INACTIVE";
+        if (latestMembership) {
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          const end = new Date(latestMembership.endDate);
+          end.setHours(0, 0, 0, 0);
+          const start = new Date(latestMembership.startDate);
+          start.setHours(0, 0, 0, 0);
+
+          if (start > today) {
+            status = "UPCOMING";
+          } else if (end < today) {
+            status = "EXPIRED";
+          } else {
+            const diffTime = end.getTime() - today.getTime();
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            if (diffDays <= 5) {
+              status = "EXPIRING_SOON";
+            } else {
+              status = "ACTIVE";
+            }
+          }
+        }
+
         return {
           id: m.id,
           firstName: m.firstName,
@@ -112,7 +149,7 @@ export class MemberService {
           email: m.email,
           createdAt: m.createdAt,
           planName: latestMembership?.membershipPlan?.name || latestMembership?.customPlanName || "No Plan",
-          status: latestMembership?.status || "INACTIVE",
+          status,
           latestMembership,
           coupleGroup: m.coupleGroup,
         };
@@ -150,11 +187,34 @@ export class MemberService {
     }
 
     const latestMembership = member.memberships.find(m => m.status === "ACTIVE") || member.memberships[0] || null;
+    let status = "INACTIVE";
+    if (latestMembership) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const end = new Date(latestMembership.endDate);
+      end.setHours(0, 0, 0, 0);
+      const start = new Date(latestMembership.startDate);
+      start.setHours(0, 0, 0, 0);
+
+      if (start > today) {
+        status = "UPCOMING";
+      } else if (end < today) {
+        status = "EXPIRED";
+      } else {
+        const diffTime = end.getTime() - today.getTime();
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        if (diffDays <= 5) {
+          status = "EXPIRING_SOON";
+        } else {
+          status = "ACTIVE";
+        }
+      }
+    }
 
     return {
       ...member,
       name: `${member.firstName} ${member.lastName}`,
-      status: latestMembership?.status || "INACTIVE",
+      status,
       latestMembership,
     };
   }

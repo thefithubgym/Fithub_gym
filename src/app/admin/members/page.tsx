@@ -83,11 +83,11 @@ export default async function MembersPage({ searchParams }: PageProps) {
             {/* Sticky Header */}
             <thead className="bg-surface-container border-b border-outline-variant">
               <tr>
-                <th className="py-md px-lg font-label-sm text-xs text-on-surface-variant uppercase tracking-widest font-semibold">Member</th>
-                <th className="py-md px-lg font-label-sm text-xs text-on-surface-variant uppercase tracking-widest font-semibold hidden sm:table-cell">Plan Type</th>
+                <th className="py-md px-lg font-label-sm text-xs text-on-surface-variant uppercase tracking-widest font-semibold">Member Name</th>
+                <th className="py-md px-lg font-label-sm text-xs text-on-surface-variant uppercase tracking-widest font-semibold">Contacts</th>
+                <th className="py-md px-lg font-label-sm text-xs text-on-surface-variant uppercase tracking-widest font-semibold">Plan Type</th>
+                <th className="py-md px-lg font-label-sm text-xs text-on-surface-variant uppercase tracking-widest font-semibold">Expires In</th>
                 <th className="py-md px-lg font-label-sm text-xs text-on-surface-variant uppercase tracking-widest font-semibold">Status</th>
-                <th className="py-md px-lg font-label-sm text-xs text-on-surface-variant uppercase tracking-widest font-semibold hidden lg:table-cell">Start Date</th>
-                <th className="py-md px-lg font-label-sm text-xs text-on-surface-variant uppercase tracking-widest font-semibold hidden lg:table-cell">End Date</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-outline-variant font-body-md text-sm bg-surface">
@@ -98,50 +98,98 @@ export default async function MembersPage({ searchParams }: PageProps) {
                   </td>
                 </tr>
               ) : (
-                result.data.map((member) => (
-                  <MemberTableRow key={member.id} memberId={member.id}>
-                    <td className="py-md px-lg">
-                      <div className="flex items-center gap-md">
-                        <div className="w-10 h-10 rounded-full bg-surface-container border border-outline-variant flex items-center justify-center shrink-0 text-primary font-bold uppercase">
-                          {member.firstName.substring(0, 1)}{member.lastName.substring(0, 1)}
+                result.data.map((member) => {
+                  // Calculate remaining days for this member's current membership
+                  const today = new Date();
+                  today.setHours(0, 0, 0, 0);
+                  
+                  let diffDays: number | null = null;
+                  if (member.latestMembership?.endDate) {
+                    const end = new Date(member.latestMembership.endDate);
+                    end.setHours(0, 0, 0, 0);
+                    const diffTime = end.getTime() - today.getTime();
+                    diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                  }
+
+                  return (
+                    <MemberTableRow key={member.id} memberId={member.id}>
+                      {/* Member Name with Avatar */}
+                      <td className="py-md px-lg">
+                        <div className="flex items-center gap-md">
+                          <div className="w-10 h-10 rounded-full bg-surface-container border border-outline-variant flex items-center justify-center shrink-0 text-primary font-bold uppercase font-display">
+                            {member.firstName.substring(0, 1)}{member.lastName.substring(0, 1)}
+                          </div>
+                          <div className="min-w-0">
+                            <div className="text-on-background font-semibold capitalize truncate">{member.name}</div>
+                          </div>
                         </div>
-                        <div className="min-w-0">
-                          <div className="text-on-background font-semibold capitalize truncate">{member.name}</div>
-                          <div className="text-on-surface-variant text-xs mt-xs truncate">{member.email || "No email"}</div>
+                      </td>
+
+                      {/* Contacts: Phone and Email */}
+                      <td className="py-md px-lg">
+                        <div className="flex flex-col gap-xs min-w-0">
+                          <div className="text-on-background font-medium truncate">{member.phone}</div>
+                          <div className="text-on-surface-variant text-xs truncate">{member.email || "No email"}</div>
                         </div>
-                      </div>
-                    </td>
-                    <td className="py-md px-lg hidden sm:table-cell">
-                      <span className="text-on-background">{member.planName}</span>
-                    </td>
-                    <td className="py-md px-lg">
-                      <span className={`inline-flex items-center gap-xs px-sm py-xs rounded-full border text-xs font-semibold whitespace-nowrap ${member.status === "ACTIVE"
-                        ? "border-primary text-primary bg-primary/10"
-                        : member.status === "UPCOMING"
-                          ? "border-primary-container text-primary-container bg-primary-container/10"
-                          : member.status === "EXPIRED"
-                            ? "border-error text-error bg-error/10"
-                            : "border-outline-variant text-on-surface-variant bg-surface-container"
+                      </td>
+
+                      {/* Plan Type */}
+                      <td className="py-md px-lg">
+                        <span className="text-on-background font-medium">{member.planName}</span>
+                      </td>
+
+                      {/* Expires In with dynamic alerts */}
+                      <td className="py-md px-lg">
+                        {diffDays === null ? (
+                          <span className="text-secondary text-xs">-</span>
+                        ) : diffDays < 0 ? (
+                          <span className="inline-flex items-center gap-xs px-sm py-xs rounded-full border text-xs font-semibold whitespace-nowrap border-error text-error bg-error/10">
+                            <span className="w-1.5 h-1.5 rounded-full bg-error"></span>
+                            Expired
+                          </span>
+                        ) : diffDays === 0 ? (
+                          <span className="inline-flex items-center gap-xs px-sm py-xs rounded-full border text-xs font-semibold whitespace-nowrap border-amber-500 text-amber-500 bg-amber-500/10 animate-pulse">
+                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                            Expires Today
+                          </span>
+                        ) : diffDays <= 5 ? (
+                          <span className="inline-flex items-center gap-xs px-sm py-xs rounded-full border text-xs font-semibold whitespace-nowrap border-yellow-500 text-yellow-500 bg-yellow-500/10 font-bold">
+                            <span className="w-1.5 h-1.5 rounded-full bg-yellow-500"></span>
+                            {diffDays} {diffDays === 1 ? "day" : "days"} left
+                          </span>
+                        ) : (
+                          <span className="text-white font-medium">
+                            {diffDays} {diffDays === 1 ? "day" : "days"}
+                          </span>
+                        )}
+                      </td>
+
+                      {/* Status */}
+                      <td className="py-md px-lg">
+                        <span className={`inline-flex items-center gap-xs px-sm py-xs rounded-full border text-xs font-semibold whitespace-nowrap uppercase tracking-wider ${
+                          member.status === "ACTIVE"
+                            ? "border-primary text-primary bg-primary/10"
+                            : member.status === "EXPIRING_SOON"
+                              ? "border-amber-500 text-amber-500 bg-amber-500/10"
+                              : member.status === "EXPIRED"
+                                ? "border-error text-error bg-error/10"
+                                : "border-outline-variant text-on-surface-variant bg-surface-container"
                         }`}>
-                        <span className={`w-1.5 h-1.5 rounded-full ${member.status === "ACTIVE"
-                          ? "bg-primary"
-                          : member.status === "UPCOMING"
-                            ? "bg-primary-container"
-                            : member.status === "EXPIRED"
-                              ? "bg-error"
-                              : "bg-on-surface-variant"
+                          <span className={`w-1.5 h-1.5 rounded-full ${
+                            member.status === "ACTIVE"
+                              ? "bg-primary"
+                              : member.status === "EXPIRING_SOON"
+                                ? "bg-amber-500 animate-pulse"
+                                : member.status === "EXPIRED"
+                                  ? "bg-error"
+                                  : "bg-on-surface-variant"
                           }`}></span>
-                        {member.status}
-                      </span>
-                    </td>
-                    <td className="py-md px-lg text-on-surface-variant hidden lg:table-cell">
-                      {member.latestMembership?.startDate ? new Date(member.latestMembership.startDate).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : "-"}
-                    </td>
-                    <td className="py-md px-lg text-on-surface-variant hidden lg:table-cell">
-                      {member.latestMembership?.endDate ? new Date(member.latestMembership.endDate).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : "-"}
-                    </td>
-                  </MemberTableRow>
-                ))
+                          {member.status === "EXPIRING_SOON" ? "EXPIRING SOON" : member.status === "UPCOMING" ? "COMING SOON" : member.status}
+                        </span>
+                      </td>
+                    </MemberTableRow>
+                  );
+                })
               )}
             </tbody>
           </table>

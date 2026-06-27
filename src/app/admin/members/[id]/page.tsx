@@ -99,23 +99,25 @@ export default async function MemberDetailPage({ params }: PageProps) {
               </div>
 
               <div className="flex-grow flex flex-col gap-xs">
-                <span className={`inline-flex items-center gap-xs px-sm py-xs rounded-full border text-xs font-semibold self-center md:self-start ${member.status === "ACTIVE"
-                  ? "border-primary text-primary bg-primary/10"
-                  : member.status === "UPCOMING"
-                    ? "border-primary-container text-primary-container bg-primary-container/10"
-                    : member.status === "EXPIRED"
-                      ? "border-error text-error bg-error/10"
-                      : "border-outline-variant text-on-surface-variant bg-surface-container"
-                  }`}>
-                  <span className={`w-1.5 h-1.5 rounded-full ${member.status === "ACTIVE"
-                    ? "bg-primary"
-                    : member.status === "UPCOMING"
-                      ? "bg-primary-container"
+                <span className={`inline-flex items-center gap-xs px-sm py-xs rounded-full border text-xs font-semibold self-center md:self-start uppercase tracking-wider ${
+                  member.status === "ACTIVE"
+                    ? "border-primary text-primary bg-primary/10"
+                    : member.status === "EXPIRING_SOON"
+                      ? "border-amber-500 text-amber-500 bg-amber-500/10"
                       : member.status === "EXPIRED"
-                        ? "bg-error"
-                        : "bg-on-surface-variant"
-                    }`}></span>
-                  {member.status}
+                        ? "border-error text-error bg-error/10"
+                        : "border-outline-variant text-on-surface-variant bg-surface-container"
+                  }`}>
+                  <span className={`w-1.5 h-1.5 rounded-full ${
+                    member.status === "ACTIVE"
+                      ? "bg-primary"
+                      : member.status === "EXPIRING_SOON"
+                        ? "bg-amber-500 animate-pulse"
+                        : member.status === "EXPIRED"
+                          ? "bg-error"
+                          : "bg-on-surface-variant"
+                  }`}></span>
+                  {member.status === "EXPIRING_SOON" ? "EXPIRING SOON" : member.status === "UPCOMING" ? "COMING SOON" : member.status}
                 </span>
                 <h1 className="text-3xl font-extrabold text-white mt-xs capitalize">{member.name}</h1>
                 {/* <p className="text-on-surface-variant text-sm">Member ID: {member.id}</p> */}
