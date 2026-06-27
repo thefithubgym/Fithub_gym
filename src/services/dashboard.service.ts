@@ -108,14 +108,41 @@ export class DashboardService {
       expiringSoon,
       expiredMembers,
       monthlyRevenue,
-      recentMembers: recentMembers.map(m => ({
-        id: m.id,
-        name: `${m.firstName} ${m.lastName}`,
-        phone: m.phone,
-        joinDate: m.createdAt,
-        planName: m.memberships[0]?.membershipPlan?.name || m.memberships[0]?.customPlanName || "No Plan",
-        status: m.memberships[0]?.status || "INACTIVE",
-      })),
+      recentMembers: recentMembers.map(m => {
+        const latestMembership = m.memberships[0] || null;
+        let status = "INACTIVE";
+        if (latestMembership) {
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          const end = new Date(latestMembership.endDate);
+          end.setHours(0, 0, 0, 0);
+          const start = new Date(latestMembership.startDate);
+          start.setHours(0, 0, 0, 0);
+
+          if (start > today) {
+            status = "UPCOMING";
+          } else if (end < today) {
+            status = "EXPIRED";
+          } else {
+            const diffTime = end.getTime() - today.getTime();
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            if (diffDays <= 5) {
+              status = "EXPIRING_SOON";
+            } else {
+              status = "ACTIVE";
+            }
+          }
+        }
+
+        return {
+          id: m.id,
+          name: `${m.firstName} ${m.lastName}`,
+          phone: m.phone,
+          joinDate: m.createdAt,
+          planName: latestMembership?.membershipPlan?.name || latestMembership?.customPlanName || "No Plan",
+          status,
+        };
+      }),
       recentRenewals: recentRenewals.map(r => ({
         id: r.id,
         memberName: `${r.member.firstName} ${r.member.lastName}`,

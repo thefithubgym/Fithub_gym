@@ -71,85 +71,175 @@ export async function createCoupleMemberAction(data: any) {
       throw new Error("Partner phone numbers must be unique.");
     }
 
-    // 1. Create the Couple Group
-    const group = await MemberService.createCoupleGroup(
-      // We will create both members first then group them
-      "", "" // placeholders
-    );
+    const { m1, m2, group, membership } = await prisma.$transaction(async (tx) => {
+      // 1. Uniqueness check for member one
+      const existingOne = await tx.member.findUnique({
+        where: { phone: validated.memberOne.phone },
+      });
+      if (existingOne && !existingOne.isDeleted) {
+        throw new Error(`Phone number ${validated.memberOne.phone} is already registered to an active member.`);
+      }
 
-    // 2. Create the two members in the group
-    const m1 = await MemberService.createMember({
-      firstName: validated.memberOne.firstName,
-      lastName: validated.memberOne.lastName,
-      phone: validated.memberOne.phone,
-      gender: validated.memberOne.gender,
-      email: validated.memberOne.email,
-      dateOfBirth: validated.memberOne.dateOfBirth,
-      address: validated.memberOne.address,
-      emergencyContact: validated.emergencyContact,
-      emergencyPhone: validated.emergencyPhone,
-      notes: validated.notes,
-    }, group.id);
+      // Uniqueness check for member two
+      const existingTwo = await tx.member.findUnique({
+        where: { phone: validated.memberTwo.phone },
+      });
+      if (existingTwo && !existingTwo.isDeleted) {
+        throw new Error(`Phone number ${validated.memberTwo.phone} is already registered to an active member.`);
+      }
 
-    const m2 = await MemberService.createMember({
-      firstName: validated.memberTwo.firstName,
-      lastName: validated.memberTwo.lastName,
-      phone: validated.memberTwo.phone,
-      gender: validated.memberTwo.gender,
-      email: validated.memberTwo.email,
-      dateOfBirth: validated.memberTwo.dateOfBirth,
-      address: validated.memberTwo.address,
-      emergencyContact: validated.emergencyContact,
-      emergencyPhone: validated.emergencyPhone,
-      notes: validated.notes,
-    }, group.id);
+      // 2. Create/Reactivate the two members
+      let member1;
+      if (existingOne && existingOne.isDeleted) {
+        member1 = await tx.member.update({
+          where: { id: existingOne.id },
+          data: {
+            firstName: validated.memberOne.firstName,
+            lastName: validated.memberOne.lastName,
+            phone: validated.memberOne.phone,
+            gender: validated.memberOne.gender,
+            email: validated.memberOne.email || null,
+            dateOfBirth: validated.memberOne.dateOfBirth || null,
+            address: validated.memberOne.address || null,
+            emergencyContact: validated.emergencyContact || null,
+            emergencyPhone: validated.emergencyPhone || null,
+            notes: validated.notes || null,
+            isDeleted: false,
+          },
+        });
+      } else {
+        member1 = await tx.member.create({
+          data: {
+            firstName: validated.memberOne.firstName,
+            lastName: validated.memberOne.lastName,
+            phone: validated.memberOne.phone,
+            gender: validated.memberOne.gender,
+            email: validated.memberOne.email || null,
+            dateOfBirth: validated.memberOne.dateOfBirth || null,
+            address: validated.memberOne.address || null,
+            emergencyContact: validated.emergencyContact || null,
+            emergencyPhone: validated.emergencyPhone || null,
+            notes: validated.notes || null,
+          },
+        });
+      }
 
-    // Update group mapping
-    await prisma.coupleGroup.update({
-      where: { id: group.id },
-      data: {
-        members: {
-          connect: [{ id: m1.id }, { id: m2.id }],
+      let member2;
+      if (existingTwo && existingTwo.isDeleted) {
+        member2 = await tx.member.update({
+          where: { id: existingTwo.id },
+          data: {
+            firstName: validated.memberTwo.firstName,
+            lastName: validated.memberTwo.lastName,
+            phone: validated.memberTwo.phone,
+            gender: validated.memberTwo.gender,
+            email: validated.memberTwo.email || null,
+            dateOfBirth: validated.memberTwo.dateOfBirth || null,
+            address: validated.memberTwo.address || null,
+            emergencyContact: validated.emergencyContact || null,
+            emergencyPhone: validated.emergencyPhone || null,
+            notes: validated.notes || null,
+            isDeleted: false,
+          },
+        });
+      } else {
+        member2 = await tx.member.create({
+          data: {
+            firstName: validated.memberTwo.firstName,
+            lastName: validated.memberTwo.lastName,
+            phone: validated.memberTwo.phone,
+            gender: validated.memberTwo.gender,
+            email: validated.memberTwo.email || null,
+            dateOfBirth: validated.memberTwo.dateOfBirth || null,
+            address: validated.memberTwo.address || null,
+            emergencyContact: validated.emergencyContact || null,
+            emergencyPhone: validated.emergencyPhone || null,
+            notes: validated.notes || null,
+          },
+        });
+      }
+
+      // 3. Create the Couple Group
+      const cpGroup = await tx.coupleGroup.create({
+        data: {},
+      });
+
+      // 4. Link both members to the group
+      await tx.member.updateMany({
+        where: {
+          id: { in: [member1.id, member2.id] },
         },
-      },
+        data: {
+          coupleGroupId: cpGroup.id,
+        },
+      });
+
+      // 5. Check overlapping dates for this couple group
+      const overlapping = await tx.membership.findFirst({
+        where: {
+          OR: [
+            { memberId: member1.id },
+            { coupleGroupId: cpGroup.id },
+          ],
+          AND: [
+            {
+              OR: [
+                {
+                  startDate: { lte: validated.startDate },
+                  endDate: { gte: validated.startDate },
+                },
+                {
+                  startDate: { lte: validated.endDate },
+                  endDate: { gte: validated.endDate },
+                },
+                {
+                  startDate: { gte: validated.startDate },
+                  endDate: { lte: validated.endDate },
+                },
+              ],
+            },
+          ],
+        },
+      });
+
+      if (overlapping) {
+        throw new Error(`The membership dates overlap with an existing membership (${overlapping.startDate.toLocaleDateString()} to ${overlapping.endDate.toLocaleDateString()}).`);
+      }
+
+      // 6. Create shared membership
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      let status = "ACTIVE";
+      if (validated.startDate > today) {
+        status = "UPCOMING";
+      } else if (validated.endDate < today) {
+        status = "EXPIRED";
+      }
+
+      const cpMembership = await tx.membership.create({
+        data: {
+          memberId: member1.id,
+          coupleGroupId: cpGroup.id,
+          membershipPlanId: validated.membershipPlanId || undefined,
+          customPlanName: validated.customPlanName,
+          amount: validated.amount,
+          registrationFee: validated.registrationFee,
+          paymentMethod: validated.paymentMethod,
+          paymentReference: validated.paymentReference,
+          startDate: validated.startDate,
+          endDate: validated.endDate,
+          remarks: validated.remarks,
+          status: status as any,
+        },
+      });
+
+      return { m1: member1, m2: member2, group: cpGroup, membership: cpMembership };
     });
 
-    // 3. Create memberships for both linked members (split the price or store half on each)
-    const splitAmount = validated.amount / 2;
-    const splitRegFee = validated.registrationFee / 2;
-
-    const m1Membership = await MembershipService.createMembership({
-      memberId: m1.id,
-      coupleGroupId: group.id,
-      membershipPlanId: validated.membershipPlanId || undefined,
-      customPlanName: validated.customPlanName,
-      amount: splitAmount,
-      registrationFee: splitRegFee,
-      paymentMethod: validated.paymentMethod,
-      paymentReference: validated.paymentReference,
-      startDate: validated.startDate,
-      endDate: validated.endDate,
-      remarks: validated.remarks,
-    });
-
-    const m2Membership = await MembershipService.createMembership({
-      memberId: m2.id,
-      coupleGroupId: group.id,
-      membershipPlanId: validated.membershipPlanId || undefined,
-      customPlanName: validated.customPlanName,
-      amount: splitAmount,
-      registrationFee: splitRegFee,
-      paymentMethod: validated.paymentMethod,
-      paymentReference: validated.paymentReference,
-      startDate: validated.startDate,
-      endDate: validated.endDate,
-      remarks: validated.remarks,
-    });
-
-    // Send receipt notifications
+    // Send receipt notifications to both members
     try {
-      await WhatsAppService.sendReceipt(m1.id, m1Membership.id);
-      await WhatsAppService.sendReceipt(m2.id, m2Membership.id);
+      await WhatsAppService.sendReceipt(m1.id, membership.id);
+      await WhatsAppService.sendReceipt(m2.id, membership.id);
     } catch (wsError) {
       console.error("Failed to send WhatsApp receipts for couple:", wsError);
     }
@@ -232,40 +322,21 @@ export async function renewMembershipAction(memberId: string, data: any) {
     };
 
     if (member.coupleGroupId) {
-      // It's a couple renewal. We should renew both members linked in the couple group!
-      const partner = member.coupleGroup?.members[0];
-      if (partner) {
-        const splitAmount = validated.amount / 2;
-        
-        const m1Renewed = await MembershipService.renewMembership(memberId, {
-          ...payload,
-          amount: splitAmount,
-        });
+      // It's a couple renewal. We renew the single shared membership under the primary member.
+      const renewed = await MembershipService.renewMembership(memberId, {
+        ...payload,
+        amount: validated.amount, // Full amount
+      });
 
-        const m2Renewed = await MembershipService.renewMembership(partner.id, {
-          ...payload,
-          amount: splitAmount,
-        });
-
-        // Send receipt notifications
-        try {
-          await WhatsAppService.sendReceipt(memberId, m1Renewed.id);
-          await WhatsAppService.sendReceipt(partner.id, m2Renewed.id);
-        } catch (wsError) {
-          console.error("Failed to send WhatsApp receipts for couple renewal:", wsError);
+      // Send receipt notifications to both members
+      try {
+        await WhatsAppService.sendReceipt(memberId, renewed.id);
+        const partner = member.coupleGroup?.members[0];
+        if (partner) {
+          await WhatsAppService.sendReceipt(partner.id, renewed.id);
         }
-      } else {
-        // Just renew single member in group
-        const m1Renewed = await MembershipService.renewMembership(memberId, {
-          ...payload,
-        });
-
-        // Send receipt notification
-        try {
-          await WhatsAppService.sendReceipt(memberId, m1Renewed.id);
-        } catch (wsError) {
-          console.error("Failed to send WhatsApp receipt for renewal:", wsError);
-        }
+      } catch (wsError) {
+        console.error("Failed to send WhatsApp receipts for couple renewal:", wsError);
       }
     } else {
       // Regular single member renewal

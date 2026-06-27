@@ -219,14 +219,16 @@ export default async function DashboardPage() {
                       </td>
                       <td className="py-md px-lg text-secondary">{member.planName}</td>
                       <td className="py-md px-lg">
-                        <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold border ${
-                          member.status === "ACTIVE" 
+                        <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold border uppercase tracking-wider ${
+                          member.status === "ACTIVE"
                             ? "bg-green-500/10 text-green-500 border-green-500/20"
-                            : member.status === "UPCOMING"
-                            ? "bg-primary-container/10 text-primary-container border-primary-container/20"
-                            : "bg-error/10 text-error border-error/20"
+                            : member.status === "EXPIRING_SOON"
+                              ? "bg-amber-500/10 text-amber-500 border-amber-500/20 animate-pulse"
+                              : member.status === "EXPIRED"
+                                ? "bg-error/10 text-error border-error/20"
+                                : "bg-surface-container text-on-surface-variant border-outline-variant/30"
                         }`}>
-                          {member.status}
+                          {member.status === "EXPIRING_SOON" ? "EXPIRING SOON" : member.status === "UPCOMING" ? "COMING SOON" : member.status}
                         </span>
                       </td>
                     </tr>
