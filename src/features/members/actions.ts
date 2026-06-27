@@ -71,49 +71,169 @@ export async function createCoupleMemberAction(data: any) {
       throw new Error("Partner phone numbers must be unique.");
     }
 
-    // 1. Create the two members first (without group ID initially)
-    const m1 = await MemberService.createMember({
-      firstName: validated.memberOne.firstName,
-      lastName: validated.memberOne.lastName,
-      phone: validated.memberOne.phone,
-      gender: validated.memberOne.gender,
-      email: validated.memberOne.email,
-      dateOfBirth: validated.memberOne.dateOfBirth,
-      address: validated.memberOne.address,
-      emergencyContact: validated.emergencyContact,
-      emergencyPhone: validated.emergencyPhone,
-      notes: validated.notes,
-    });
+    const { m1, m2, group, membership } = await prisma.$transaction(async (tx) => {
+      // 1. Uniqueness check for member one
+      const existingOne = await tx.member.findUnique({
+        where: { phone: validated.memberOne.phone },
+      });
+      if (existingOne && !existingOne.isDeleted) {
+        throw new Error(`Phone number ${validated.memberOne.phone} is already registered to an active member.`);
+      }
 
-    const m2 = await MemberService.createMember({
-      firstName: validated.memberTwo.firstName,
-      lastName: validated.memberTwo.lastName,
-      phone: validated.memberTwo.phone,
-      gender: validated.memberTwo.gender,
-      email: validated.memberTwo.email,
-      dateOfBirth: validated.memberTwo.dateOfBirth,
-      address: validated.memberTwo.address,
-      emergencyContact: validated.emergencyContact,
-      emergencyPhone: validated.emergencyPhone,
-      notes: validated.notes,
-    });
+      // Uniqueness check for member two
+      const existingTwo = await tx.member.findUnique({
+        where: { phone: validated.memberTwo.phone },
+      });
+      if (existingTwo && !existingTwo.isDeleted) {
+        throw new Error(`Phone number ${validated.memberTwo.phone} is already registered to an active member.`);
+      }
 
-    // 2. Create the Couple Group and link both members
-    const group = await MemberService.createCoupleGroup(m1.id, m2.id);
+      // 2. Create/Reactivate the two members
+      let member1;
+      if (existingOne && existingOne.isDeleted) {
+        member1 = await tx.member.update({
+          where: { id: existingOne.id },
+          data: {
+            firstName: validated.memberOne.firstName,
+            lastName: validated.memberOne.lastName,
+            phone: validated.memberOne.phone,
+            gender: validated.memberOne.gender,
+            email: validated.memberOne.email || null,
+            dateOfBirth: validated.memberOne.dateOfBirth || null,
+            address: validated.memberOne.address || null,
+            emergencyContact: validated.emergencyContact || null,
+            emergencyPhone: validated.emergencyPhone || null,
+            notes: validated.notes || null,
+            isDeleted: false,
+          },
+        });
+      } else {
+        member1 = await tx.member.create({
+          data: {
+            firstName: validated.memberOne.firstName,
+            lastName: validated.memberOne.lastName,
+            phone: validated.memberOne.phone,
+            gender: validated.memberOne.gender,
+            email: validated.memberOne.email || null,
+            dateOfBirth: validated.memberOne.dateOfBirth || null,
+            address: validated.memberOne.address || null,
+            emergencyContact: validated.emergencyContact || null,
+            emergencyPhone: validated.emergencyPhone || null,
+            notes: validated.notes || null,
+          },
+        });
+      }
 
-    // 3. Create a single shared membership under the primary member (m1)
-    const membership = await MembershipService.createMembership({
-      memberId: m1.id,
-      coupleGroupId: group.id,
-      membershipPlanId: validated.membershipPlanId || undefined,
-      customPlanName: validated.customPlanName,
-      amount: validated.amount, // Full amount
-      registrationFee: validated.registrationFee, // Full registration fee
-      paymentMethod: validated.paymentMethod,
-      paymentReference: validated.paymentReference,
-      startDate: validated.startDate,
-      endDate: validated.endDate,
-      remarks: validated.remarks,
+      let member2;
+      if (existingTwo && existingTwo.isDeleted) {
+        member2 = await tx.member.update({
+          where: { id: existingTwo.id },
+          data: {
+            firstName: validated.memberTwo.firstName,
+            lastName: validated.memberTwo.lastName,
+            phone: validated.memberTwo.phone,
+            gender: validated.memberTwo.gender,
+            email: validated.memberTwo.email || null,
+            dateOfBirth: validated.memberTwo.dateOfBirth || null,
+            address: validated.memberTwo.address || null,
+            emergencyContact: validated.emergencyContact || null,
+            emergencyPhone: validated.emergencyPhone || null,
+            notes: validated.notes || null,
+            isDeleted: false,
+          },
+        });
+      } else {
+        member2 = await tx.member.create({
+          data: {
+            firstName: validated.memberTwo.firstName,
+            lastName: validated.memberTwo.lastName,
+            phone: validated.memberTwo.phone,
+            gender: validated.memberTwo.gender,
+            email: validated.memberTwo.email || null,
+            dateOfBirth: validated.memberTwo.dateOfBirth || null,
+            address: validated.memberTwo.address || null,
+            emergencyContact: validated.emergencyContact || null,
+            emergencyPhone: validated.emergencyPhone || null,
+            notes: validated.notes || null,
+          },
+        });
+      }
+
+      // 3. Create the Couple Group
+      const cpGroup = await tx.coupleGroup.create({
+        data: {},
+      });
+
+      // 4. Link both members to the group
+      await tx.member.updateMany({
+        where: {
+          id: { in: [member1.id, member2.id] },
+        },
+        data: {
+          coupleGroupId: cpGroup.id,
+        },
+      });
+
+      // 5. Check overlapping dates for this couple group
+      const overlapping = await tx.membership.findFirst({
+        where: {
+          OR: [
+            { memberId: member1.id },
+            { coupleGroupId: cpGroup.id },
+          ],
+          AND: [
+            {
+              OR: [
+                {
+                  startDate: { lte: validated.startDate },
+                  endDate: { gte: validated.startDate },
+                },
+                {
+                  startDate: { lte: validated.endDate },
+                  endDate: { gte: validated.endDate },
+                },
+                {
+                  startDate: { gte: validated.startDate },
+                  endDate: { lte: validated.endDate },
+                },
+              ],
+            },
+          ],
+        },
+      });
+
+      if (overlapping) {
+        throw new Error(`The membership dates overlap with an existing membership (${overlapping.startDate.toLocaleDateString()} to ${overlapping.endDate.toLocaleDateString()}).`);
+      }
+
+      // 6. Create shared membership
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      let status = "ACTIVE";
+      if (validated.startDate > today) {
+        status = "UPCOMING";
+      } else if (validated.endDate < today) {
+        status = "EXPIRED";
+      }
+
+      const cpMembership = await tx.membership.create({
+        data: {
+          memberId: member1.id,
+          coupleGroupId: cpGroup.id,
+          membershipPlanId: validated.membershipPlanId || undefined,
+          customPlanName: validated.customPlanName,
+          amount: validated.amount,
+          registrationFee: validated.registrationFee,
+          paymentMethod: validated.paymentMethod,
+          paymentReference: validated.paymentReference,
+          startDate: validated.startDate,
+          endDate: validated.endDate,
+          remarks: validated.remarks,
+          status: status as any,
+        },
+      });
+
+      return { m1: member1, m2: member2, group: cpGroup, membership: cpMembership };
     });
 
     // Send receipt notifications to both members
