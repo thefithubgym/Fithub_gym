@@ -71,13 +71,7 @@ export async function createCoupleMemberAction(data: any) {
       throw new Error("Partner phone numbers must be unique.");
     }
 
-    // 1. Create the Couple Group
-    const group = await MemberService.createCoupleGroup(
-      // We will create both members first then group them
-      "", "" // placeholders
-    );
-
-    // 2. Create the two members in the group
+    // 1. Create the two members first (without group ID initially)
     const m1 = await MemberService.createMember({
       firstName: validated.memberOne.firstName,
       lastName: validated.memberOne.lastName,
@@ -89,7 +83,7 @@ export async function createCoupleMemberAction(data: any) {
       emergencyContact: validated.emergencyContact,
       emergencyPhone: validated.emergencyPhone,
       notes: validated.notes,
-    }, group.id);
+    });
 
     const m2 = await MemberService.createMember({
       firstName: validated.memberTwo.firstName,
@@ -102,29 +96,19 @@ export async function createCoupleMemberAction(data: any) {
       emergencyContact: validated.emergencyContact,
       emergencyPhone: validated.emergencyPhone,
       notes: validated.notes,
-    }, group.id);
-
-    // Update group mapping
-    await prisma.coupleGroup.update({
-      where: { id: group.id },
-      data: {
-        members: {
-          connect: [{ id: m1.id }, { id: m2.id }],
-        },
-      },
     });
 
-    // 3. Create memberships for both linked members (split the price or store half on each)
-    const splitAmount = validated.amount / 2;
-    const splitRegFee = validated.registrationFee / 2;
+    // 2. Create the Couple Group and link both members
+    const group = await MemberService.createCoupleGroup(m1.id, m2.id);
 
-    const m1Membership = await MembershipService.createMembership({
+    // 3. Create a single shared membership under the primary member (m1)
+    const membership = await MembershipService.createMembership({
       memberId: m1.id,
       coupleGroupId: group.id,
       membershipPlanId: validated.membershipPlanId || undefined,
       customPlanName: validated.customPlanName,
-      amount: splitAmount,
-      registrationFee: splitRegFee,
+      amount: validated.amount, // Full amount
+      registrationFee: validated.registrationFee, // Full registration fee
       paymentMethod: validated.paymentMethod,
       paymentReference: validated.paymentReference,
       startDate: validated.startDate,
@@ -132,24 +116,10 @@ export async function createCoupleMemberAction(data: any) {
       remarks: validated.remarks,
     });
 
-    const m2Membership = await MembershipService.createMembership({
-      memberId: m2.id,
-      coupleGroupId: group.id,
-      membershipPlanId: validated.membershipPlanId || undefined,
-      customPlanName: validated.customPlanName,
-      amount: splitAmount,
-      registrationFee: splitRegFee,
-      paymentMethod: validated.paymentMethod,
-      paymentReference: validated.paymentReference,
-      startDate: validated.startDate,
-      endDate: validated.endDate,
-      remarks: validated.remarks,
-    });
-
-    // Send receipt notifications
+    // Send receipt notifications to both members
     try {
-      await WhatsAppService.sendReceipt(m1.id, m1Membership.id);
-      await WhatsAppService.sendReceipt(m2.id, m2Membership.id);
+      await WhatsAppService.sendReceipt(m1.id, membership.id);
+      await WhatsAppService.sendReceipt(m2.id, membership.id);
     } catch (wsError) {
       console.error("Failed to send WhatsApp receipts for couple:", wsError);
     }
@@ -232,40 +202,21 @@ export async function renewMembershipAction(memberId: string, data: any) {
     };
 
     if (member.coupleGroupId) {
-      // It's a couple renewal. We should renew both members linked in the couple group!
-      const partner = member.coupleGroup?.members[0];
-      if (partner) {
-        const splitAmount = validated.amount / 2;
-        
-        const m1Renewed = await MembershipService.renewMembership(memberId, {
-          ...payload,
-          amount: splitAmount,
-        });
+      // It's a couple renewal. We renew the single shared membership under the primary member.
+      const renewed = await MembershipService.renewMembership(memberId, {
+        ...payload,
+        amount: validated.amount, // Full amount
+      });
 
-        const m2Renewed = await MembershipService.renewMembership(partner.id, {
-          ...payload,
-          amount: splitAmount,
-        });
-
-        // Send receipt notifications
-        try {
-          await WhatsAppService.sendReceipt(memberId, m1Renewed.id);
-          await WhatsAppService.sendReceipt(partner.id, m2Renewed.id);
-        } catch (wsError) {
-          console.error("Failed to send WhatsApp receipts for couple renewal:", wsError);
+      // Send receipt notifications to both members
+      try {
+        await WhatsAppService.sendReceipt(memberId, renewed.id);
+        const partner = member.coupleGroup?.members[0];
+        if (partner) {
+          await WhatsAppService.sendReceipt(partner.id, renewed.id);
         }
-      } else {
-        // Just renew single member in group
-        const m1Renewed = await MembershipService.renewMembership(memberId, {
-          ...payload,
-        });
-
-        // Send receipt notification
-        try {
-          await WhatsAppService.sendReceipt(memberId, m1Renewed.id);
-        } catch (wsError) {
-          console.error("Failed to send WhatsApp receipt for renewal:", wsError);
-        }
+      } catch (wsError) {
+        console.error("Failed to send WhatsApp receipts for couple renewal:", wsError);
       }
     } else {
       // Regular single member renewal

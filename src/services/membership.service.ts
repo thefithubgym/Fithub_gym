@@ -21,26 +21,38 @@ export class MembershipService {
       throw new Error("End date must be after the start date.");
     }
 
-    // Check for overlapping membership dates for this member
+    const member = await prisma.member.findUnique({
+      where: { id: memberId },
+      select: { coupleGroupId: true },
+    });
+
+    // Check for overlapping membership dates for this member or their couple group
     const overlapping = await prisma.membership.findFirst({
       where: {
-        memberId,
-        id: currentMembershipId ? { not: currentMembershipId } : undefined,
         OR: [
+          { memberId },
+          member?.coupleGroupId ? { coupleGroupId: member.coupleGroupId } : {},
+        ],
+        id: currentMembershipId ? { not: currentMembershipId } : undefined,
+        AND: [
           {
-            // New startDate is within an existing membership
-            startDate: { lte: startDate },
-            endDate: { gte: startDate },
-          },
-          {
-            // New endDate is within an existing membership
-            startDate: { lte: endDate },
-            endDate: { gte: endDate },
-          },
-          {
-            // Existing membership is fully inside new membership
-            startDate: { gte: startDate },
-            endDate: { lte: endDate },
+            OR: [
+              {
+                // New startDate is within an existing membership
+                startDate: { lte: startDate },
+                endDate: { gte: startDate },
+              },
+              {
+                // New endDate is within an existing membership
+                startDate: { lte: endDate },
+                endDate: { gte: endDate },
+              },
+              {
+                // Existing membership is fully inside new membership
+                startDate: { gte: startDate },
+                endDate: { lte: endDate },
+              },
+            ],
           },
         ],
       },
@@ -134,8 +146,18 @@ export class MembershipService {
   }
 
   static async getHistoryByMember(memberId: string) {
+    const member = await prisma.member.findUnique({
+      where: { id: memberId },
+    });
+    if (!member) return [];
+
     return prisma.membership.findMany({
-      where: { memberId },
+      where: {
+        OR: [
+          { memberId },
+          member.coupleGroupId ? { coupleGroupId: member.coupleGroupId } : {},
+        ],
+      },
       orderBy: { startDate: "desc" },
       include: { membershipPlan: true },
     });
@@ -162,14 +184,32 @@ export class MembershipService {
 
     if (search) {
       conditions.push({
-        member: {
-          OR: [
-            { firstName: { contains: search, mode: "insensitive" } },
-            { lastName: { contains: search, mode: "insensitive" } },
-            { phone: { contains: search, mode: "insensitive" } },
-            { email: { contains: search, mode: "insensitive" } },
-          ],
-        },
+        OR: [
+          {
+            member: {
+              OR: [
+                { firstName: { contains: search, mode: "insensitive" } },
+                { lastName: { contains: search, mode: "insensitive" } },
+                { phone: { contains: search, mode: "insensitive" } },
+                { email: { contains: search, mode: "insensitive" } },
+              ],
+            },
+          },
+          {
+            coupleGroup: {
+              members: {
+                some: {
+                  OR: [
+                    { firstName: { contains: search, mode: "insensitive" } },
+                    { lastName: { contains: search, mode: "insensitive" } },
+                    { phone: { contains: search, mode: "insensitive" } },
+                    { email: { contains: search, mode: "insensitive" } },
+                  ],
+                },
+              },
+            },
+          },
+        ],
       });
     }
 

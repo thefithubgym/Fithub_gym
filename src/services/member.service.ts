@@ -103,6 +103,11 @@ export class MemberService {
           coupleGroup: {
             include: {
               members: true,
+              memberships: {
+                orderBy: { endDate: "desc" },
+                take: 1,
+                include: { membershipPlan: true },
+              },
             },
           },
         },
@@ -114,7 +119,7 @@ export class MemberService {
 
     return {
       data: data.map((m) => {
-        const latestMembership = m.memberships[0] || null;
+        const latestMembership = m.memberships[0] || m.coupleGroup?.memberships?.[0] || null;
         let status = "INACTIVE";
         if (latestMembership) {
           const today = new Date();
@@ -177,6 +182,10 @@ export class MemberService {
                 isDeleted: false,
               },
             },
+            memberships: {
+              orderBy: { startDate: "desc" },
+              include: { membershipPlan: true },
+            },
           },
         },
       },
@@ -186,7 +195,11 @@ export class MemberService {
       return null;
     }
 
-    const latestMembership = member.memberships.find(m => m.status === "ACTIVE") || member.memberships[0] || null;
+    const latestMembership = member.memberships.find(m => m.status === "ACTIVE") 
+      || member.memberships[0] 
+      || member.coupleGroup?.memberships?.find(m => m.status === "ACTIVE")
+      || member.coupleGroup?.memberships?.[0]
+      || null;
     let status = "INACTIVE";
     if (latestMembership) {
       const today = new Date();
