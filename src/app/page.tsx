@@ -45,7 +45,7 @@ export default async function LandingPage() {
       {/* Main Content Canvas */}
       <main className="pt-24 md:pt-20">
         {/* 1. Hero Section (Design from Screen 1 - Styled 16:9 aspect ratio, vertical paddings removed) */}
-        <section className="relative w-full aspect-[16/9] min-h-[500px] flex items-center justify-center overflow-hidden px-6 py-0">
+        <section className="relative w-full min-h-[400] md:aspect-16/6 items-center flex justify-center overflow-hidden px-6 py-0">
           {/* Background Image with Overlay */}
           <div className="absolute inset-0 z-0">
             <div
@@ -55,7 +55,7 @@ export default async function LandingPage() {
             <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent"></div>
             <div className="absolute inset-0 bg-gradient-to-r from-background via-transparent to-transparent"></div>
           </div>
-          
+
           <div className="relative z-10 text-center px-4 max-w-4xl mx-auto flex flex-col items-center gap-md">
             <div className="inline-flex items-center gap-xs px-3 py-1 rounded-full border border-outline-variant bg-surface-container-low/60 backdrop-blur-sm">
               <span className="w-2 h-2 rounded-full bg-primary-container animate-pulse"></span>
@@ -63,16 +63,16 @@ export default async function LandingPage() {
                 Premium Unisex Fitness Center
               </span>
             </div>
-            
+
             <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-extrabold uppercase text-on-surface tracking-tight leading-tight text-center">
               Unleash Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-container to-primary">Elite</span> Potential
             </h1>
-            
+
             <p className="font-body-md text-sm md:text-base text-secondary max-w-xl text-center">
               Premium Unisex Fitness Center designed for high-performance training and unparalleled luxury. Forged in discipline, engineered for results.
             </p>
-            
-            <div className="flex flex-col sm:flex-row gap-sm mt-md">
+
+            <div className="flex flex-row gap-sm mt-md">
               <a
                 href="#memberships"
                 className="bg-primary-container text-[#0F0F0F] font-bold py-3 px-6 rounded-xl hover:bg-primary transition-colors font-label-md text-sm scale-95 active:scale-90 transition-transform duration-200"
@@ -106,7 +106,7 @@ export default async function LandingPage() {
               <div className="col-span-1 md:col-span-8 bg-surface-container border border-outline-variant rounded-xl overflow-hidden group relative min-h-[400px]">
                 <div className="absolute inset-0 z-0">
                   <div
-                    className="w-full h-full bg-cover bg-center opacity-50 group-hover:opacity-70 transition-opacity duration-500"
+                    className="w-full h-full bg-cover bg-center opacity-100 md:opacity-50 group-hover:opacity-100 transition-opacity duration-500"
                     style={{ backgroundImage: "url('/assets/gallery/gallery1.jpeg')" }}
                   ></div>
                   <div className="absolute inset-0 bg-gradient-to-t from-surface-container via-surface-container/80 to-transparent"></div>
@@ -152,7 +152,7 @@ export default async function LandingPage() {
               <div className="col-span-1 md:col-span-7 bg-surface-container border border-outline-variant rounded-xl overflow-hidden group relative min-h-[250px]">
                 <div className="absolute inset-0 z-0">
                   <div
-                    className="w-full h-full bg-cover bg-center opacity-40 group-hover:opacity-60 transition-opacity duration-500"
+                    className="w-full h-full bg-cover bg-center opacity-100 md:opacity-50 group-hover:opacity-100 transition-opacity duration-500"
                     style={{ backgroundImage: "url('/assets/gallery/gallery2.jpeg')" }}
                   ></div>
                   <div className="absolute inset-0 bg-gradient-to-r from-surface-container via-surface-container/90 to-transparent"></div>
@@ -256,7 +256,7 @@ export default async function LandingPage() {
             </div>
 
             {/* Horizontal Scroll Container inside the padding hierarchy */}
-            <div 
+            <div
               className="flex overflow-x-auto gap-lg pb-lg snap-x snap-mandatory scrollbar-themed"
               style={{ scrollbarWidth: 'thin' }}
             >
@@ -284,7 +284,7 @@ export default async function LandingPage() {
         </section>
 
         {/* 5. Access Tiers (Pricing Grid - Consistent Padding) */}
-        <section className="py-16 px-container-margin bg-surface" id="memberships">
+        <section className="py-16 px-container-margin bg-linear-to-b from-surface to-transparent" id="memberships">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-2xl">
               <h2 className="font-display text-4xl md:text-5xl font-extrabold text-on-background uppercase tracking-tight">
@@ -301,11 +301,10 @@ export default async function LandingPage() {
                 return (
                   <div
                     key={plan.id}
-                    className={`rounded-xl p-xl flex flex-col relative transition-all duration-300 ${
-                      isQuarterly
-                        ? "bg-surface-container-high border-2 border-primary-container shadow-2xl shadow-primary-container/20 lg:scale-105"
-                        : "bg-surface-container border border-outline-variant hover:border-outline"
-                    }`}
+                    className={`rounded-xl p-xl flex flex-col relative transition-all duration-300 ${isQuarterly
+                      ? "bg-surface-container-high border-2 border-primary-container shadow-2xl shadow-primary-container/20 lg:scale-105"
+                      : "bg-surface-container border border-outline-variant hover:border-outline"
+                      }`}
                   >
                     {isQuarterly && (
                       <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-primary-container text-[#0F0F0F] font-label-sm uppercase px-md py-xs rounded-full whitespace-nowrap font-extrabold">
@@ -356,11 +355,10 @@ export default async function LandingPage() {
 
                     <a
                       href="#contact"
-                      className={`w-full py-md rounded-xl font-bold font-label-md text-center transition-all ${
-                        isQuarterly
-                          ? "bg-primary-container text-[#0F0F0F] hover:opacity-90"
-                          : "border border-outline-variant text-on-background hover:bg-surface-bright"
-                      }`}
+                      className={`w-full py-md rounded-xl font-bold font-label-md text-center transition-all ${isQuarterly
+                        ? "bg-primary-container text-[#0F0F0F] hover:opacity-90"
+                        : "border border-outline-variant text-on-background hover:bg-surface-bright"
+                        }`}
                     >
                       Select {plan.name.split(" ")[0]}
                     </a>
@@ -386,54 +384,13 @@ export default async function LandingPage() {
         </section>
 
         {/* 6. Connect with Us (CTA Section - Standardized Margin/Padding) */}
-        <section className="border-t border-outline-variant bg-surface py-16 px-container-margin" id="contact">
+        <section className="pt-16" id="contact">
           <div className="max-w-7xl mx-auto">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-xl">
-              {/* Left Column: Form */}
-              <div className="flex flex-col gap-lg bg-[#181818] border border-[#323232] rounded-2xl p-xl shadow-lg">
-                <div>
-                  <h2 className="font-display text-4xl md:text-5xl font-extrabold text-white uppercase tracking-tight">
-                    Connect with us
-                  </h2>
-                  <p className="text-secondary text-sm mt-sm">
-                    Have questions about memberships or want to schedule a visit? Send us a message and our team will connect with you.
-                  </p>
-                </div>
-                <form className="flex flex-col gap-md">
-                  <div className="flex flex-col gap-sm">
-                    <label className="input-label" htmlFor="fullName">Full Name</label>
-                    <input className="input-field" id="fullName" placeholder="John Doe" type="text" required />
-                  </div>
-                  <div className="flex flex-col gap-sm">
-                    <label className="input-label" htmlFor="emailAddress">Email Address</label>
-                    <input className="input-field" id="emailAddress" placeholder="john@example.com" type="email" required />
-                  </div>
-                  <div className="flex flex-col gap-sm">
-                    <label className="input-label" htmlFor="phoneNumber">Phone Number</label>
-                    <input className="input-field" id="phoneNumber" placeholder="+91 98765 43210" type="tel" required />
-                  </div>
-                  <div className="flex flex-col gap-sm">
-                    <label className="input-label" htmlFor="message">Message</label>
-                    <textarea 
-                      className="bg-[#181818] border border-[#323232] rounded-xl p-4 text-white placeholder:text-secondary focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-colors font-body-md text-body-md resize-none h-32" 
-                      id="message" 
-                      placeholder="Tell us about your goals..." 
-                      required
-                    />
-                  </div>
-                  <button 
-                    className="w-full bg-primary-container text-[#0F0F0F] font-bold rounded-xl py-4 hover:bg-primary transition-all active:scale-[0.98] cursor-pointer text-sm font-label-md"
-                    type="submit"
-                  >
-                    Send Request
-                  </button>
-                </form>
-              </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-2xl">
 
-              {/* Right Column: Contact info & Operating Hours */}
               <div className="flex flex-col gap-xl">
                 {/* Contact Details */}
-                <div className="bg-[#181818] border border-[#323232] rounded-2xl p-xl flex flex-col gap-lg">
+                <div className="flex flex-col gap-lg">
                   <h3 className="font-display text-2xl font-bold text-white uppercase tracking-tight">Facility Details</h3>
                   <div className="flex flex-col gap-md">
                     <div className="flex items-start gap-md">
@@ -442,7 +399,7 @@ export default async function LandingPage() {
                       </div>
                       <div>
                         <h4 className="text-white font-bold text-sm">Street Address</h4>
-                        <p className="text-secondary text-sm mt-xs">Kalambha Road, opp. Govt ITI, Narkher, Maharashtra 441304</p>
+                        <p className="text-secondary text-sm mt-xs">Plot no 6456, Ward no 17, opp Govt ITI, Kalambha Road, Narkhed - 441304</p>
                       </div>
                     </div>
 
@@ -452,7 +409,7 @@ export default async function LandingPage() {
                       </div>
                       <div>
                         <h4 className="text-white font-bold text-sm">Contact Number</h4>
-                        <p className="text-secondary text-sm mt-xs">+91 33 2345 6789 / +91 98765 43210</p>
+                        <p className="text-secondary text-sm mt-xs">+91 8788849529</p>
                       </div>
                     </div>
 
@@ -462,38 +419,82 @@ export default async function LandingPage() {
                       </div>
                       <div>
                         <h4 className="text-white font-bold text-sm">Email Address</h4>
-                        <p className="text-secondary text-sm mt-xs">support@thefithubgym.com / admin@thefithubgym.com</p>
+                        <p className="text-secondary text-sm mt-xs">millennialcorpllp@gmail.com</p>
                       </div>
                     </div>
                   </div>
                 </div>
 
                 {/* Operating Hours */}
-                <div className="bg-[#181818] border border-[#323232] rounded-2xl p-xl overflow-hidden">
-                  <h3 className="font-display text-2xl font-bold text-white uppercase tracking-tight mb-md">Operating Hours</h3>
+                <div className="md:pr-2xl overflow-hidden">
+                  <h3 className="font-display text-2xl font-bold text-white uppercase tracking-tight mb-xs">Operating Hours</h3>
                   <table className="w-full text-left border-collapse">
                     <thead>
                       <tr className="border-b border-[#323232]">
-                        <th className="py-sm font-label-sm text-label-sm text-secondary uppercase font-semibold">Day</th>
+                        <th className="py-sm font-label-sm text-label-sm text-secondary uppercase font-semibold">Session</th>
                         <th className="py-sm font-label-sm text-label-sm text-secondary uppercase font-semibold text-right">Hours</th>
                       </tr>
                     </thead>
                     <tbody className="font-body-md text-body-md">
                       <tr className="border-b border-[#323232]">
-                        <td className="py-md text-on-surface">Monday - Friday</td>
-                        <td className="py-md text-secondary text-right">5:00 AM - 11:00 PM</td>
+                        <td className="py-md text-on-surface font-semibold">Morning</td>
+                        <td className="py-md text-secondary text-right">6:00 AM - 11:00 AM</td>
                       </tr>
                       <tr className="border-b border-[#323232]">
-                        <td className="py-md text-on-surface">Saturday</td>
-                        <td className="py-md text-secondary text-right">6:00 AM - 9:00 PM</td>
+                        <td className="py-md text-on-surface/80 pl-4 text-sm italic">└ Ladies Special</td>
+                        <td className="py-md text-secondary/80 text-right text-sm italic">6:00 AM - 7:00 AM</td>
+                      </tr>
+                      <tr className="border-b border-[#323232]">
+                        <td className="py-md text-on-surface font-semibold">Evening</td>
+                        <td className="py-md text-secondary text-right">4:00 PM - 9:00 PM</td>
                       </tr>
                       <tr>
-                        <td className="py-md text-on-surface">Sunday</td>
-                        <td className="py-md text-secondary text-right">7:00 AM - 8:00 PM</td>
+                        <td className="py-md text-on-surface/80 pl-4 text-sm italic">└ Ladies Special</td>
+                        <td className="py-md text-secondary/80 text-right text-sm italic">4:00 PM - 5:00 PM</td>
                       </tr>
                     </tbody>
                   </table>
                 </div>
+              </div>
+
+              <div className="flex flex-col gap-lg bg-surface rounded-2xl ">
+                <div>
+                  <h2 className="font-display text-4xl md:text-5xl font-extrabold text-white uppercase tracking-tight">
+                    Connect with us
+                  </h2>
+                  <p className="text-secondary text-sm mt-sm">
+                    Have questions about memberships or want to schedule a visit? Send us a message and our team will connect with you.
+                  </p>
+                </div>
+                <form className="flex flex-col gap-4">
+                  <div className="flex flex-col gap-0">
+                    <label className="input-label" htmlFor="fullName">Full Name</label>
+                    <input className="input-field" id="fullName" placeholder="John Doe" type="text" required />
+                  </div>
+                  <div className="flex flex-col gap-0">
+                    <label className="input-label" htmlFor="emailAddress">Email Address</label>
+                    <input className="input-field" id="emailAddress" placeholder="john@example.com" type="email" required />
+                  </div>
+                  <div className="flex flex-col gap-0">
+                    <label className="input-label" htmlFor="phoneNumber">Phone Number</label>
+                    <input className="input-field" id="phoneNumber" placeholder="+91 98765 43210" type="tel" required />
+                  </div>
+                  <div className="flex flex-col gap-0">
+                    <label className="input-label" htmlFor="message">Message</label>
+                    <textarea
+                      className="bg-[#181818] border border-[#323232] rounded-xl p-4 text-white placeholder:text-secondary focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-colors font-body-md text-body-md resize-none h-32"
+                      id="message"
+                      placeholder="Tell us about your goals..."
+                      required
+                    />
+                  </div>
+                  <button
+                    className="w-full bg-primary-container text-[#0F0F0F] font-bold rounded-xl py-4 hover:bg-primary transition-all active:scale-[0.98] cursor-pointer text-sm font-label-md"
+                    type="submit"
+                  >
+                    Send Request
+                  </button>
+                </form>
               </div>
             </div>
           </div>
@@ -501,7 +502,7 @@ export default async function LandingPage() {
           {/* Map layout directly below contact panels - pointing to Narkher address iframe, grayscale, bounce pin removed */}
           <div className="w-full h-96 border-t border-[#323232] relative mt-16 overflow-hidden">
             <iframe
-              src="https://maps.google.com/maps?q=Kalambha%20Road,%20opp.%20Govt%20ITI,%20Narkher,%20Maharashtra%20441304&t=&z=16&ie=UTF8&iwloc=&output=embed"
+              src="https://maps.google.com/maps?q=Plot%20no%206456,%20Ward%20no%2017,%20opp%20Govt%20ITI,%20Kalambha%20Road,%20Narkhed%20-%20441304&t=&z=16&ie=UTF8&iwloc=&output=embed"
               className="w-full h-full border-0 grayscale opacity-80 contrast-125"
               allowFullScreen
               loading="lazy"
@@ -509,10 +510,10 @@ export default async function LandingPage() {
             ></iframe>
             <div className="absolute bottom-lg left-1/2 -translate-x-1/2 bg-[#181818] border border-[#323232] px-lg py-md rounded-xl shadow-lg backdrop-blur-md flex items-center gap-md z-10">
               <Compass className="w-5 h-5 text-primary-container animate-spin" style={{ animationDuration: '6s' }} />
-              <a 
+              <a
                 target="_blank"
                 rel="noopener noreferrer"
-                href="https://www.google.com/maps?gs_lcrp=EgZjaHJvbWUqCAgAEEUYJxg7MggIABBFGCcYOzIHCAEQABiABDIHCAIQABiABDIHCAMQABiABDIHCAQQABiABDIHCAUQABiABDIHCAYQABiABDIHCAcQABiABDIHCAgQABiABDIHCAkQABiABNIBCTEwNTM0ajBqN6gCALACAA&um=1&ie=UTF-8&fb=1&gl=in&sa=X&geocode=KY-RnQyGrdU7MaHJY1UE-nxj&daddr=Kalambha+Road,+opp.+Govt+ITI,+Narkher,+Maharashtra+441304"
+                href="https://www.google.com/maps?gs_lcrp=EgZjaHJvbWUqCAgAEEUYJxg7MggIABBFGCcYOzIHCAEQABiABDIHCAIQABiABDIHCAMQABiABDIHCAQQABiABDIHCAUQABiABDIHCAYQABiABDIHCAcQABiABDIHCAgQABiABDIHCAkQABiABNIBCTEwNTM0ajBqN6gCALACAA&um=1&ie=UTF-8&fb=1&gl=in&sa=X&geocode=KY-RnQyGrdU7MaHJY1UE-nxj&daddr=Plot+no+6456,+Ward+no+17,+opp+Govt+ITI,+Kalambha+Road,+Narkhed+-+441304"
                 className="font-label-md text-xs md:text-sm font-bold text-white hover:text-primary transition-colors"
               >
                 Find Us on Google Maps
@@ -524,51 +525,73 @@ export default async function LandingPage() {
 
       {/* Footer (Re-structured columns and Copyright details) */}
       <footer className="bg-surface-container dark:bg-surface-container w-full border-t border-outline-variant py-16 px-container-margin">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-xl items-start">
-          {/* Left Column: links that are already present in the header and login */}
-          <div className="col-span-1 md:col-span-6 flex flex-col space-y-md font-label-sm text-label-sm">
-            <span className="text-on-surface font-bold uppercase tracking-wider text-xs border-b border-outline-variant/30 pb-xs">
-              Quick Links
-            </span>
-            <div className="grid grid-cols-2 gap-sm">
-              <div className="flex flex-col space-y-sm">
-                <Link className="text-on-surface-variant hover:text-primary transition-colors text-sm" href="#">Home</Link>
-                <a className="text-on-surface-variant hover:text-primary transition-colors text-sm" href="#training">Training</a>
-                <a className="text-on-surface-variant hover:text-primary transition-colors text-sm" href="#memberships">Memberships</a>
+        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-5 gap-8 md:items-center">
+          <div className="col-span-1 md:col-span-2 flex flex-col gap-md md:pr-xl">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-md">
+              <div className="flex items-center gap-md">
+                <img
+                  src="/assets/gallery/logo.jpeg"
+                  alt="The FitHub Gym Logo"
+                  className="h-10 w-auto object-contain rounded border border-outline-variant/20"
+                />
+                <div className="h-6 w-px bg-outline-variant/40 hidden sm:block" />
               </div>
-              <div className="flex flex-col space-y-sm">
-                <a className="text-on-surface-variant hover:text-primary transition-colors text-sm" href="#coaches">Coaches</a>
-                <a className="text-on-surface-variant hover:text-primary transition-colors text-sm" href="#contact">Contact</a>
-                <Link className="text-on-surface-variant hover:text-primary transition-colors text-sm font-semibold text-primary" href="/auth/login">Login</Link>
+              <div className="flex gap-md">
+                <a
+                  href="https://www.instagram.com/thefithubgym.narkhed"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-on-surface-variant hover:text-primary transition-colors flex items-center gap-xs text-xs"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="w-6 h-6 shrink-0"
+                  >
+                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+                  </svg>
+                </a>
+                <a
+                  href="mailto:millennialcorpllp@gmail.com"
+                  className="text-on-surface-variant hover:text-primary transition-colors flex items-center gap-xs text-xs"
+                >
+                  <Mail className="w-6 h-6 shrink-0" />
+                </a>
               </div>
             </div>
+
+            <p className="text-on-surface-variant">Premium Unisex Fitness Center designed for high-performance training and unparalleled luxury. Forged in discipline, engineered for results.</p>
           </div>
 
-          {/* Right Column: brand description & logo image below it */}
-          <div className="col-span-1 md:col-span-6 space-y-md md:text-right md:flex md:flex-col md:items-end">
-            <div className="font-headline-md text-headline-md font-bold text-primary dark:text-primary tracking-tight uppercase">
-              The FitHub Gym
-            </div>
-            <p className="font-label-sm text-label-sm text-on-surface-variant max-w-sm font-normal leading-relaxed md:text-right">
-              Elite Performance Standards. Engineered for those who demand more from their training environment.
-            </p>
-            <img 
-              src="/assets/gallery/logo.jpeg" 
-              alt="The FitHub Gym Logo" 
-              className="h-16 w-auto object-contain rounded mt-sm border border-outline-variant/20" 
-            />
+          <div className="col-span-1 md:col-span-3 flex justify-between items-center w-full h-fit flex-wrap sm:flex-nowrap gap-sm">
+            <Link className="text-on-surface-variant hover:text-primary transition-colors text-sm" href="#">Home</Link>
+            <a className="text-on-surface-variant hover:text-primary transition-colors text-sm" href="#training">Training</a>
+            <a className="text-on-surface-variant hover:text-primary transition-colors text-sm" href="#memberships">Memberships</a>
+            <a className="text-on-surface-variant hover:text-primary transition-colors text-sm" href="#coaches">Coaches</a>
+            <a className="text-on-surface-variant hover:text-primary transition-colors text-sm" href="#contact">Contact</a>
+            <div className="h-6 w-px bg-outline-variant/40 hidden sm:block" />
+            <Link className="text-on-surface-variant hover:text-primary transition-colors text-sm font-semibold text-primary" href="/auth/login">Login</Link>
           </div>
         </div>
 
         {/* Below footer: copyright (left) and legal links (right) */}
-        <div className="max-w-7xl mx-auto border-t border-outline-variant/20 mt-xl pt-lg flex flex-col md:flex-row justify-between items-center gap-md text-xs text-on-surface-variant">
-          <div className="md:text-left">
-            © {new Date().getFullYear()} The FitHub Gym by Millenial Corp LLP. All rights reserved.
+        <div className="max-w-7xl mx-auto border-t border-outline-variant/20 mt-xl pt-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-md text-xs text-on-surface-variant">
+          <div className="flex flex-col gap-xs">
+
+            <div className="text-on-surface-variant/70">
+              © {new Date().getFullYear()} The FitHub Gym by Millenial Corp LLP. All rights reserved.
+            </div>
           </div>
           <div className="flex gap-lg justify-end">
             <Link className="hover:text-primary transition-colors" href="#">Privacy Policy</Link>
             <Link className="hover:text-primary transition-colors" href="#">Terms of Service</Link>
-            <Link className="hover:text-primary transition-colors" href="#">Accessibility</Link>
           </div>
         </div>
       </footer>
