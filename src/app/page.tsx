@@ -7,9 +7,13 @@ import ProvingGrounds from "@/components/landing/ProvingGrounds";
 import AccessTiers from "@/components/landing/AccessTiers";
 import ConnectWithUs from "@/components/landing/ConnectWithUs";
 import Footer from "@/components/landing/Footer";
+import { auth } from "@/auth";
 
 
 export default async function LandingPage() {
+  const session = await auth();
+  const isLoggedIn = !!session?.user;
+
   // Fetch active plans to display in the pricing grid
   const allPlans = await prisma.membershipPlan.findMany({
     where: { isActive: true },
@@ -31,7 +35,7 @@ export default async function LandingPage() {
 
   return (
     <div className="bg-background text-on-background min-h-screen font-sans antialiased overflow-x-hidden relative selection:bg-primary-container selection:text-on-primary-container">
-      <Header />
+      <Header isLoggedIn={isLoggedIn} />
 
       <main className="pt-20">
         <HeroSection />
@@ -47,7 +51,7 @@ export default async function LandingPage() {
         <ConnectWithUs />
       </main>
 
-      <Footer />
+      <Footer isLoggedIn={isLoggedIn} />
     </div>
   );
 }

@@ -2,7 +2,11 @@ import Link from "next/link";
 import { Mail } from "lucide-react";
 import Logo from "./Logo";
 
-export default function Footer() {
+interface FooterProps {
+  isLoggedIn?: boolean;
+}
+
+export default function Footer({ isLoggedIn }: FooterProps) {
   return (
     <footer className="bg-surface-container dark:bg-surface-container w-full border-t border-outline-variant py-16 px-4 md:px-container-margin">
       <div className="max-w-7xl md:px-container-margin mx-auto grid grid-cols-1 md:grid-cols-5 gap-8 md:items-center">
@@ -55,7 +59,11 @@ export default function Footer() {
           <a className="text-on-surface-variant hover:text-primary transition-colors text-sm" href="#coaches">Coaches</a>
           <a className="text-on-surface-variant hover:text-primary transition-colors text-sm" href="#contact">Contact</a>
           <div className="h-6 w-px bg-outline-variant/40 block" />
-          <Link className="transition-colors text-sm font-semibold text-primary" href="/auth/login">Login</Link>
+          {isLoggedIn ? (
+            <Link className="transition-colors text-sm font-semibold text-primary" href="/admin/dashboard">Dashboard</Link>
+          ) : (
+            <Link className="transition-colors text-sm font-semibold text-primary" href="/auth/login">Login</Link>
+          )}
         </div>
       </div>
 
