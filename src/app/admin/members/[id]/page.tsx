@@ -27,9 +27,20 @@ interface PageProps {
   }>;
 }
 
-export const dynamic = "force-dynamic";
+import { Suspense } from "react";
+import MemberDetailLoading from "./loading";
 
-export default async function MemberDetailPage({ params }: PageProps) {
+export const unstable_instant = { prefetch: "static", unstable_disableValidation: true };
+
+export default function MemberDetailPage({ params }: PageProps) {
+  return (
+    <Suspense fallback={<MemberDetailLoading />}>
+      <MemberDetailContent params={params} />
+    </Suspense>
+  );
+}
+
+async function MemberDetailContent({ params }: PageProps) {
   const { id } = await params;
   const member = await MemberService.getMemberById(id);
 

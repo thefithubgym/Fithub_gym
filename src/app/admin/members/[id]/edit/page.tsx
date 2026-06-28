@@ -8,9 +8,20 @@ interface PageProps {
   }>;
 }
 
-export const dynamic = "force-dynamic";
+import { Suspense } from "react";
+import EditMemberLoading from "./loading";
 
-export default async function EditMemberPage({ params }: PageProps) {
+export const unstable_instant = { prefetch: "static", unstable_disableValidation: true };
+
+export default function EditMemberPage({ params }: PageProps) {
+  return (
+    <Suspense fallback={<EditMemberLoading />}>
+      <EditMemberContent params={params} />
+    </Suspense>
+  );
+}
+
+async function EditMemberContent({ params }: PageProps) {
   const { id } = await params;
   const member = await MemberService.getMemberById(id);
 

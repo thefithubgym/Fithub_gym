@@ -1,9 +1,20 @@
 import { PlanService } from "@/services/plan.service";
 import PlansListClient from "./PlansListClient";
 
-export const dynamic = "force-dynamic";
+import { Suspense } from "react";
+import MembershipPlansLoading from "./loading";
 
-export default async function MembershipPlansPage() {
+export const unstable_instant = { prefetch: "static", unstable_disableValidation: true };
+
+export default function MembershipPlansPage() {
+  return (
+    <Suspense fallback={<MembershipPlansLoading />}>
+      <MembershipPlansContent />
+    </Suspense>
+  );
+}
+
+async function MembershipPlansContent() {
   const activePlans = await PlanService.getPlans();
 
   // Convert schema object to plain properties for React client rendering

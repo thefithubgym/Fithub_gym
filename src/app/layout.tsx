@@ -12,6 +12,8 @@ export const metadata: Metadata = {
   description: "Unisex Fitness Center Admin Portal & Member Site",
 };
 
+import { Suspense } from "react";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -27,7 +29,9 @@ export default function RootLayout({
         />
       </head>
       <body className="bg-background text-on-background min-h-screen font-sans antialiased">
-        {children}
+        <Suspense fallback={null}>
+          {children}
+        </Suspense>
       </body>
     </html>
   );

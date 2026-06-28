@@ -25,9 +25,20 @@ interface PageProps {
   }>;
 }
 
-export const dynamic = "force-dynamic";
+import { Suspense } from "react";
+import MembersLoading from "./loading";
 
-export default async function MembersPage({ searchParams }: PageProps) {
+export const unstable_instant = { prefetch: "static", unstable_disableValidation: true };
+
+export default function MembersPage({ searchParams }: PageProps) {
+  return (
+    <Suspense fallback={<MembersLoading />}>
+      <MembersContent searchParams={searchParams} />
+    </Suspense>
+  );
+}
+
+async function MembersContent({ searchParams }: PageProps) {
   const params = await searchParams;
   const page = Number(params.page || "1");
   const search = params.search || "";

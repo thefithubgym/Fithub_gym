@@ -9,9 +9,20 @@ interface PageProps {
   }>;
 }
 
-export const dynamic = "force-dynamic";
+import { Suspense } from "react";
+import RenewMemberLoading from "./loading";
 
-export default async function RenewMemberPage({ params }: PageProps) {
+export const unstable_instant = { prefetch: "static", unstable_disableValidation: true };
+
+export default function RenewMemberPage({ params }: PageProps) {
+  return (
+    <Suspense fallback={<RenewMemberLoading />}>
+      <RenewMemberContent params={params} />
+    </Suspense>
+  );
+}
+
+async function RenewMemberContent({ params }: PageProps) {
   const { id } = await params;
   
   // Fetch member info
