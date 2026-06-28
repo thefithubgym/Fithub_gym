@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Mail } from "lucide-react";
+import Logo from "./Logo";
 
 export default function Footer() {
   return (
@@ -8,11 +9,7 @@ export default function Footer() {
         <div className="col-span-1 md:col-span-2 flex flex-col gap-md md:pr-xl">
           <div className="flex flex-col sm:flex-row sm:items-center gap-md">
             <div className="flex items-center gap-md">
-              <img
-                src="/assets/gallery/logo.jpeg"
-                alt="The FitHub Gym Logo"
-                className="h-10 w-auto object-contain rounded border border-outline-variant/20"
-              />
+              <Logo />
               <div className="h-6 w-px bg-outline-variant/40 hidden sm:block" />
             </div>
             <div className="flex gap-md">

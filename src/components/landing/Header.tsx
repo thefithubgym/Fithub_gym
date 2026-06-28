@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
+import Logo from "./Logo";
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -32,11 +33,7 @@ export default function Header() {
         <div className="flex justify-between items-center h-full px-container-margin max-w-7xl mx-auto w-full">
           {/* Brand Logo */}
           <Link href="#" className="flex items-center gap-md hover:opacity-90 transition-opacity">
-            <img 
-              src="/assets/gallery/logo.jpeg" 
-              alt="The FitHub Gym Logo" 
-              className="h-12 w-auto object-contain rounded" 
-            />
+            <Logo />
           </Link>
 
           {/* Desktop Navigation */}

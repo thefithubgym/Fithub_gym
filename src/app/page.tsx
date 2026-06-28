@@ -32,31 +32,22 @@ export default async function LandingPage() {
 
   return (
     <div className="bg-background text-on-background min-h-screen font-sans antialiased overflow-x-hidden relative selection:bg-primary-container selection:text-on-primary-container">
-      {/* Interactive Top Navbar */}
       <Header />
 
-      {/* Main Content Canvas */}
       <main className="pt-24 md:pt-20">
-        {/* 1. Hero Section */}
         <HeroSection />
 
-        {/* 2. The Standard of Excellence */}
         <StandardOfExcellence />
 
-        {/* 3. The Elite Performance Framework */}
         <PerformanceFramework />
 
-        {/* 4. The Proving Grounds */}
         <ProvingGrounds />
 
-        {/* 5. Access Tiers */}
         <AccessTiers plans={plans} />
 
-        {/* 6. Connect with Us */}
         <ConnectWithUs />
       </main>
 
-      {/* Footer */}
       <Footer />
     </div>
   );
