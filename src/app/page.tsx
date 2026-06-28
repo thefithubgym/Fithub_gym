@@ -34,7 +34,7 @@ export default async function LandingPage() {
     <div className="bg-background text-on-background min-h-screen font-sans antialiased overflow-x-hidden relative selection:bg-primary-container selection:text-on-primary-container">
       <Header />
 
-      <main className="pt-24 md:pt-20">
+      <main className="pt-20">
         <HeroSection />
 
         <StandardOfExcellence />

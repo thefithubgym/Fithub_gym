@@ -1,6 +1,6 @@
 export default function HeroSection() {
   return (
-    <section className="relative w-full min-h-[400px] md:aspect-16/6 items-center flex justify-center overflow-hidden px-container-margin py-0 ">
+    <section className="relative w-full min-h-[450px] md:aspect-16/6 items-center flex justify-center overflow-hidden px-container-margin py-0 ">
       {/* Background Image with Overlay */}
       <div className="absolute inset-0 z-0">
         <div
