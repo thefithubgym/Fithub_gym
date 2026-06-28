@@ -13,7 +13,11 @@ const navLinks = [
   { label: "Gallery", href: "#gallery" },
 ];
 
-export default function Header() {
+interface HeaderProps {
+  isLoggedIn?: boolean;
+}
+
+export default function Header({ isLoggedIn }: HeaderProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -52,9 +56,15 @@ export default function Header() {
               </Link>
             ))}
 
-            <Link href="/auth/login" className="text-primary">
-              Login
-            </Link>
+            {isLoggedIn ? (
+              <Link href="/admin/dashboard" className="text-primary">
+                Dashboard
+              </Link>
+            ) : (
+              <Link href="/auth/login" className="text-primary">
+                Login
+              </Link>
+            )}
           </div>
 
           {/* Mobile Menu Toggle */}
@@ -91,13 +101,23 @@ export default function Header() {
             </Link>
           ))}
           <div className="h-px bg-outline-variant w-42 mx-auto"></div>
-          <Link
-            href="/auth/login"
-            className="text-primary"
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
-            Login
-          </Link>
+          {isLoggedIn ? (
+            <Link
+              href="/admin/dashboard"
+              className="text-primary"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Dashboard
+            </Link>
+          ) : (
+            <Link
+              href="/auth/login"
+              className="text-primary"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Login
+            </Link>
+          )}
         </div>
       </div>
     </>

@@ -71,13 +71,18 @@ export class MembershipService {
     await this.validateDates(data.memberId, data.startDate, data.endDate);
 
     // 2. Derive status
+    const start = new Date(data.startDate);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(data.endDate);
+    end.setHours(0, 0, 0, 0);
+
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     let status: MembershipStatus = MembershipStatus.ACTIVE;
     
-    if (data.startDate > today) {
+    if (start > today) {
       status = MembershipStatus.UPCOMING;
-    } else if (data.endDate < today) {
+    } else if (end < today) {
       status = MembershipStatus.EXPIRED;
     }
 
@@ -113,14 +118,20 @@ export class MembershipService {
     // Validate dates
     await this.validateDates(memberId, input.startDate, input.endDate);
 
+    const start = new Date(input.startDate);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(input.endDate);
+    end.setHours(0, 0, 0, 0);
+
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     let status: MembershipStatus = MembershipStatus.ACTIVE;
-    if (input.startDate > today) {
+    if (start > today) {
       status = MembershipStatus.UPCOMING;
-    } else if (input.endDate < today) {
+    } else if (end < today) {
       status = MembershipStatus.EXPIRED;
     }
+
 
     // Create new membership record
     const newMembership = await prisma.membership.create({
@@ -169,12 +180,14 @@ export class MembershipService {
     search = "",
     status = "",
     planId = "",
+    dateRange = "all_time",
   }: {
     page?: number;
     limit?: number;
     search?: string;
     status?: string;
     planId?: string;
+    dateRange?: string;
   }) {
     const skip = (page - 1) * limit;
 
@@ -214,39 +227,52 @@ export class MembershipService {
     }
 
     if (status) {
-      const now = new Date();
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+      const todayEnd = new Date();
+      todayEnd.setHours(23, 59, 59, 999);
+
       if (status === "active") {
         conditions.push({
-          status: "ACTIVE",
-          startDate: { lte: now },
-          endDate: { gte: now },
+          startDate: { lte: todayEnd },
+          endDate: { gte: todayStart },
         });
       } else if (status === "expiring_soon") {
-        const fiveDaysFromNow = new Date();
-        fiveDaysFromNow.setDate(fiveDaysFromNow.getDate() + 5);
+        const fiveDaysFromNowEnd = new Date();
+        fiveDaysFromNowEnd.setDate(fiveDaysFromNowEnd.getDate() + 5);
+        fiveDaysFromNowEnd.setHours(23, 59, 59, 999);
+
         conditions.push({
-          status: "ACTIVE",
-          startDate: { lte: now },
+          startDate: { lte: todayEnd },
           endDate: {
-            gte: now,
-            lte: fiveDaysFromNow,
+            gte: todayStart,
+            lte: fiveDaysFromNowEnd,
           },
         });
       } else if (status === "expired") {
         conditions.push({
-          OR: [
-            { status: "EXPIRED" },
-            { endDate: { lt: now } },
-          ],
+          endDate: { lt: todayStart },
         });
       } else if (status === "upcoming") {
         conditions.push({
-          OR: [
-            { status: "UPCOMING" },
-            { startDate: { gt: now } },
-          ],
+          startDate: { gt: todayEnd },
         });
       }
+    }
+
+    if (dateRange === "current_month") {
+      const now = new Date();
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      startOfMonth.setHours(0, 0, 0, 0);
+      const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+      endOfMonth.setHours(23, 59, 59, 999);
+
+      conditions.push({
+        startDate: {
+          gte: startOfMonth,
+          lte: endOfMonth,
+        },
+      });
     }
 
     if (planId) {
@@ -266,26 +292,39 @@ export class MembershipService {
         include: {
           member: true,
           membershipPlan: true,
+          coupleGroup: {
+            include: {
+              members: true,
+            },
+          },
         },
       }),
       prisma.membership.count({ where }),
     ]);
 
     return {
-      data: data.map(m => ({
-        id: m.id,
-        memberName: `${m.member.firstName} ${m.member.lastName}`,
-        memberId: m.memberId,
-        planName: m.membershipPlan?.name || m.customPlanName || "Custom Plan",
-        amount: Number(m.amount),
-        registrationFee: Number(m.registrationFee),
-        paymentMethod: m.paymentMethod,
-        paymentReference: m.paymentReference,
-        startDate: m.startDate,
-        endDate: m.endDate,
-        status: m.status,
-        createdAt: m.createdAt,
-      })),
+      data: data.map(m => {
+        const partner = m.coupleGroup?.members.find(
+          (member) => member.id !== m.memberId
+        ) || null;
+        return {
+          id: m.id,
+          memberName: `${m.member.firstName} ${m.member.lastName}`,
+          memberId: m.memberId,
+          memberPhone: m.member.phone,
+          memberEmail: m.member.email || "",
+          partnerName: partner ? `${partner.firstName} ${partner.lastName}` : "",
+          planName: m.membershipPlan?.name || m.customPlanName || "Custom Plan",
+          amount: Number(m.amount),
+          registrationFee: Number(m.registrationFee),
+          paymentMethod: m.paymentMethod,
+          paymentReference: m.paymentReference,
+          startDate: m.startDate,
+          endDate: m.endDate,
+          status: m.status,
+          createdAt: m.createdAt,
+        };
+      }),
       total,
       page,
       pageSize: limit,
