@@ -45,7 +45,7 @@ export default async function LandingPage() {
       {/* Main Content Canvas */}
       <main className="pt-24 md:pt-20">
         {/* 1. Hero Section (Design from Screen 1 - Styled 16:9 aspect ratio, vertical paddings removed) */}
-        <section className="relative w-full min-h-[400] md:aspect-16/6 items-center flex justify-center overflow-hidden px-6 py-0">
+        <section className="relative w-full min-h-[400px] md:aspect-16/6 items-center flex justify-center overflow-hidden px-container-margin py-0 ">
           {/* Background Image with Overlay */}
           <div className="absolute inset-0 z-0">
             <div
@@ -56,42 +56,44 @@ export default async function LandingPage() {
             <div className="absolute inset-0 bg-gradient-to-r from-background via-transparent to-transparent"></div>
           </div>
 
-          <div className="relative z-10 text-center px-4 max-w-4xl mx-auto flex flex-col items-center gap-md">
-            <div className="inline-flex items-center gap-xs px-3 py-1 rounded-full border border-outline-variant bg-surface-container-low/60 backdrop-blur-sm">
-              <span className="w-2 h-2 rounded-full bg-primary-container animate-pulse"></span>
-              <span className="font-label-sm text-xs text-on-surface-variant uppercase tracking-wider">
-                Premium Unisex Fitness Center
-              </span>
-            </div>
+          <div className="max-w-7xl mx-auto w-full relative z-10 flex flex-col items-center justify-center">
+            <div className="text-center px-4 max-w-4xl mx-auto flex flex-col items-center gap-md">
+              <div className="inline-flex items-center gap-xs px-3 py-1 rounded-full border border-outline-variant bg-surface-container-low/60 backdrop-blur-sm">
+                <span className="w-2 h-2 rounded-full bg-primary-container animate-pulse"></span>
+                <span className="font-label-sm text-xs text-on-surface-variant uppercase tracking-wider">
+                  Premium Unisex Fitness Center
+                </span>
+              </div>
 
-            <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-extrabold uppercase text-on-surface tracking-tight leading-tight text-center">
-              Unleash Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-container to-primary">Elite</span> Potential
-            </h1>
+              <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-extrabold uppercase text-on-surface tracking-tight leading-tight text-center">
+                Unleash Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-container to-primary">Elite</span> Potential
+              </h1>
 
-            <p className="font-body-md text-sm md:text-base text-secondary max-w-xl text-center">
-              Premium Unisex Fitness Center designed for high-performance training and unparalleled luxury. Forged in discipline, engineered for results.
-            </p>
+              <p className="font-body-md text-sm md:text-base text-secondary max-w-xl text-center">
+                Premium Unisex Fitness Center designed for high-performance training and unparalleled luxury. Forged in discipline, engineered for results.
+              </p>
 
-            <div className="flex flex-row gap-sm mt-md">
-              <a
-                href="#memberships"
-                className="bg-primary-container text-[#0F0F0F] font-bold py-3 px-6 rounded-xl hover:bg-primary transition-colors font-label-md text-sm scale-95 active:scale-90 transition-transform duration-200"
-              >
-                Join Now
-              </a>
-              <a
-                href="#training"
-                className="bg-transparent border border-outline-variant text-on-surface font-bold py-3 px-6 rounded-xl hover:border-primary-container hover:text-primary transition-colors font-label-md text-sm scale-95 active:scale-90 transition-transform duration-200"
-              >
-                Explore Facility
-              </a>
+              <div className="flex flex-row gap-sm mt-md">
+                <a
+                  href="#memberships"
+                  className="bg-primary-container text-[#0F0F0F] font-bold py-3 px-6 rounded-xl hover:bg-primary transition-colors font-label-md text-sm scale-95 active:scale-90 transition-transform duration-200"
+                >
+                  Join Now
+                </a>
+                <a
+                  href="#training"
+                  className="bg-transparent border border-outline-variant text-on-surface font-bold py-3 px-6 rounded-xl hover:border-primary-container hover:text-primary transition-colors font-label-md text-sm scale-95 active:scale-90 transition-transform duration-200"
+                >
+                  Explore Facility
+                </a>
+              </div>
             </div>
           </div>
         </section>
 
         {/* 2. The Standard of Excellence (Bento Grid from Screen 2 - Consistent Padding) */}
-        <section className="py-16 px-container-margin bg-surface-container-lowest" id="training">
-          <div className="max-w-7xl mx-auto space-y-2xl">
+        <section className="py-16 bg-surface-container-lowest" id="training">
+          <div className="max-w-7xl px-container-margin mx-auto space-y-2xl">
             <div className="text-center space-y-sm max-w-3xl mx-auto">
               <h2 className="font-display text-4xl md:text-5xl font-extrabold text-on-background uppercase tracking-tight">
                 The Standard of Excellence
@@ -157,7 +159,7 @@ export default async function LandingPage() {
                   ></div>
                   <div className="absolute inset-0 bg-gradient-to-r from-surface-container via-surface-container/90 to-transparent"></div>
                 </div>
-                <div className="relative z-10 p-xl h-full flex flex-col justify-center w-2/3">
+                <div className="relative z-10 p-xl h-full flex flex-col justify-center w-full md:w-2/3">
                   <div className="w-12 h-12 rounded-lg bg-surface border border-outline-variant flex items-center justify-center mb-md text-primary-container self-start">
                     <span className="material-symbols-outlined">spa</span>
                   </div>
@@ -172,8 +174,8 @@ export default async function LandingPage() {
         </section>
 
         {/* 3. The Elite Performance Framework (from Screen 2 - Consistent Padding) */}
-        <section className="py-16 px-container-margin bg-surface">
-          <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-2xl items-center">
+        <section className="py-16 bg-surface">
+          <div className="max-w-7xl px-container-margin mx-auto flex flex-col lg:flex-row gap-2xl items-center">
             <div className="flex-1 space-y-xl">
               <div>
                 <h2 className="font-display text-4xl md:text-5xl font-extrabold text-on-background mb-md uppercase tracking-tight">
@@ -230,7 +232,7 @@ export default async function LandingPage() {
 
             {/* Spinning decorative frame surrounding gallery3.jpeg */}
             <div className="flex-1 w-full relative">
-              <div className="aspect-square max-w-md mx-auto rounded-full border border-outline-variant flex items-center justify-center relative overflow-hidden p-lg">
+              <div className="aspect-square w-full max-w-md mx-auto rounded-full border border-outline-variant flex items-center justify-center relative overflow-hidden p-lg">
                 <div className="absolute inset-0 border border-primary-container/20 rounded-full animate-[spin_60s_linear_infinite]"></div>
                 <div className="absolute inset-xl border border-outline-variant rounded-full border-dashed animate-[spin_40s_linear_infinite_reverse]"></div>
                 <div
@@ -257,7 +259,7 @@ export default async function LandingPage() {
 
             {/* Horizontal Scroll Container inside the padding hierarchy */}
             <div
-              className="flex overflow-x-auto gap-lg pb-lg snap-x snap-mandatory scrollbar-themed"
+              className="flex w-full max-w-full overflow-x-auto gap-lg pb-lg snap-x snap-mandatory scrollbar-themed"
               style={{ scrollbarWidth: 'thin' }}
             >
               {gallerySlides.map((slide, index) => (
@@ -284,8 +286,8 @@ export default async function LandingPage() {
         </section>
 
         {/* 5. Access Tiers (Pricing Grid - Consistent Padding) */}
-        <section className="py-16 px-container-margin bg-linear-to-b from-surface to-transparent" id="memberships">
-          <div className="max-w-7xl mx-auto">
+        <section className="py-16 bg-linear-to-b from-surface to-transparent" id="memberships">
+          <div className="max-w-7xl px-container-margin mx-auto">
             <div className="text-center mb-2xl">
               <h2 className="font-display text-4xl md:text-5xl font-extrabold text-on-background uppercase tracking-tight">
                 Access Tiers
@@ -373,7 +375,7 @@ export default async function LandingPage() {
                 Looking for customized cardio programs, personal trainers, or couple discounts? Get in touch with us!
               </p>
               <a
-                href="#contact"
+                href="#contact-form"
                 className="inline-flex items-center gap-xs bg-transparent border border-outline-variant hover:border-primary-container hover:text-primary-container text-on-background font-bold py-2.5 px-6 rounded-xl text-sm transition-all duration-300 active:scale-95 cursor-pointer"
               >
                 <span className="material-symbols-outlined text-sm">mail</span>
@@ -385,7 +387,7 @@ export default async function LandingPage() {
 
         {/* 6. Connect with Us (CTA Section - Standardized Margin/Padding) */}
         <section className="pt-16" id="contact">
-          <div className="max-w-7xl mx-auto">
+          <div className="max-w-7xl px-container-margin mx-auto">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-2xl">
 
               <div className="flex flex-col gap-xl">
@@ -457,7 +459,7 @@ export default async function LandingPage() {
                 </div>
               </div>
 
-              <div className="flex flex-col gap-lg bg-surface rounded-2xl ">
+              <div className="flex flex-col gap-lg" id='contact-form'>
                 <div>
                   <h2 className="font-display text-4xl md:text-5xl font-extrabold text-white uppercase tracking-tight">
                     Connect with us
@@ -525,7 +527,7 @@ export default async function LandingPage() {
 
       {/* Footer (Re-structured columns and Copyright details) */}
       <footer className="bg-surface-container dark:bg-surface-container w-full border-t border-outline-variant py-16 px-container-margin">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-5 gap-8 md:items-center">
+        <div className="max-w-7xl px-container-margin mx-auto grid grid-cols-1 md:grid-cols-5 gap-8 md:items-center">
           <div className="col-span-1 md:col-span-2 flex flex-col gap-md md:pr-xl">
             <div className="flex flex-col sm:flex-row sm:items-center gap-md">
               <div className="flex items-center gap-md">
@@ -582,7 +584,7 @@ export default async function LandingPage() {
         </div>
 
         {/* Below footer: copyright (left) and legal links (right) */}
-        <div className="max-w-7xl mx-auto border-t border-outline-variant/20 mt-xl pt-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-md text-xs text-on-surface-variant">
+        <div className="max-w-7xl px-container-margin mx-auto border-t border-outline-variant/20 mt-xl pt-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-md text-xs text-on-surface-variant">
           <div className="flex flex-col gap-xs">
 
             <div className="text-on-surface-variant/70">
