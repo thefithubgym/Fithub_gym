@@ -4,6 +4,8 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import HistoryTableControls from "./HistoryTableControls";
 import ReceiptButton from "./ReceiptButton";
+import ExportPDFButton from "./ExportPDFButton";
+
 
 interface PageProps {
   searchParams: Promise<{
@@ -53,11 +55,16 @@ async function MembershipHistoryContent({ searchParams }: PageProps) {
   return (
     <div className="flex flex-col gap-lg w-full">
       {/* Page Header */}
-      <div>
-        <h2 className="font-display text-4xl font-extrabold text-on-background uppercase tracking-tight">Membership History</h2>
-        <p className="font-body-md text-body-md text-on-surface-variant mt-sm">
-          Audit log of all registered membership transactions, renewals, and fees.
-        </p>
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-md w-full">
+        <div>
+          <h2 className="font-display text-4xl font-extrabold text-on-background uppercase tracking-tight">Membership History</h2>
+          <p className="font-body-md text-body-md text-on-surface-variant mt-sm">
+            Audit log of all registered membership transactions, renewals, and fees.
+          </p>
+        </div>
+        <div className="shrink-0 md:self-start">
+          <ExportPDFButton search={search} status={status} planId={planId} plans={activePlans} />
+        </div>
       </div>
 
       {/* Table Card */}

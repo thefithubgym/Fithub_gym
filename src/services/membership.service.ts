@@ -266,26 +266,39 @@ export class MembershipService {
         include: {
           member: true,
           membershipPlan: true,
+          coupleGroup: {
+            include: {
+              members: true,
+            },
+          },
         },
       }),
       prisma.membership.count({ where }),
     ]);
 
     return {
-      data: data.map(m => ({
-        id: m.id,
-        memberName: `${m.member.firstName} ${m.member.lastName}`,
-        memberId: m.memberId,
-        planName: m.membershipPlan?.name || m.customPlanName || "Custom Plan",
-        amount: Number(m.amount),
-        registrationFee: Number(m.registrationFee),
-        paymentMethod: m.paymentMethod,
-        paymentReference: m.paymentReference,
-        startDate: m.startDate,
-        endDate: m.endDate,
-        status: m.status,
-        createdAt: m.createdAt,
-      })),
+      data: data.map(m => {
+        const partner = m.coupleGroup?.members.find(
+          (member) => member.id !== m.memberId
+        ) || null;
+        return {
+          id: m.id,
+          memberName: `${m.member.firstName} ${m.member.lastName}`,
+          memberId: m.memberId,
+          memberPhone: m.member.phone,
+          memberEmail: m.member.email || "",
+          partnerName: partner ? `${partner.firstName} ${partner.lastName}` : "",
+          planName: m.membershipPlan?.name || m.customPlanName || "Custom Plan",
+          amount: Number(m.amount),
+          registrationFee: Number(m.registrationFee),
+          paymentMethod: m.paymentMethod,
+          paymentReference: m.paymentReference,
+          startDate: m.startDate,
+          endDate: m.endDate,
+          status: m.status,
+          createdAt: m.createdAt,
+        };
+      }),
       total,
       page,
       pageSize: limit,

@@ -127,13 +127,15 @@ export default function HistoryTableControls({ plans }: HistoryTableControlsProp
       applyFilters(search, statusRef.current, planIdRef.current);
     }, 500);
     return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search]);
+
+
 
   const selectedStatusLabel =
     STATUS_OPTIONS.find((s) => s.value === status)?.label ?? "Status";
   const selectedPlanLabel =
     plans.find((p) => p.id === planId)?.name ?? "Plan";
+
 
   return (
     <div className="p-lg border-b border-outline-variant flex flex-col md:flex-row gap-md items-center justify-between bg-surface-container-lowest rounded-t-xl">

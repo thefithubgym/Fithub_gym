@@ -360,3 +360,19 @@ export async function renewMembershipAction(memberId: string, data: any) {
     return { error: error.message || "An unexpected error occurred." };
   }
 }
+
+export async function getMembershipHistoryForExportAction(filters: { search?: string; status?: string; planId?: string }) {
+  try {
+    const result = await MembershipService.getMembershipHistoryLog({
+      limit: 100000,
+      search: filters.search || "",
+      status: filters.status || "",
+      planId: filters.planId || "",
+    });
+    return { success: true, data: result.data };
+  } catch (error: any) {
+    console.error("Error fetching membership history for export:", error);
+    return { error: error.message || "An unexpected error occurred." };
+  }
+}
+
