@@ -4,13 +4,13 @@ import Logo from "./Logo";
 
 export default function Footer() {
   return (
-    <footer className="bg-surface-container dark:bg-surface-container w-full border-t border-outline-variant py-16 px-container-margin">
-      <div className="max-w-7xl px-container-margin mx-auto grid grid-cols-1 md:grid-cols-5 gap-8 md:items-center">
+    <footer className="bg-surface-container dark:bg-surface-container w-full border-t border-outline-variant py-16 px-4 md:px-container-margin">
+      <div className="max-w-7xl md:px-container-margin mx-auto grid grid-cols-1 md:grid-cols-5 gap-8 md:items-center">
         <div className="col-span-1 md:col-span-2 flex flex-col gap-md md:pr-xl">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-md">
+          <div className="flex items-center gap-md">
             <div className="flex items-center gap-md">
               <Logo />
-              <div className="h-6 w-px bg-outline-variant/40 hidden sm:block" />
+              <div className="h-6 w-px bg-primary block" />
             </div>
             <div className="flex gap-md">
               <a
@@ -54,13 +54,13 @@ export default function Footer() {
           <a className="text-on-surface-variant hover:text-primary transition-colors text-sm" href="#memberships">Memberships</a>
           <a className="text-on-surface-variant hover:text-primary transition-colors text-sm" href="#coaches">Coaches</a>
           <a className="text-on-surface-variant hover:text-primary transition-colors text-sm" href="#contact">Contact</a>
-          <div className="h-6 w-px bg-outline-variant/40 hidden sm:block" />
-          <Link className="text-on-surface-variant hover:text-primary transition-colors text-sm font-semibold text-primary" href="/auth/login">Login</Link>
+          <div className="h-6 w-px bg-outline-variant/40 block" />
+          <Link className="transition-colors text-sm font-semibold text-primary" href="/auth/login">Login</Link>
         </div>
       </div>
 
       {/* Below footer: copyright (left) and legal links (right) */}
-      <div className="max-w-7xl px-container-margin mx-auto border-t border-outline-variant/20 mt-xl pt-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-md text-xs text-on-surface-variant">
+      <div className="max-w-7xl md:px-container-margin mx-auto border-t border-outline-variant/20 mt-xl pt-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-md text-xs text-on-surface-variant">
         <div className="flex flex-col gap-xs">
           <div className="text-on-surface-variant/70">
             © {new Date().getFullYear()} The FitHub Gym by Millenial Corp LLP. All rights reserved.
