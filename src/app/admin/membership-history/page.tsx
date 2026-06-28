@@ -14,9 +14,20 @@ interface PageProps {
   }>;
 }
 
-export const dynamic = "force-dynamic";
+import { Suspense } from "react";
+import MembershipHistoryLoading from "./loading";
 
-export default async function MembershipHistoryPage({ searchParams }: PageProps) {
+export const unstable_instant = { prefetch: "static", unstable_disableValidation: true };
+
+export default function MembershipHistoryPage({ searchParams }: PageProps) {
+  return (
+    <Suspense fallback={<MembershipHistoryLoading />}>
+      <MembershipHistoryContent searchParams={searchParams} />
+    </Suspense>
+  );
+}
+
+async function MembershipHistoryContent({ searchParams }: PageProps) {
   const params = await searchParams;
   const page = Number(params.page || "1");
   const search = params.search || "";

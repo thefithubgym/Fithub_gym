@@ -2,9 +2,20 @@ import { prisma } from "@/lib/prisma";
 import MemberForm from "./MemberForm";
 import { MemberType } from "@prisma/client";
 
-export const dynamic = "force-dynamic";
+import { Suspense } from "react";
+import NewMemberLoading from "./loading";
 
-export default async function NewMemberPage() {
+export const unstable_instant = { prefetch: "static", unstable_disableValidation: true };
+
+export default function NewMemberPage() {
+  return (
+    <Suspense fallback={<NewMemberLoading />}>
+      <NewMemberContent />
+    </Suspense>
+  );
+}
+
+async function NewMemberContent() {
   // Fetch active plans to pass to form
   const activePlans = await prisma.membershipPlan.findMany({
     where: { isActive: true, isDeleted: false },

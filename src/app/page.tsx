@@ -8,7 +8,6 @@ import AccessTiers from "@/components/landing/AccessTiers";
 import ConnectWithUs from "@/components/landing/ConnectWithUs";
 import Footer from "@/components/landing/Footer";
 
-export const revalidate = 3600; // Revalidate every hour
 
 export default async function LandingPage() {
   // Fetch active plans to display in the pricing grid

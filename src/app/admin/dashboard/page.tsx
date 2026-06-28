@@ -15,9 +15,23 @@ import {
   ArrowDownRight
 } from "lucide-react";
 
-export const dynamic = "force-dynamic";
+import { headers } from "next/headers";
 
-export default async function DashboardPage() {
+import { Suspense } from "react";
+import DashboardLoading from "./loading";
+
+export const unstable_instant = { prefetch: "static", unstable_disableValidation: true };
+
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={<DashboardLoading />}>
+      <DashboardContent />
+    </Suspense>
+  );
+}
+
+async function DashboardContent() {
+  await headers();
   const summary = await DashboardService.getSummary();
   const todayStr = new Date().toLocaleDateString("en-US", {
     weekday: "short",
