@@ -1,18 +1,153 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useState, useTransition } from "react";
 import { authenticate } from "@/features/auth/actions";
-import { Eye, EyeOff, Dumbbell, ArrowRight, Check } from "lucide-react";
+import { Eye, EyeOff, Dumbbell, ArrowRight, Check, X, Loader2, CheckCircle2, Lock } from "lucide-react";
+import { sendForgotPasswordOtpAction, verifyOtpAndResetPasswordAction } from "@/features/auth/account-actions";
+
+const RULES = [
+  { label: "Minimum 8 characters",   check: (p: string) => p.length >= 8 },
+  { label: "One uppercase letter",   check: (p: string) => /[A-Z]/.test(p) },
+  { label: "One lowercase letter",   check: (p: string) => /[a-z]/.test(p) },
+  { label: "One number",             check: (p: string) => /[0-9]/.test(p) },
+  { label: "One special character",  check: (p: string) => /[^A-Za-z0-9]/.test(p) },
+];
+
+function OtpModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: () => void; }) {
+  const [step, setStep] = useState<"email" | "otp" | "done">("email");
+  const [email, setEmail] = useState("");
+  const [otp, setOtp] = useState("");
+  const [newPass, setNewPass] = useState("");
+  const [confirmPass, setConfirmPass] = useState("");
+  const [showNew, setShowNew] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [err, setErr] = useState("");
+  const [pending, startTransition] = useTransition();
+
+  const handleSendOtp = () => {
+    if (!email) { setErr("Please enter your email."); return; }
+    setErr("");
+    startTransition(async () => {
+      const res = await sendForgotPasswordOtpAction(email);
+      if (res.error) { setErr(res.error); return; }
+      setStep("otp");
+    });
+  };
+
+  const handleVerify = () => {
+    if (!otp || !newPass || !confirmPass) { setErr("Please fill in all fields."); return; }
+    setErr("");
+    startTransition(async () => {
+      const res = await verifyOtpAndResetPasswordAction({ email, otp, newPassword: newPass, confirmPassword: confirmPass });
+      if (res.error) { setErr(res.error); return; }
+      setStep("done");
+      setTimeout(() => { onSuccess(); onClose(); }, 1500);
+    });
+  };
+
+  return (
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-sm p-md">
+      <div className="bg-[#181818] border border-[#323232] rounded-2xl p-xl shadow-2xl w-full max-w-md relative text-left">
+        <button onClick={onClose} className="absolute top-4 right-4 text-secondary hover:text-white transition-colors cursor-pointer">
+          <X className="w-5 h-5" />
+        </button>
+        <div className="flex items-center gap-sm mb-lg">
+          <div className="w-10 h-10 rounded-xl bg-primary-container/20 border border-primary-container/30 flex items-center justify-center">
+            <Lock className="w-5 h-5 text-primary" />
+          </div>
+          <div>
+            <h3 className="font-display text-lg font-bold text-on-background">Forgot Password</h3>
+            <p className="text-xs text-secondary">Verify ownership with an OTP</p>
+          </div>
+        </div>
+
+        {step === "email" && (
+          <div className="flex flex-col gap-md">
+            <div className="flex flex-col gap-xs">
+              <label className="input-label" htmlFor="otp-email">Admin Email</label>
+              <input id="otp-email" className="input-field h-[42px]" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="admin@example.com" />
+            </div>
+            {err && <p className="text-red-400 text-xs">{err}</p>}
+            <button onClick={handleSendOtp} disabled={pending} className="bg-primary-container text-on-primary-container px-lg py-sm rounded-xl hover:bg-primary transition-colors text-sm font-bold flex items-center justify-center gap-xs cursor-pointer disabled:opacity-50 h-[42px]">
+              {pending ? <><Loader2 className="w-4 h-4 animate-spin" />Sending...</> : "Send OTP"}
+            </button>
+          </div>
+        )}
+
+        {step === "otp" && (
+          <div className="flex flex-col gap-md">
+            <div className="bg-[#111] border border-primary-container/20 rounded-xl p-md text-xs text-secondary">
+              OTP sent to <span className="text-primary font-semibold">{email}</span>. Valid for 10 minutes.
+            </div>
+            <div className="flex flex-col gap-xs">
+              <label className="input-label" htmlFor="otp-code">6-Digit OTP</label>
+              <input id="otp-code" className="input-field h-[42px] tracking-[0.5em] text-center text-lg font-bold" type="text" maxLength={6} value={otp} onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))} placeholder="------" />
+            </div>
+            <div className="flex flex-col gap-xs">
+              <label className="input-label" htmlFor="otp-newpass">New Password</label>
+              <div className="relative">
+                <input id="otp-newpass" className="input-field h-[42px] pr-10" type={showNew ? "text" : "password"} value={newPass} onChange={(e) => setNewPass(e.target.value)} />
+                <button type="button" onClick={() => setShowNew(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-secondary hover:text-white cursor-pointer transition-colors">
+                  {showNew ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+            <div className="flex flex-col gap-xs">
+              <label className="input-label" htmlFor="otp-confirmpass">Confirm Password</label>
+              <div className="relative">
+                <input id="otp-confirmpass" className="input-field h-[42px] pr-10" type={showConfirm ? "text" : "password"} value={confirmPass} onChange={(e) => setConfirmPass(e.target.value)} />
+                <button type="button" onClick={() => setShowConfirm(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-secondary hover:text-white cursor-pointer transition-colors">
+                  {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+            <div className="bg-[#111] border border-[#2a2a2a] rounded-xl p-md flex flex-col gap-1.5">
+              {RULES.map((rule) => {
+                const ok = rule.check(newPass);
+                return (
+                  <div key={rule.label} className={`flex items-center gap-xs text-xs transition-colors ${ok ? "text-emerald-400" : "text-secondary"}`}>
+                    <CheckCircle2 className={`w-3.5 h-3.5 shrink-0 ${ok ? "opacity-100" : "opacity-30"}`} />
+                    {rule.label}
+                  </div>
+                );
+              })}
+            </div>
+            {err && <p className="text-red-400 text-xs">{err}</p>}
+            <button onClick={handleVerify} disabled={pending} className="bg-primary-container text-on-primary-container px-lg py-sm rounded-xl hover:bg-primary transition-colors text-sm font-bold flex items-center justify-center gap-xs cursor-pointer disabled:opacity-50 h-[42px]">
+              {pending ? <><Loader2 className="w-4 h-4 animate-spin" />Verifying...</> : "Reset Password"}
+            </button>
+          </div>
+        )}
+
+        {step === "done" && (
+          <div className="flex flex-col items-center gap-md py-md">
+            <CheckCircle2 className="w-12 h-12 text-emerald-400" />
+            <p className="text-white font-semibold">Password reset successfully!</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export default function LoginPage() {
   const [state, formAction, isPending] = useActionState(authenticate, undefined);
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [showForgotModal, setShowForgotModal] = useState(false);
+  const [successMsg, setSuccessMsg] = useState("");
 
   return (
     <div className="bg-background text-on-background min-h-screen flex items-center justify-center p-md md:p-container-margin font-body-md antialiased selection:bg-primary-container selection:text-on-primary-container relative">
       {/* Background Atmospheric Element */}
       <div className="fixed inset-0 z-0 pointer-events-none opacity-20 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-surface-container-high via-background to-background"></div>
+
+      {showForgotModal && (
+        <OtpModal
+          onClose={() => setShowForgotModal(false)}
+          onSuccess={() => setSuccessMsg("Password reset successfully! Please log in with your new password.")}
+        />
+      )}
 
       {/* Main Login Container */}
       <main className="w-full max-w-[440px] relative z-10 flex flex-col gap-xl">
@@ -42,6 +177,13 @@ export default function LoginPage() {
               </div>
             )}
 
+            {/* Success Message */}
+            {successMsg && (
+              <div className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm p-sm rounded-lg">
+                {successMsg}
+              </div>
+            )}
+
             {/* Email Field */}
             <div className="flex flex-col gap-sm">
               <label className="font-label-sm text-label-sm text-on-surface uppercase tracking-wider" htmlFor="email">
@@ -66,9 +208,13 @@ export default function LoginPage() {
                 <label className="font-label-sm text-label-sm text-on-surface uppercase tracking-wider" htmlFor="password">
                   Password
                 </label>
-                <a className="font-label-md text-label-md text-primary-container hover:text-primary transition-colors" href="#">
+                <button
+                  type="button"
+                  onClick={() => { setSuccessMsg(""); setShowForgotModal(true); }}
+                  className="font-label-md text-label-md text-primary-container hover:text-primary transition-colors cursor-pointer"
+                >
                   Forgot?
-                </a>
+                </button>
               </div>
               <div className="relative flex items-center">
                 <span className="material-symbols-outlined absolute left-md text-secondary pointer-events-none">lock</span>

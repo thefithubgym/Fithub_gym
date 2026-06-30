@@ -15,12 +15,19 @@ export async function authenticate(
     });
     return { success: true };
   } catch (error: any) {
+    console.error("Authentication action failed. Error details:", {
+      type: error?.type,
+      name: error?.name,
+      message: error?.message,
+      cause: error?.cause,
+      stack: error?.stack,
+    });
     if (error instanceof AuthError) {
       switch (error.type) {
         case "CredentialsSignin":
           return { error: "Invalid email or password." };
         default:
-          return { error: "Authentication failed. Please check your credentials." };
+          return { error: `Authentication failed (${error.type}). Please check your credentials.` };
       }
     }
     

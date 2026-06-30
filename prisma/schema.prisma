@@ -44,16 +44,29 @@ enum DeliveryStatus {
 }
 
 model Admin {
-  id           String   @id @default(uuid()) @db.Uuid
+  id           String    @id @default(uuid()) @db.Uuid
   name         String
-  email        String   @unique
+  email        String    @unique
   passwordHash String
-  role         String   @default("ADMIN")
-  isActive     Boolean  @default(true)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  role         String    @default("ADMIN")
+  isActive     Boolean   @default(true)
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
   @@map("admins")
+}
+
+model AdminOtp {
+  id        String   @id @default(uuid()) @db.Uuid
+  email     String
+  otpHash   String
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([email])
+  @@map("admin_otps")
 }
 
 model Member {

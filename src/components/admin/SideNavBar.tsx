@@ -2,12 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { 
-  LayoutDashboard, 
-  Users, 
-  History, 
-  CreditCard, 
-  Settings, 
+import {
+  LayoutDashboard,
+  Users,
+  History,
+  CreditCard,
+  Settings,
   X,
   MessageSquare
 } from "lucide-react";
@@ -36,7 +36,7 @@ export default function SideNavBar({ isOpen, onClose, adminName = "FitHub Admin"
     <>
       {/* Mobile Overlay */}
       {isOpen && (
-        <div 
+        <div
           className="fixed inset-0 z-40 bg-black/60 md:hidden"
           onClick={onClose}
         />
@@ -47,9 +47,6 @@ export default function SideNavBar({ isOpen, onClose, adminName = "FitHub Admin"
         <div className="px-lg pb-xl flex items-center justify-between gap-md border-b border-outline-variant/30 mb-md">
           <div className="flex items-center gap-md">
             <Logo />
-            <span className="text-[10px] font-bold px-2 py-0.5 border border-primary-container/20 rounded bg-primary-container/10 text-primary-container uppercase tracking-wider shrink-0">
-              Admin
-            </span>
           </div>
           {/* Close button for mobile */}
           {onClose && (
@@ -69,11 +66,10 @@ export default function SideNavBar({ isOpen, onClose, adminName = "FitHub Admin"
                 key={item.name}
                 href={item.href}
                 onClick={onClose}
-                className={`flex items-center gap-md px-md py-sm rounded-lg transition-all duration-200 ease-in-out font-label-md text-label-md ${
-                  isActive
+                className={`flex items-center gap-md px-md py-sm rounded-lg transition-all duration-200 ease-in-out font-label-md text-label-md ${isActive
                     ? "border-l-2 border-primary-container bg-surface-container-highest text-primary font-bold"
                     : "text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface"
-                }`}
+                  }`}
               >
                 <Icon className={`w-[20px] h-[20px] ${isActive ? "text-primary" : ""}`} />
                 {item.name}
