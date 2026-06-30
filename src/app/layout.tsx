@@ -69,7 +69,7 @@ export default function RootLayout({
               "@context": "https://schema.org",
               "@type": "ExerciseGym",
               "name": "The FitHub Gym",
-              "image": "https://fithubgym.in/assets/gallery/hero.png",
+              "image": "https://fithubgym.in/assets/gallery/hero.webp",
               "@id": "https://fithubgym.in/#gym",
               "url": "https://fithubgym.in",
               "telephone": "+918788849529",

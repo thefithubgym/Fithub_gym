@@ -96,7 +96,7 @@ export default function AccessTiers({ plans }: AccessTiersProps) {
             🏋️ Modern Equipment • 💪 Trainer Guidance • ❤️ Cardio Access • 👫 Couple Memberships • 📅 Flexible Plans
           </p>
           <p className="text-secondary text-sm max-w-xl mx-auto">
-            Looking for customized cardio programs, personal trainers, or couple discounts? Get in touch with us!
+            Not sure which membership is right for you? Compare all our plans, benefits, and pricing in one place.
           </p>
           <a
             href="/memberships"

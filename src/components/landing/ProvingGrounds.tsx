@@ -1,16 +1,16 @@
 const gallerySlides = [
-  { src: "/assets/gallery/hero.png" },
-  { src: "/assets/gallery/gallery1.jpeg" },
-  { src: "/assets/gallery/gallery2.jpeg" },
-  { src: "/assets/gallery/gallery3.jpeg" },
-  { src: "/assets/gallery/gallery4.jpeg" },
-  { src: "/assets/gallery/gallery5.jpeg" },
-  { src: "/assets/gallery/gallery6.jpeg" },
-  { src: "/assets/gallery/gallery7.jpeg" },
-  { src: "/assets/gallery/gallery9.jpeg" },
-  { src: "/assets/gallery/gallery10.jpeg" },
-  { src: "/assets/gallery/gallery11.jpeg" },
-  { src: "/assets/gallery/gallery12.jpeg" },
+  { src: "/assets/gallery/hero.webp" },
+  { src: "/assets/gallery/gallery1.webp" },
+  { src: "/assets/gallery/gallery2.webp" },
+  { src: "/assets/gallery/gallery3.webp" },
+  { src: "/assets/gallery/gallery4.webp" },
+  { src: "/assets/gallery/gallery5.webp" },
+  { src: "/assets/gallery/gallery6.webp" },
+  { src: "/assets/gallery/gallery7.webp" },
+  { src: "/assets/gallery/gallery9.webp" },
+  { src: "/assets/gallery/gallery10.webp" },
+  { src: "/assets/gallery/gallery11.webp" },
+  { src: "/assets/gallery/gallery12.webp" },
 ];
 
 export default function ProvingGrounds() {

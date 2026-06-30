@@ -5,7 +5,7 @@ export default function HeroSection() {
       <div className="absolute inset-0 z-0">
         <div
           className="w-full h-full bg-cover bg-center bg-no-repeat opacity-45 grayscale"
-          style={{ backgroundImage: "url('/assets/gallery/hero.png')" }}
+          style={{ backgroundImage: "url('/assets/gallery/hero.webp')" }}
         ></div>
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent"></div>
         <div className="absolute inset-0 bg-gradient-to-r from-background via-transparent to-transparent"></div>
