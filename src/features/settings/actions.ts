@@ -3,10 +3,51 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import { DEFAULT_SETTINGS } from "./defaults";
+
+
+export async function getSettings() {
+  try {
+    const settings = await prisma.settings.findFirst();
+    if (!settings) return DEFAULT_SETTINGS;
+
+    return {
+      id: settings.id,
+      gymName: settings.gymName || DEFAULT_SETTINGS.gymName,
+      addressLine1: settings.addressLine1 || DEFAULT_SETTINGS.addressLine1,
+      addressLine2: settings.addressLine2 || DEFAULT_SETTINGS.addressLine2,
+      addressLine3: settings.addressLine3 || DEFAULT_SETTINGS.addressLine3,
+      phoneNo: settings.phoneNo || DEFAULT_SETTINGS.phoneNo,
+      registrationFee: settings.registrationFee ? Number(settings.registrationFee) : DEFAULT_SETTINGS.registrationFee,
+      expiryReminderDays: settings.expiryReminderDays !== null && settings.expiryReminderDays !== undefined ? settings.expiryReminderDays : DEFAULT_SETTINGS.expiryReminderDays,
+      socialInstagram: settings.socialInstagram || DEFAULT_SETTINGS.socialInstagram,
+      socialWhatsapp: settings.socialWhatsapp || DEFAULT_SETTINGS.socialWhatsapp,
+      socialGoogleMaps: settings.socialGoogleMaps || DEFAULT_SETTINGS.socialGoogleMaps,
+      socialEmail: settings.socialEmail || DEFAULT_SETTINGS.socialEmail,
+      whatsappEnabled: settings.whatsappEnabled ?? DEFAULT_SETTINGS.whatsappEnabled,
+      whatsappPhoneId: settings.whatsappPhoneId,
+      whatsappToken: settings.whatsappToken,
+      businessId: settings.businessId,
+      timezone: settings.timezone || DEFAULT_SETTINGS.timezone,
+    };
+  } catch (error) {
+    console.error("Error reading settings from DB, using fallback:", error);
+    return DEFAULT_SETTINGS;
+  }
+}
 
 const settingsSchema = z.object({
   gymName: z.string().min(1, "Gym name is required").trim(),
+  addressLine1: z.string().min(1, "Address line 1 is required").trim(),
+  addressLine2: z.string().min(1, "Address line 2 is required").trim(),
+  addressLine3: z.string().min(1, "Address line 3 is required").trim(),
+  phoneNo: z.string().min(1, "Phone number is required").trim(),
   registrationFee: z.coerce.number().min(0, "Registration fee cannot be negative"),
+  expiryReminderDays: z.coerce.number().int().min(1, "Expiry reminder days must be at least 1"),
+  socialInstagram: z.string().nullable().optional().transform(v => v === "" ? null : v),
+  socialWhatsapp: z.string().nullable().optional().transform(v => v === "" ? null : v),
+  socialGoogleMaps: z.string().nullable().optional().transform(v => v === "" ? null : v),
+  socialEmail: z.string().nullable().optional().transform(v => v === "" ? null : v),
   whatsappEnabled: z.boolean().default(false),
   whatsappPhoneId: z.string().nullable().optional().transform(v => v === "" ? null : v),
   whatsappToken: z.string().nullable().optional().transform(v => v === "" ? null : v),
@@ -16,34 +57,13 @@ const settingsSchema = z.object({
 
 export async function getSettingsAction() {
   try {
-    let settings = await prisma.settings.findFirst();
-    if (!settings) {
-      // Create default settings if not found
-      settings = await prisma.settings.create({
-        data: {
-          gymName: "The FitHub Gym",
-          registrationFee: 200.00,
-          whatsappEnabled: false,
-          timezone: "Asia/Kolkata",
-        },
-      });
-    }
-
+    const data = await getSettings();
     return {
       success: true,
-      data: {
-        id: settings.id,
-        gymName: settings.gymName,
-        registrationFee: Number(settings.registrationFee),
-        whatsappEnabled: settings.whatsappEnabled,
-        whatsappPhoneId: settings.whatsappPhoneId,
-        whatsappToken: settings.whatsappToken,
-        businessId: settings.businessId,
-        timezone: settings.timezone,
-      },
+      data,
     };
   } catch (error: any) {
-    console.error("Error fetching settings:", error);
+    console.error("Error fetching settings action:", error);
     return { error: error.message || "Failed to fetch settings." };
   }
 }
@@ -65,6 +85,11 @@ export async function updateSettingsAction(data: any) {
     }
 
     revalidatePath("/admin/settings");
+    revalidatePath("/");
+    revalidatePath("/about");
+    revalidatePath("/gallery");
+    revalidatePath("/memberships");
+    revalidatePath("/testimonials/submit");
     return { success: true };
   } catch (error: any) {
     console.error("Error updating settings:", error);

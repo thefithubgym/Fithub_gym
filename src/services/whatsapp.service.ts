@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { NotificationType, DeliveryStatus } from "@prisma/client";
+import { getSettings } from "@/features/settings/actions";
 
 export class WhatsAppService {
   /**
@@ -83,10 +84,7 @@ export class WhatsAppService {
 
       if (!member || !membership) return false;
 
-      const settings = await prisma.settings.findFirst() || {
-        whatsappEnabled: false,
-        gymName: "The FitHub Gym",
-      };
+      const settings = await getSettings();
 
       const planName = membership.membershipPlan?.name || membership.customPlanName || "Custom Plan";
       const amount = Number(membership.amount) + Number(membership.registrationFee);
@@ -170,10 +168,7 @@ export class WhatsAppService {
 
       if (!member || !membership) return false;
 
-      const settings = await prisma.settings.findFirst() || {
-        whatsappEnabled: false,
-        gymName: "The FitHub Gym",
-      };
+      const settings = await getSettings();
 
       const planName = membership.membershipPlan?.name || membership.customPlanName || "Custom Plan";
       const endDateStr = membership.endDate.toLocaleDateString("en-IN", { dateStyle: "medium" });
@@ -241,10 +236,7 @@ export class WhatsAppService {
    * Broadcast a manual text message to multiple members
    */
   static async sendBroadcast(memberIds: string[], message: string): Promise<{ sent: number; failed: number }> {
-    const settings = await prisma.settings.findFirst() || {
-      whatsappEnabled: false,
-      gymName: "The FitHub Gym",
-    };
+    const settings = await getSettings();
 
     let sent = 0;
     let failed = 0;

@@ -1,3 +1,5 @@
+import { getSettings } from "@/features/settings/actions";
+
 const excellenceCards = [
   {
     colSpan: "col-span-1 md:col-span-8",
@@ -11,41 +13,44 @@ const excellenceCards = [
   },
   {
     colSpan: "col-span-1 md:col-span-4",
-    minHeight: "min-h-[250px]",
-    icon: "sports",
-    title: "EXPERT TRAINER GUIDANCE",
-    description: "Former collegiate athletes and certified strength specialists dedicated to optimizing your form and programming.",
-    isTextCard: true,
+    minHeight: "min-h-[400px]",
+    icon: "schedule",
+    title: "CONVENIENT TIMINGS",
+    description: "Flexible morning and evening sessions to suit your busy schedule, with separate batches dedicated for ladies.",
+    bgImage: null,
+    overlayClass: "",
+    contentClass: "justify-start",
   },
   {
-    colSpan: "col-span-1 md:col-span-5",
-    minHeight: "min-h-[250px]",
-    icon: "key",
-    title: "CARDIO & FAT LOSS ZONE",
-    description: "Burn calories and improve endurance with treadmills, exercise bikes, and dedicated cardio equipment suitable for every fitness level.",
-    bgImage: "/assets/gallery/gallery6.webp",
-    overlayClass: "bg-gradient-to-r from-surface-container via-surface-container/90 to-transparent",
+    colSpan: "col-span-1 md:col-span-4",
+    minHeight: "min-h-[400px]",
+    icon: "stars",
+    title: "EXPERT TRAINING GUIDANCE",
+    description: "Our certified gym trainers are always on the floor to guide you on form, posture, and technique to prevent injuries.",
+    bgImage: null,
+    overlayClass: "",
+    contentClass: "justify-start",
+  },
+  {
+    colSpan: "col-span-1 md:col-span-8",
+    minHeight: "min-h-[400px]",
+    icon: "groups",
+    title: "SUPPORTIVE COMMUNITY",
+    description: "Train alongside consistent and motivating members in an encouraging environment where fitness goals are taken seriously.",
+    bgImage: "/assets/gallery/gallery3.webp",
+    overlayClass: "bg-gradient-to-t from-surface-container via-surface-container/80 to-transparent",
     contentClass: "justify-end",
-  },
-  {
-    colSpan: "col-span-1 md:col-span-7",
-    minHeight: "min-h-[250px]",
-    icon: "spa",
-    title: "CLEAN & MOTIVATING ENVIRONMENT",
-    description: "A spacious, clean, and motivating atmosphere that helps you stay focused and enjoy every workout.",
-    bgImage: "/assets/gallery/gallery2.webp",
-    overlayClass: "bg-gradient-to-r from-surface-container via-surface-container/90 to-transparent",
-    contentClass: "justify-center w-full md:w-2/3",
   },
 ];
 
-export default function StandardOfExcellence() {
+export default async function StandardOfExcellence() {
+  const settings = await getSettings();
   return (
     <section className="py-16 bg-surface-container-lowest bg-linear-to-b from-surface-container-lowest to-surface-container" id="training">
       <div className="max-w-7xl px-container-margin mx-auto space-y-lg">
         <div className="text-center space-y-sm max-w-3xl mx-auto">
           <h2 className="font-display text-3xl md:text-4xl font-extrabold text-on-background uppercase tracking-tight">
-            WHY CHOOSE THE FITHUB GYM
+            WHY CHOOSE {settings.gymName.toUpperCase()}
           </h2>
           <p className="font-body-md text-sm md:text-base text-secondary">
             Everything you need to achieve your fitness goals in one place.
@@ -72,7 +77,7 @@ export default function StandardOfExcellence() {
                 )}
 
                 <div
-                  className={`relative z-10 p-xl h-full flex flex-col ${card.isTextCard ? "justify-between" : card.contentClass || ""
+                  className={`relative z-10 p-xl h-full flex flex-col ${card.contentClass || ""
                     }`}
                 >
                   <div

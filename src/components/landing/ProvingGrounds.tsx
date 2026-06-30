@@ -1,3 +1,5 @@
+import { getSettings } from "@/features/settings/actions";
+
 const gallerySlides = [
   { src: "/assets/gallery/hero.webp" },
   { src: "/assets/gallery/gallery1.webp" },
@@ -13,7 +15,8 @@ const gallerySlides = [
   { src: "/assets/gallery/gallery12.webp" },
 ];
 
-export default function ProvingGrounds() {
+export default async function ProvingGrounds() {
+  const settings = await getSettings();
   return (
     <section className="py-16 bg-surface-container-lowest" id="gallery">
       <div className="max-w-7xl mx-auto px-container-margin space-y-xl">
@@ -22,7 +25,7 @@ export default function ProvingGrounds() {
             EXPLORE OUR GYM
           </h2>
           <p className="font-body-md text-body-md text-secondary mt-xs">
-            Take a look inside The FitHub Gym and discover the spaces where your fitness journey begins.
+            Take a look inside {settings.gymName} and discover the spaces where your fitness journey begins.
           </p>
         </div>
 
@@ -39,7 +42,7 @@ export default function ProvingGrounds() {
               <img
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 src={slide.src}
-                alt={`The FitHub Gym training zone - image ${index + 1}`}
+                alt={`${settings.gymName} training zone - image ${index + 1}`}
                 loading="lazy"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-surface-container-lowest via-transparent to-transparent"></div>

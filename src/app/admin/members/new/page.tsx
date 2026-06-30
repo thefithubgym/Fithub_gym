@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import MemberForm from "./MemberForm";
 import { MemberType } from "@prisma/client";
+import { getSettings } from "@/features/settings/actions";
 
 import { Suspense } from "react";
 import NewMemberLoading from "./loading";
@@ -16,6 +17,9 @@ export default function NewMemberPage() {
 }
 
 async function NewMemberContent() {
+  const settings = await getSettings();
+  const defaultRegistrationFee = settings?.registrationFee ?? 200;
+
   // Fetch active plans to pass to form
   const activePlans = await prisma.membershipPlan.findMany({
     where: { isActive: true, isDeleted: false },
@@ -37,5 +41,5 @@ async function NewMemberContent() {
     durationMonths: plan.durationMonths,
   }));
 
-  return <MemberForm plans={plans} />;
+  return <MemberForm plans={plans} defaultRegistrationFee={defaultRegistrationFee} />;
 }

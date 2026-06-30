@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Building2, Coins, MessageSquare, ShieldCheck, Loader2 } from "lucide-react";
+import { Building2, MessageSquare, ShieldCheck, Loader2 } from "lucide-react";
 import { getSettingsAction, updateSettingsAction } from "@/features/settings/actions";
 
 type Tab = "gym" | "whatsapp";
@@ -15,7 +15,16 @@ export default function SettingsPage() {
 
   // Form states
   const [gymName, setGymName] = useState("");
+  const [addressLine1, setAddressLine1] = useState("");
+  const [addressLine2, setAddressLine2] = useState("");
+  const [addressLine3, setAddressLine3] = useState("");
+  const [phoneNo, setPhoneNo] = useState("");
   const [registrationFee, setRegistrationFee] = useState(200);
+  const [expiryReminderDays, setExpiryReminderDays] = useState(5);
+  const [socialInstagram, setSocialInstagram] = useState("");
+  const [socialWhatsapp, setSocialWhatsapp] = useState("");
+  const [socialGoogleMaps, setSocialGoogleMaps] = useState("");
+  const [socialEmail, setSocialEmail] = useState("");
   const [timezone, setTimezone] = useState("Asia/Kolkata");
 
   const [whatsappEnabled, setWhatsappEnabled] = useState(false);
@@ -37,7 +46,16 @@ export default function SettingsPage() {
       } else if (res.data) {
         const d = res.data;
         setGymName(d.gymName);
+        setAddressLine1(d.addressLine1 || "");
+        setAddressLine2(d.addressLine2 || "");
+        setAddressLine3(d.addressLine3 || "");
+        setPhoneNo(d.phoneNo || "");
         setRegistrationFee(d.registrationFee);
+        setExpiryReminderDays(d.expiryReminderDays ?? 5);
+        setSocialInstagram(d.socialInstagram || "");
+        setSocialWhatsapp(d.socialWhatsapp || "");
+        setSocialGoogleMaps(d.socialGoogleMaps || "");
+        setSocialEmail(d.socialEmail || "");
         setTimezone(d.timezone);
         setWhatsappEnabled(d.whatsappEnabled);
         setWhatsappPhoneId(d.whatsappPhoneId || "");
@@ -60,7 +78,16 @@ export default function SettingsPage() {
     try {
       const res = await updateSettingsAction({
         gymName,
+        addressLine1,
+        addressLine2,
+        addressLine3,
+        phoneNo,
         registrationFee,
+        expiryReminderDays,
+        socialInstagram: socialInstagram || null,
+        socialWhatsapp: socialWhatsapp || null,
+        socialGoogleMaps: socialGoogleMaps || null,
+        socialEmail: socialEmail || null,
         timezone,
         whatsappEnabled,
         whatsappPhoneId: whatsappPhoneId || null,
@@ -116,12 +143,13 @@ export default function SettingsPage() {
       {/* Header */}
       <div>
         <h2 className="font-display text-4xl font-extrabold text-on-background uppercase tracking-tight">System Settings</h2>
-        <p className="font-body-md text-body-md text-on-surface-variant mt-sm">Configure gym preferences, fees, and communication integrations.</p>
+        <p className="font-body-md text-body-md text-on-surface-variant mt-sm">Configure gym preferences, contact details, fees, and integrations.</p>
       </div>
 
       {/* Tabs list */}
       <div className="flex border-b border-[#323232] gap-sm mt-md">
         <button
+          type="button"
           onClick={() => setActiveTab("gym")}
           className={`flex items-center gap-xs pb-md px-md font-label-md text-sm cursor-pointer transition-colors border-b-2 ${activeTab === "gym"
             ? "border-primary text-primary font-bold"
@@ -129,9 +157,10 @@ export default function SettingsPage() {
             }`}
         >
           <Building2 className="w-4 h-4" />
-          Gym Configuration
+          General
         </button>
         <button
+          type="button"
           onClick={() => setActiveTab("whatsapp")}
           className={`flex items-center gap-xs pb-md px-md font-label-md text-sm cursor-pointer transition-colors border-b-2 ${activeTab === "whatsapp"
             ? "border-primary text-primary font-bold"
@@ -159,28 +188,101 @@ export default function SettingsPage() {
       {/* Settings Form */}
       <form onSubmit={handleSave} className="bg-[#181818] border border-[#323232] rounded-2xl p-lg md:p-xl flex flex-col gap-lg shadow-lg">
         {activeTab === "gym" ? (
-          <div className="flex flex-col gap-md">
-            <div>
-              <h3 className="text-white font-display text-lg font-bold uppercase tracking-wide border-b border-[#323232] pb-xs mb-md">General Info</h3>
+          <div className="flex flex-col gap-xl">
+            {/* 1st Section: Gym Info */}
+            <div className="flex flex-col gap-md">
+              <h3 className="text-primary font-display text-base font-bold uppercase tracking-wide border-b border-[#323232] pb-xs mb-sm">1. Gym Info</h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
+                <div className="flex flex-col gap-xs md:col-span-2">
+                  <label className="input-label" htmlFor="gymName">Gym/Facility Name</label>
+                  <input
+                    id="gymName"
+                    className="input-field h-[42px]"
+                    type="text"
+                    value={gymName}
+                    onChange={(e) => setGymName(e.target.value)}
+                    required
+                  />
+                </div>
+
+                <div className="flex flex-col gap-xs md:col-span-2">
+                  <label className="input-label" htmlFor="addressLine1">Address Line 1</label>
+                  <input
+                    id="addressLine1"
+                    className="input-field h-[42px]"
+                    type="text"
+                    placeholder="e.g. Plot No. 6456, Ward No. 17, Opp. Govt. ITI"
+                    value={addressLine1}
+                    onChange={(e) => setAddressLine1(e.target.value)}
+                    required
+                  />
+                </div>
+
+                <div className="flex flex-col gap-xs">
+                  <label className="input-label" htmlFor="addressLine2">Address Line 2</label>
+                  <input
+                    id="addressLine2"
+                    className="input-field h-[42px]"
+                    type="text"
+                    placeholder="e.g. Kalambha Road"
+                    value={addressLine2}
+                    onChange={(e) => setAddressLine2(e.target.value)}
+                    required
+                  />
+                </div>
+
+                <div className="flex flex-col gap-xs">
+                  <label className="input-label" htmlFor="addressLine3">Address Line 3 / City & Pin</label>
+                  <input
+                    id="addressLine3"
+                    className="input-field h-[42px]"
+                    type="text"
+                    placeholder="e.g. Narkhed - 441304"
+                    value={addressLine3}
+                    onChange={(e) => setAddressLine3(e.target.value)}
+                    required
+                  />
+                </div>
+
+                <div className="flex flex-col gap-xs">
+                  <label className="input-label" htmlFor="phoneNo">Contact Phone Number</label>
+                  <input
+                    id="phoneNo"
+                    className="input-field h-[42px]"
+                    type="text"
+                    placeholder="e.g. +91 87888 49529"
+                    value={phoneNo}
+                    onChange={(e) => setPhoneNo(e.target.value)}
+                    required
+                  />
+                </div>
+
+                <div className="flex flex-col gap-xs">
+                  <label className="input-label" htmlFor="timezone">Default Timezone</label>
+                  <select
+                    id="timezone"
+                    className="input-field px-3 h-[42px] outline-none"
+                    value={timezone}
+                    onChange={(e) => setTimezone(e.target.value)}
+                  >
+                    <option value="Asia/Kolkata">Asia/Kolkata (IST)</option>
+                    <option value="UTC">Coordinated Universal Time (UTC)</option>
+                    <option value="US/Eastern">US/Eastern (EST/EDT)</option>
+                    <option value="Europe/London">Europe/London (GMT/BST)</option>
+                  </select>
+                  <p className="text-[11px] text-secondary">System-wide date conversions adapt to this zone.</p>
+                </div>
+              </div>
             </div>
 
-            <div className="flex flex-col gap-xs">
-              <label className="input-label" htmlFor="gymName">Gym/Facility Name</label>
-              <input
-                id="gymName"
-                className="input-field h-[42px]"
-                type="text"
-                value={gymName}
-                onChange={(e) => setGymName(e.target.value)}
-                required
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
-              <div className="flex flex-col gap-xs">
-                <label className="input-label" htmlFor="regFee">Default Registration Fee (₹)</label>
-                <div className="relative flex items-center">
-                  {/* <Coins className="absolute left-3 w-4 h-4 text-secondary" /> */}
+            {/* 2nd Section: Membership Settings */}
+            <div className="flex flex-col gap-md">
+              <h3 className="text-primary font-display text-base font-bold uppercase tracking-wide border-b border-[#323232] pb-xs mb-sm">2. Membership Settings</h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
+                <div className="flex flex-col gap-xs">
+                  <label className="input-label" htmlFor="regFee">Default Registration Fee (₹)</label>
                   <input
                     id="regFee"
                     className="input-field h-[42px]"
@@ -190,24 +292,77 @@ export default function SettingsPage() {
                     onChange={(e) => setRegistrationFee(Number(e.target.value))}
                     required
                   />
+                  <p className="text-[11px] text-secondary">Fee charged only on new member registrations. Renewals are exempt.</p>
                 </div>
-                <p className="text-[11px] text-secondary">Fee charged only on new member registrations. Renewals are exempt.</p>
-              </div>
 
-              <div className="flex flex-col gap-xs">
-                <label className="input-label" htmlFor="timezone">Default Timezone</label>
-                <select
-                  id="timezone"
-                  className="input-field px-3 h-[42px] outline-none"
-                  value={timezone}
-                  onChange={(e) => setTimezone(e.target.value)}
-                >
-                  <option value="Asia/Kolkata">Asia/Kolkata (IST)</option>
-                  <option value="UTC">Coordinated Universal Time (UTC)</option>
-                  <option value="US/Eastern">US/Eastern (EST/EDT)</option>
-                  <option value="Europe/London">Europe/London (GMT/BST)</option>
-                </select>
-                <p className="text-[11px] text-secondary">System-wide date conversions adapt to this zone.</p>
+                <div className="flex flex-col gap-xs">
+                  <label className="input-label" htmlFor="expiryReminderDays">Expiry Reminder Days</label>
+                  <input
+                    id="expiryReminderDays"
+                    className="input-field h-[42px]"
+                    type="number"
+                    min={1}
+                    value={expiryReminderDays}
+                    onChange={(e) => setExpiryReminderDays(Number(e.target.value))}
+                    required
+                  />
+                  <p className="text-[11px] text-secondary">Days before membership expiration to display warnings and send alerts.</p>
+                </div>
+              </div>
+            </div>
+
+            {/* 3rd Section: Social Links */}
+            <div className="flex flex-col gap-md">
+              <h3 className="text-primary font-display text-base font-bold uppercase tracking-wide border-b border-[#323232] pb-xs mb-sm">3. Social Links & Contact</h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
+                <div className="flex flex-col gap-xs">
+                  <label className="input-label" htmlFor="socialInstagram">Instagram URL</label>
+                  <input
+                    id="socialInstagram"
+                    className="input-field h-[42px]"
+                    type="text"
+                    placeholder="e.g. https://www.instagram.com/thefithubgym.narkhed"
+                    value={socialInstagram}
+                    onChange={(e) => setSocialInstagram(e.target.value)}
+                  />
+                </div>
+
+                <div className="flex flex-col gap-xs">
+                  <label className="input-label" htmlFor="socialWhatsapp">WhatsApp URL/Number</label>
+                  <input
+                    id="socialWhatsapp"
+                    className="input-field h-[42px]"
+                    type="text"
+                    placeholder="e.g. https://wa.me/918788849529"
+                    value={socialWhatsapp}
+                    onChange={(e) => setSocialWhatsapp(e.target.value)}
+                  />
+                </div>
+
+                <div className="flex flex-col gap-xs">
+                  <label className="input-label" htmlFor="socialGoogleMaps">Google Maps Link</label>
+                  <input
+                    id="socialGoogleMaps"
+                    className="input-field h-[42px]"
+                    type="text"
+                    placeholder="Google Maps Directions URL"
+                    value={socialGoogleMaps}
+                    onChange={(e) => setSocialGoogleMaps(e.target.value)}
+                  />
+                </div>
+
+                <div className="flex flex-col gap-xs">
+                  <label className="input-label" htmlFor="socialEmail">Email Address</label>
+                  <input
+                    id="socialEmail"
+                    className="input-field h-[42px]"
+                    type="email"
+                    placeholder="e.g. contact@fithub.com"
+                    value={socialEmail}
+                    onChange={(e) => setSocialEmail(e.target.value)}
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -299,7 +454,7 @@ export default function SettingsPage() {
                 Saving...
               </>
             ) : (
-              "Save Settings"
+              "Save Changes"
             )}
           </button>
         </div>

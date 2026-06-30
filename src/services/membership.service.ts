@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { MembershipStatus, PaymentMethod } from "@prisma/client";
+import { getSettings } from "@/features/settings/actions";
 
 export interface CreateMembershipInput {
   memberId: string;
@@ -238,15 +239,17 @@ export class MembershipService {
           endDate: { gte: todayStart },
         });
       } else if (status === "expiring_soon") {
-        const fiveDaysFromNowEnd = new Date();
-        fiveDaysFromNowEnd.setDate(fiveDaysFromNowEnd.getDate() + 5);
-        fiveDaysFromNowEnd.setHours(23, 59, 59, 999);
+        const settings = await getSettings();
+        const reminderDays = settings?.expiryReminderDays ?? 5;
+        const expiryThresholdEnd = new Date();
+        expiryThresholdEnd.setDate(expiryThresholdEnd.getDate() + reminderDays);
+        expiryThresholdEnd.setHours(23, 59, 59, 999);
 
         conditions.push({
           startDate: { lte: todayEnd },
           endDate: {
             gte: todayStart,
-            lte: fiveDaysFromNowEnd,
+            lte: expiryThresholdEnd,
           },
         });
       } else if (status === "expired") {

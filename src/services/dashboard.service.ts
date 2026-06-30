@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { MembershipStatus } from "@prisma/client";
+import { getSettings } from "@/features/settings/actions";
 
 export class DashboardService {
   static async getSummary() {
@@ -44,9 +45,11 @@ export class DashboardService {
       },
     });
 
-    // 3. Expiring Soon (memberships starting in current month ending within 5 days)
-    const fiveDaysFromNowEnd = new Date(todayEnd);
-    fiveDaysFromNowEnd.setDate(todayEnd.getDate() + 5);
+    // 3. Expiring Soon (memberships starting in current month ending within expiryReminderDays)
+    const settings = await getSettings();
+    const reminderDays = settings?.expiryReminderDays ?? 5;
+    const expiryThresholdEnd = new Date(todayEnd);
+    expiryThresholdEnd.setDate(todayEnd.getDate() + reminderDays);
 
     const expiringSoon = await prisma.membership.count({
       where: {
@@ -62,7 +65,7 @@ export class DashboardService {
           {
             endDate: {
               gte: todayStart,
-              lte: fiveDaysFromNowEnd,
+              lte: expiryThresholdEnd,
             },
           },
         ],

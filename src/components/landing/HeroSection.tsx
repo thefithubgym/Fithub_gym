@@ -1,10 +1,12 @@
 import { prisma } from "@/lib/prisma";
+import { getSettings } from "@/features/settings/actions";
 
 export default async function HeroSection() {
   const memberCount = await prisma.member.count({
     where: { isDeleted: false },
   });
   const displayCount = Math.floor(memberCount / 10) * 10;
+  const settings = await getSettings();
   return (
     <section className="relative w-full min-h-[450px] md:aspect-16/6 items-center flex justify-center overflow-hidden px-container-margin py-0 ">
       {/* Background Image with Overlay */}
@@ -33,7 +35,7 @@ export default async function HeroSection() {
           </h1>
 
           <p className="font-body-md text-sm md:text-base text-secondary max-w-xl text-center">
-            Whether you're starting your fitness journey or pushing your limits, The FitHub Gym provides everything you need to achieve your goals.
+            Whether you're starting your fitness journey or pushing your limits, {settings.gymName} provides everything you need to achieve your goals.
           </p>
 
           <div className="flex flex-col md:flex-row gap-sm mt-md w-full md:w-auto">

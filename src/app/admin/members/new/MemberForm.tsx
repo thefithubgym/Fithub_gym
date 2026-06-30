@@ -24,9 +24,10 @@ interface Plan {
 
 interface MemberFormProps {
   plans: Plan[];
+  defaultRegistrationFee?: number;
 }
 
-export default function MemberForm({ plans }: MemberFormProps) {
+export default function MemberForm({ plans, defaultRegistrationFee = 200 }: MemberFormProps) {
   const router = useRouter();
   const [memberType, setMemberType] = useState<MemberType>(MemberType.SINGLE);
   const [error, setError] = useState<string | null>(null);
@@ -78,7 +79,7 @@ export default function MemberForm({ plans }: MemberFormProps) {
       membershipPlanId: "",
       customPlanName: "",
       amount: 0,
-      registrationFee: 200, // Default fee
+      registrationFee: defaultRegistrationFee, // Default fee
       paymentMethod: PaymentMethod.UPI as PaymentMethod,
       paymentReference: "",
       startDate: new Date().toISOString().split("T")[0],

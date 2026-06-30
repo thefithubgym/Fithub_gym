@@ -1,7 +1,14 @@
-import { Phone, Mail, MapPin, Compass, Sun, Moon, Calendar, MessageSquare } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Phone, Mail, MapPin, Compass, Sun, Moon, Calendar } from "lucide-react";
+import { getSettings } from "@/features/settings/actions";
 
-export default function ConnectWithUs() {
+export default async function ConnectWithUs() {
+  const settings = await getSettings();
+
+  const formattedAddress = `${settings.addressLine1}, ${settings.addressLine2}, ${settings.addressLine3}`;
+  const encodedAddress = encodeURIComponent(formattedAddress);
+  const mapEmbedUrl = `https://maps.google.com/maps?q=${encodedAddress}&t=&z=16&ie=UTF8&iwloc=&output=embed`;
+  const mapDirectionsUrl = settings.socialGoogleMaps || `https://www.google.com/maps?q=${encodedAddress}`;
+
   return (
     <section className="pt-16" id="contact">
       <div className="max-w-7xl px-container-margin mx-auto">
@@ -10,7 +17,7 @@ export default function ConnectWithUs() {
             Ready to Transform?
           </h2>
           <p className="font-body-md text-body-md text-secondary max-w-4xl">
-            Whether you want to lose weight, build muscle, or improve your overall fitness, our team is here to help. Visit The FitHub Gym, explore our facility, and choose the membership plan that's right for you.
+            Whether you want to lose weight, build muscle, or improve your overall fitness, our team is here to help. Visit {settings.gymName}, explore our facility, and choose the membership plan that's right for you.
           </p>
         </div>
 
@@ -28,13 +35,13 @@ export default function ConnectWithUs() {
 
                 <div className="flex gap-4 items-end justify-between mt-2 ml-2 w-full flex-wrap">
                   <p className="font-body-md text-secondary text-sm leading-relaxed mt-2 ml-2">
-                    Plot No. 6456, Ward No. 17,Opp. Govt. ITI,<br />
-                    Kalambha Road, Narkhed - 441304
+                    {settings.addressLine1},<br />
+                    {settings.addressLine2}, {settings.addressLine3}
                   </p>
                   <a
                     target="_blank"
                     rel="noopener noreferrer"
-                    href="https://www.google.com/maps?gs_lcrp=EgZjaHJvbWUqCAgAEEUYJxg7MggIABBFGCcYOzIHCAEQABiABDIHCAIQABiABDIHCAMQABiABDIHCAQQABiABDIHCAUQABiABDIHCAYQABiABDIHCAcQABiABDIHCAgQABiABDIHCAkQABiABNIBCTEwNTM0ajBqN6gCALACAA&um=1&ie=UTF8&fb=1&gl=in&sa=X&geocode=KY-RnQyGrdU7MaHJY1UE-nxj&daddr=Plot+no+6456,+Ward+no+17,+opp+Govt+ITI,+Kalambha+Road,+Narkhed+-+441304"
+                    href={mapDirectionsUrl}
                     className="inline-flex items-end gap-xs text-primary-container hover:text-primary transition-colors text-xs"
                   >
                     Get Directions
@@ -46,7 +53,7 @@ export default function ConnectWithUs() {
             </div>
 
             {/* Card 2: Call Us */}
-            <div className="bg-surface-container-low/40 backdrop-blur-sm border border-outline-variant rounded-2xl p-6 shadow-lg flex flex-col justify-between hover:border-primary-container/40 transition-colors">
+            <div className="bg-surface-container-low/40 backdrop-blur-sm border border-[#323232] rounded-2xl p-6 shadow-lg flex flex-col justify-between hover:border-primary-container/40 transition-colors">
               <div className="flex gap-2 items-center">
                 <Phone className="w-6 h-6 text-primary-container" />
                 <div className="flex flex-col items-start">
@@ -57,15 +64,17 @@ export default function ConnectWithUs() {
                 </div>
               </div>
               <div className="flex gap-2 items-center justify-between mt-2 ml-2 w-full flex-wrap">
-                <p className="font-body-md text-white font-semibold text-lg">+91 87888 49529</p>
-                <a
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  href="https://wa.me/918788849529"
-                  className="inline-flex items-end gap-xs text-primary-container hover:text-primary transition-colors text-xs"
-                >
-                  Chat on WhatsApp
-                </a>
+                <p className="font-body-md text-white font-semibold text-lg">{settings.phoneNo}</p>
+                {settings.socialWhatsapp && (
+                  <a
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    href={settings.socialWhatsapp.startsWith("http") ? settings.socialWhatsapp : `https://wa.me/${settings.socialWhatsapp}`}
+                    className="inline-flex items-end gap-xs text-primary-container hover:text-primary transition-colors text-xs"
+                  >
+                    Chat on WhatsApp
+                  </a>
+                )}
               </div>
             </div>
 
@@ -82,13 +91,15 @@ export default function ConnectWithUs() {
                 </div>
               </div>
               <div className="flex gap-4 items-center justify-between mt-2 ml-2 w-full flex-wrap">
-                <p className="font-body-md text-white font-semibold text-sm break-all">millennialcorpllp@gmail.com</p>
-                <a
-                  href="mailto:millennialcorpllp@gmail.com"
-                  className="inline-flex items-center gap-xs text-primary-container hover:text-primary transition-colors text-xs"
-                >
-                  Send Email
-                </a>
+                <p className="font-body-md text-white font-semibold text-sm break-all">{settings.socialEmail}</p>
+                {settings.socialEmail && (
+                  <a
+                    href={`mailto:${settings.socialEmail}`}
+                    className="inline-flex items-center gap-xs text-primary-container hover:text-primary transition-colors text-xs"
+                  >
+                    Send Email
+                  </a>
+                )}
               </div>
             </div>
           </div>
@@ -157,10 +168,10 @@ export default function ConnectWithUs() {
         </div>
       </div>
 
-      {/* Map layout directly below contact panels - pointing to Narkher address iframe, grayscale, bounce pin removed */}
+      {/* Map layout directly below contact panels - pointing to address iframe, grayscale */}
       <div className="w-full h-96 border-t border-[#323232] relative mt-16 overflow-hidden">
         <iframe
-          src="https://maps.google.com/maps?q=Plot%20no%206456,%20Ward%20no%2017,%20opp%20Govt%20ITI,%20Kalambha%20Road,%20Narkhed%20-%20441304&t=&z=16&ie=UTF8&iwloc=&output=embed"
+          src={mapEmbedUrl}
           className="w-full h-full border-0 grayscale opacity-80 contrast-125"
           allowFullScreen
           loading="lazy"
@@ -171,7 +182,7 @@ export default function ConnectWithUs() {
           <a
             target="_blank"
             rel="noopener noreferrer"
-            href="https://www.google.com/maps?gs_lcrp=EgZjaHJvbWUqCAgAEEUYJxg7MggIABBFGCcYOzIHCAEQABiABDIHCAIQABiABDIHCAMQABiABDIHCAQQABiABDIHCAUQABiABDIHCAYQABiABDIHCAcQABiABDIHCAgQABiABDIHCAkQABiABNIBCTEwNTM0ajBqN6gCALACAA&um=1&ie=UTF-8&fb=1&gl=in&sa=X&geocode=KY-RnQyGrdU7MaHJY1UE-nxj&daddr=Plot+no+6456,+Ward+no+17,+opp+Govt+ITI,+Kalambha+Road,+Narkhed+-+441304"
+            href={mapDirectionsUrl}
             className="font-label-md text-xs md:text-sm font-bold text-white hover:text-primary transition-colors"
           >
             Find Us on Google Maps
