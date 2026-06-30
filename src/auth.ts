@@ -28,7 +28,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         );
         
         if (!isPasswordValid) return null;
-        
+
+        // Track last login time
+        await prisma.admin.update({
+          where: { id: admin.id },
+          data: { lastLoginAt: new Date() },
+        });
+
         return {
           id: admin.id,
           name: admin.name,
