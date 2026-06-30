@@ -52,10 +52,10 @@ export default function TestimonialsSection({ testimonials }: TestimonialsSectio
         {/* Marquee Wrapper with left & right gradient fades */}
         <div className="w-full relative py-md overflow-hidden">
           {/* Left Gradient Fade */}
-          <div className="absolute left-0 top-0 bottom-0 w-16 md:w-32 bg-gradient-to-r from-surface-container-lowest to-transparent z-30 pointer-events-none" />
+          <div className="hidden md:block absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-surface-container-lowest to-transparent z-30 pointer-events-none" />
 
           {/* Right Gradient Fade */}
-          <div className="absolute right-0 top-0 bottom-0 w-16 md:w-32 bg-gradient-to-l from-surface-container-lowest to-transparent z-30 pointer-events-none" />
+          <div className="hidden md:block absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-surface-container-lowest to-transparent z-30 pointer-events-none" />
 
           {/* Row 1 (Faster) */}
           <InfiniteMovingCards
