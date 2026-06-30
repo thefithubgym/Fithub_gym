@@ -6,13 +6,11 @@ import { Menu, X } from "lucide-react";
 import Logo from "./Logo";
 
 const navLinks = [
-  { label: "Training", href: "#training" },
-  { label: "Memberships", href: "#memberships" },
-  { label: "Coaches", href: "#coaches" },
-  { label: "Contact", href: "#contact" },
-  { label: "Gallery", href: "#gallery" },
+  { label: "About Us", href: "/about" },
+  { label: "Memberships", href: "/memberships" },
+  { label: "Gallery", href: "/gallery" },
+  { label: "Contact", href: "/#contact" },
 ];
-
 interface HeaderProps {
   isLoggedIn?: boolean;
 }
@@ -40,7 +38,7 @@ export default function Header({ isLoggedIn }: HeaderProps) {
       >
         <div className="flex justify-between items-center h-full px-container-margin max-w-7xl mx-auto w-full">
           {/* Brand Logo */}
-          <Link href="#" className="flex items-center gap-md hover:opacity-90 transition-opacity">
+          <Link href="/" className="flex items-center gap-md hover:opacity-90 transition-opacity">
             <Logo />
           </Link>
 

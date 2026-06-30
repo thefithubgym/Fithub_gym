@@ -1,5 +1,5 @@
-import Header from "@/components/landing/Header";
-import Footer from "@/components/landing/Footer";
+import Header from "@/components/common/Header";
+import Footer from "@/components/common/Footer";
 import TestimonialForm from "./TestimonialForm";
 import { auth } from "@/auth";
 

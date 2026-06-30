@@ -1,4 +1,5 @@
 import { MembershipPlan } from "@prisma/client";
+import { Target } from "lucide-react";
 
 interface AccessTiersProps {
   plans: MembershipPlan[];
@@ -98,11 +99,11 @@ export default function AccessTiers({ plans }: AccessTiersProps) {
             Looking for customized cardio programs, personal trainers, or couple discounts? Get in touch with us!
           </p>
           <a
-            href="#contact-form"
+            href="/memberships"
             className="inline-flex items-center gap-xs bg-transparent border border-outline-variant hover:border-primary-container hover:text-primary-container text-on-background font-bold py-2.5 px-6 rounded-xl text-sm transition-all duration-300 active:scale-95 cursor-pointer"
           >
-            <span className="material-symbols-outlined text-sm">mail</span>
-            Inquire Custom Programs & Discounts
+            <span className="material-symbols-outlined text-sm"><Target size={16} /></span>
+            Find Your Perfect Plan
           </a>
         </div>
       </div>

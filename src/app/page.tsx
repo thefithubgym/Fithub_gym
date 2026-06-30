@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import Header from "@/components/landing/Header";
+import Header from "@/components/common/Header";
 import HeroSection from "@/components/landing/HeroSection";
 import StatsSection from "@/components/landing/StatsSection";
 import StandardOfExcellence from "@/components/landing/StandardOfExcellence";
@@ -7,9 +7,9 @@ import PerformanceFramework from "@/components/landing/PerformanceFramework";
 import ProvingGrounds from "@/components/landing/ProvingGrounds";
 import AccessTiers from "@/components/landing/AccessTiers";
 import TestimonialsSection from "@/components/landing/TestimonialsSection";
-import FAQSection from "@/components/landing/FAQSection";
+import FAQSection from "@/components/common/FAQSection";
 import ConnectWithUs from "@/components/landing/ConnectWithUs";
-import Footer from "@/components/landing/Footer";
+import Footer from "@/components/common/Footer";
 import { auth } from "@/auth";
 
 
