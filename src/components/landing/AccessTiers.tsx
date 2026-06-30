@@ -9,11 +9,11 @@ export default function AccessTiers({ plans }: AccessTiersProps) {
     <section className="py-16 bg-linear-to-b from-surface to-transparent" id="memberships">
       <div className="max-w-7xl px-container-margin mx-auto">
         <div className="text-center mb-2xl">
-          <h2 className="font-display text-4xl md:text-5xl font-extrabold text-on-background uppercase tracking-tight">
-            Access Tiers
+          <h2 className="font-display text-3xl md:text-4xl font-extrabold text-on-background uppercase tracking-tight">
+            MEMBERSHIP PLANS
           </h2>
           <p className="font-body-md text-body-md text-secondary">
-            Select the level of performance that matches your ambition.
+            Flexible plans designed to fit your fitness journey and budget.
           </p>
         </div>
 
@@ -23,14 +23,13 @@ export default function AccessTiers({ plans }: AccessTiersProps) {
             return (
               <div
                 key={plan.id}
-                className={`rounded-xl p-xl flex flex-col relative transition-all duration-300 ${
-                  isQuarterly
-                    ? "bg-surface-container-high border-2 border-primary-container shadow-2xl shadow-primary-container/20 lg:scale-105"
-                    : "bg-surface-container border border-outline-variant hover:border-outline"
-                }`}
+                className={`rounded-xl p-xl flex flex-col relative transition-all duration-300 ${isQuarterly
+                  ? "bg-surface-container-high border-2 border-primary-container shadow-2xl shadow-primary-container/20 lg:scale-105"
+                  : "bg-surface-container border border-outline-variant hover:border-outline"
+                  }`}
               >
                 {isQuarterly && (
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-primary-container text-[#0F0F0F] font-label-sm uppercase px-md py-xs rounded-full whitespace-nowrap font-extrabold">
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-primary-container text-[#0F0F0F] font-label-sm capitalize px-md py-xs rounded-full whitespace-nowrap font-bold">
                     Fan Favourite
                   </div>
                 )}
@@ -78,11 +77,10 @@ export default function AccessTiers({ plans }: AccessTiersProps) {
 
                 <a
                   href="#contact"
-                  className={`w-full py-md rounded-xl font-bold font-label-md text-center transition-all ${
-                    isQuarterly
-                      ? "bg-primary-container text-[#0F0F0F] hover:opacity-90"
-                      : "border border-outline-variant text-on-background hover:bg-surface-bright"
-                  }`}
+                  className={`w-full py-md rounded-xl font-bold font-label-md text-center transition-all ${isQuarterly
+                    ? "bg-primary-container text-[#0F0F0F] hover:opacity-90"
+                    : "border border-outline-variant text-on-background hover:bg-surface-bright"
+                    }`}
                 >
                   Select {plan.name.split(" ")[0]}
                 </a>
@@ -93,6 +91,9 @@ export default function AccessTiers({ plans }: AccessTiersProps) {
 
         {/* Custom program info and contact CTA */}
         <div className="mt-2xl text-center space-y-md">
+          <p>
+            🏋️ Modern Equipment • 💪 Trainer Guidance • ❤️ Cardio Access • 👫 Couple Memberships • 📅 Flexible Plans
+          </p>
           <p className="text-secondary text-sm max-w-xl mx-auto">
             Looking for customized cardio programs, personal trainers, or couple discounts? Get in touch with us!
           </p>

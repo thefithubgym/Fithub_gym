@@ -24,7 +24,7 @@ export default async function LandingPage() {
   const getBestPlanForDuration = (duration: number) => {
     const durationPlans = allPlans.filter(p => p.durationMonths === duration);
     if (durationPlans.length === 0) return null;
-    return durationPlans.sort((a, b) => Number(b.price) - Number(a.price))[0];
+    return durationPlans.sort((a, b) => Number(a.price) - Number(b.price))[0];
   };
 
   const monthlyPlan = getBestPlanForDuration(1);
