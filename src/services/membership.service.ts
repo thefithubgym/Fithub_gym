@@ -276,28 +276,49 @@ export class MembershipService {
     const conditions: any[] = [];
 
     if (search) {
+      const trimmedSearch = search.trim();
+      const parts = trimmedSearch.split(/\s+/);
+      let memberOrConditions: any[] = [
+        { firstName: { contains: trimmedSearch, mode: "insensitive" } },
+        { lastName: { contains: trimmedSearch, mode: "insensitive" } },
+        { phone: { contains: trimmedSearch, mode: "insensitive" } },
+        { email: { contains: trimmedSearch, mode: "insensitive" } },
+      ];
+
+      if (parts.length >= 2) {
+        const firstPart = parts[0];
+        const lastPart = parts.slice(1).join(" ");
+        const reverseFirstPart = parts[parts.length - 1];
+        const reverseLastPart = parts.slice(0, parts.length - 1).join(" ");
+
+        memberOrConditions.push(
+          {
+            AND: [
+              { firstName: { contains: firstPart, mode: "insensitive" } },
+              { lastName: { contains: lastPart, mode: "insensitive" } },
+            ],
+          },
+          {
+            AND: [
+              { firstName: { contains: reverseLastPart, mode: "insensitive" } },
+              { lastName: { contains: reverseFirstPart, mode: "insensitive" } },
+            ],
+          }
+        );
+      }
+
       conditions.push({
         OR: [
           {
             member: {
-              OR: [
-                { firstName: { contains: search, mode: "insensitive" } },
-                { lastName: { contains: search, mode: "insensitive" } },
-                { phone: { contains: search, mode: "insensitive" } },
-                { email: { contains: search, mode: "insensitive" } },
-              ],
+              OR: memberOrConditions,
             },
           },
           {
             coupleGroup: {
               members: {
                 some: {
-                  OR: [
-                    { firstName: { contains: search, mode: "insensitive" } },
-                    { lastName: { contains: search, mode: "insensitive" } },
-                    { phone: { contains: search, mode: "insensitive" } },
-                    { email: { contains: search, mode: "insensitive" } },
-                  ],
+                  OR: memberOrConditions,
                 },
               },
             },
