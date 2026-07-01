@@ -28,24 +28,16 @@ export class DashboardService {
       },
     });
 
-    // 2. Active Memberships in Current Month
+    // 2. Active Memberships
     const activeMembers = await prisma.membership.count({
       where: {
         member: { isDeleted: false },
-        AND: [
-          {
-            startDate: {
-              gte: startOfMonth,
-              lte: endOfMonth,
-            },
-          },
-          { startDate: { lte: todayEnd } },
-          { endDate: { gte: todayStart } },
-        ],
+        startDate: { lte: todayEnd },
+        endDate: { gte: todayStart },
       },
     });
 
-    // 3. Expiring Soon (memberships starting in current month ending within expiryReminderDays)
+    // 3. Expiring Soon (memberships ending within expiryReminderDays)
     const settings = await getSettings();
     const reminderDays = settings?.expiryReminderDays ?? 5;
     const expiryThresholdEnd = new Date(todayEnd);
@@ -54,33 +46,23 @@ export class DashboardService {
     const expiringSoon = await prisma.membership.count({
       where: {
         member: { isDeleted: false },
-        AND: [
-          {
-            startDate: {
-              gte: startOfMonth,
-              lte: endOfMonth,
-            },
-          },
-          { startDate: { lte: todayEnd } },
-          {
-            endDate: {
-              gte: todayStart,
-              lte: expiryThresholdEnd,
-            },
-          },
-        ],
+        startDate: { lte: todayEnd },
+        endDate: {
+          gte: todayStart,
+          lte: expiryThresholdEnd,
+        },
       },
     });
 
-    // 4. Expired Memberships in Current Month
+    // 4. Expired This Month
     const expiredMembers = await prisma.membership.count({
       where: {
-        startDate: {
+        member: { isDeleted: false },
+        endDate: {
+          lt: todayStart,
           gte: startOfMonth,
           lte: endOfMonth,
         },
-        member: { isDeleted: false },
-        endDate: { lt: todayStart },
       },
     });
 
