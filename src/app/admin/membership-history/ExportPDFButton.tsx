@@ -27,6 +27,14 @@ const STATUS_OPTIONS = [
   { value: "expired_last_30_days", label: "Expired in Last 30 Days" },
 ];
 
+const formatDate = (dateInput: Date | string) => {
+  const d = new Date(dateInput);
+  const day = String(d.getDate()).padStart(2, "0");
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const year = d.getFullYear();
+  return `${day}-${month}-${year}`;
+};
+
 export default function ExportPDFButton({ search, status, planId, plans }: ExportPDFButtonProps) {
   const [isExporting, setIsExporting] = useState(false);
 
@@ -145,8 +153,8 @@ export default function ExportPDFButton({ search, status, planId, plans }: Expor
           }
         }
 
-        const logDateStr = new Date(log.createdAt).toLocaleDateString();
-        const periodStr = `${start.toLocaleDateString()} to ${end.toLocaleDateString()}\nStatus: ${statusText}`;
+        const logDateStr = formatDate(log.createdAt);
+        const periodStr = `${formatDate(start)} to ${formatDate(end)}\nStatus: ${statusText}`;
         const regFeeStr = log.registrationFee > 0 ? `Rs. ${log.registrationFee.toLocaleString("en-IN")}` : "-";
         const paidAmountStr = `Rs. ${(log.amount + log.registrationFee).toLocaleString("en-IN")}`;
 

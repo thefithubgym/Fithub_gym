@@ -30,6 +30,14 @@ export default function MembershipHistoryPage({ searchParams }: PageProps) {
   );
 }
 
+const formatDate = (dateInput: Date | string) => {
+  const d = new Date(dateInput);
+  const day = String(d.getDate()).padStart(2, "0");
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const year = d.getFullYear();
+  return `${day}-${month}-${year}`;
+};
+
 async function MembershipHistoryContent({ searchParams }: PageProps) {
   const params = await searchParams;
   const page = Number(params.page || "1");
@@ -112,7 +120,7 @@ async function MembershipHistoryContent({ searchParams }: PageProps) {
                   return (
                     <tr key={log.id} className="hover:bg-surface-container-lowest transition-colors">
                       <td className="py-md px-lg text-on-surface-variant">
-                        {new Date(log.createdAt).toLocaleDateString()}
+                        {formatDate(log.createdAt)}
                       </td>
                       <td className="py-md px-lg font-medium text-white">
                         <Link href={`/admin/members/${log.memberId}`} prefetch={false} className="hover:text-primary transition-colors">
@@ -123,7 +131,7 @@ async function MembershipHistoryContent({ searchParams }: PageProps) {
                         {log.planName}
                       </td>
                       <td className="py-md px-lg text-on-surface-variant">
-                        {new Date(log.startDate).toLocaleDateString()} to {new Date(log.endDate).toLocaleDateString()}
+                        {formatDate(log.startDate)} to {formatDate(log.endDate)}
                       </td>
                       <td className="py-md px-lg">
                         {diffDays < 0 ? (
