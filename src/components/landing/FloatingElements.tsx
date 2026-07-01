@@ -8,6 +8,7 @@ import { usePathname } from "next/navigation";
 export default function FloatingElements() {
   const pathname = usePathname();
   const [hasScrolled, setHasScrolled] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   const { scrollYProgress } = useScroll();
 
@@ -19,6 +20,8 @@ export default function FloatingElements() {
   });
 
   useEffect(() => {
+    setMounted(true);
+
     // Determine scroll state dynamically
     const unsubscribe = scrollYProgress.on("change", (latest) => {
       setHasScrolled(latest > 0.005); // Set scrolled state as soon as user scrolls slightly
@@ -27,8 +30,17 @@ export default function FloatingElements() {
     return () => unsubscribe();
   }, [scrollYProgress]);
 
-  // Exclude admin dashboard pages completely
-  if (pathname && pathname.startsWith("/admin")) {
+  if (!mounted) {
+    return null;
+  }
+
+  // Exclude admin dashboard, login, and receipt pages completely
+  if (
+    pathname &&
+    (pathname.startsWith("/admin") ||
+      pathname.startsWith("/auth") ||
+      pathname.startsWith("/receipt"))
+  ) {
     return null;
   }
 
