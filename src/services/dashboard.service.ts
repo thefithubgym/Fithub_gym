@@ -20,7 +20,7 @@ export class DashboardService {
     // 1. Total Memberships in Current Month
     const totalMembers = await prisma.membership.count({
       where: {
-        startDate: {
+        createdAt: {
           gte: startOfMonth,
           lte: endOfMonth,
         },
@@ -69,7 +69,7 @@ export class DashboardService {
     // 5. Monthly Revenue (sum of amount + registrationFee for current month)
     const revenueResult = await prisma.membership.aggregate({
       where: {
-        startDate: {
+        createdAt: {
           gte: startOfMonth,
           lte: endOfMonth,
         },
