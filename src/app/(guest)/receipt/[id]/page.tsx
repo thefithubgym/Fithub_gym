@@ -81,6 +81,10 @@ export default async function ReceiptPage({ params }: PageProps) {
     <div className="min-h-screen bg-[#131313] text-[#e5e2e1] px-md py-xl md:py-2xl flex flex-col justify-start items-center selection:bg-amber-100 print:bg-white print:p-0 print:py-0 font-sans antialiased">
       <style dangerouslySetInnerHTML={{ __html: `
         @media print {
+          @page {
+            size: A5 portrait;
+            margin: 8mm 10mm;
+          }
           .no-print {
             display: none !important;
           }
@@ -100,19 +104,74 @@ export default async function ReceiptPage({ params }: PageProps) {
             background-color: white !important;
             color: black !important;
           }
+          .receipt-header {
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            border-bottom-width: 1px !important;
+            padding-bottom: 0.5rem !important;
+            margin-bottom: 0.75rem !important;
+            gap: 1rem !important;
+          }
+          .receipt-header > div {
+            text-align: left !important;
+          }
+          .receipt-header > .text-right {
+            text-align: right !important;
+            align-items: flex-end !important;
+          }
+          .receipt-title {
+            font-size: 1.25rem !important;
+          }
+          .receipt-grid {
+            display: grid !important;
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            gap: 1rem !important;
+            margin-bottom: 0.75rem !important;
+          }
+          .receipt-table-section {
+            margin-bottom: 0.75rem !important;
+          }
+          .receipt-table-section th,
+          .receipt-table-section td {
+            padding-top: 0.35rem !important;
+            padding-bottom: 0.35rem !important;
+          }
+          .receipt-financials {
+            display: flex !important;
+            flex-direction: row !important;
+            justify-content: space-between !important;
+            align-items: flex-start !important;
+            gap: 1rem !important;
+            margin-top: 0.5rem !important;
+            padding-top: 0.5rem !important;
+            border-top-width: 1px !important;
+          }
+          .receipt-payment-info {
+            width: 50% !important;
+          }
+          .receipt-summary {
+            width: 45% !important;
+            margin-top: 0 !important;
+          }
+          .receipt-footer {
+            margin-top: 1rem !important;
+            padding-top: 0.75rem !important;
+          }
         }
       `}} />
 
-      <div className="w-full max-w-4xl mx-auto">
+      <div className="w-full max-w-[148mm] mx-auto">
         {/* Top Navigation & Actions */}
         <ReceiptControls whatsappUrl={whatsappUrl} />
 
         {/* Main Receipt Card */}
-        <main className="receipt-container w-full max-w-4xl bg-white text-stone-900 rounded-xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] p-lg md:p-2xl border border-stone-200 print:border-none print:shadow-none">
+        <main className="receipt-container w-full max-w-[148mm] bg-white text-stone-900 rounded-xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] p-lg border border-stone-200 print:border-none print:shadow-none print:p-0">
           {/* Header Section */}
-          <header className="flex flex-col md:flex-row justify-between items-start md:items-center border-b-2 border-stone-100 pb-lg mb-lg gap-lg">
+          <header className="receipt-header flex flex-row justify-between items-center border-b-2 border-stone-100 pb-md mb-md gap-md">
             <div className="flex flex-col gap-xs text-left">
-              <div className="font-sans font-black text-2xl sm:text-3xl tracking-tight uppercase text-stone-900 leading-none select-none">
+              <div className="receipt-title font-sans font-black text-lg sm:text-2xl tracking-tight uppercase text-stone-900 leading-none select-none">
                 THE FITHUB <span className="text-[#f59e0b]">GYM</span>
               </div>
               <div className="font-semibold text-[8px] sm:text-[9px] font-medium tracking-[0.22em] uppercase text-stone-500 mt-1 pl-[1px]">
@@ -122,7 +181,7 @@ export default async function ReceiptPage({ params }: PageProps) {
                 Membership Payment Receipt
               </div>
             </div>
-            <div className="text-right flex flex-col items-end text-xs">
+            <div className="text-right flex flex-col items-end text-[10px] sm:text-xs">
               <span className="inline-flex items-center px-sm py-xs rounded bg-green-100 text-green-700 font-bold mb-xs text-[10px]">
                 <span className="material-symbols-outlined text-[14px] mr-1" style={{ fontVariationSettings: "'FILL' 1" }}>
                   check_circle
@@ -135,10 +194,10 @@ export default async function ReceiptPage({ params }: PageProps) {
             </div>
           </header>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-xl mb-xl text-left">
+          <div className="receipt-grid grid grid-cols-2 gap-md sm:gap-lg mb-lg text-left">
             {/* Gym Details */}
-            <section className="text-xs">
-              <h3 className="font-bold text-stone-400 uppercase tracking-wider mb-sm text-[10px]">Facility Information</h3>
+            <section className="text-[10px] sm:text-xs">
+              <h3 className="font-bold text-stone-400 uppercase tracking-wider mb-sm text-[9px] sm:text-[10px]">Facility Information</h3>
               <div className="space-y-xs">
                 <p className="font-bold text-stone-900 text-sm">The FitHub Gym</p>
                 <p className="text-stone-600 leading-relaxed">
@@ -146,13 +205,13 @@ export default async function ReceiptPage({ params }: PageProps) {
                   Kalambha Road, Narkhed - 441304
                 </p>
                 <p className="text-stone-600">PH: +91 8788849529</p>
-                <p className="text-stone-600 underline">millennialcorpllp@gmail.com</p>
+                <p className="text-stone-600 underline break-all">millennialcorpllp@gmail.com</p>
               </div>
             </section>
 
             {/* Member Details */}
-            <section className="text-xs">
-              <h3 className="font-bold text-stone-400 uppercase tracking-wider mb-sm text-[10px]">Member Information</h3>
+            <section className="text-[10px] sm:text-xs">
+              <h3 className="font-bold text-stone-400 uppercase tracking-wider mb-sm text-[9px] sm:text-[10px]">Member Information</h3>
               <div className="space-y-xs">
                 <p className="font-bold text-stone-900 text-sm">
                   {member.firstName} {member.lastName}
@@ -163,46 +222,46 @@ export default async function ReceiptPage({ params }: PageProps) {
                   </p>
                 )}
                 <p className="text-stone-600">Phone: {member.phone}</p>
-                <p className="text-stone-600">Email: {member.email || "N/A"}</p>
+                <p className="text-stone-600 underline break-all">Email: {member.email || "N/A"}</p>
               </div>
             </section>
           </div>
 
           {/* Membership Info Table */}
-          <section className="mb-xl overflow-x-auto text-left text-xs">
+          <section className="receipt-table-section mb-lg overflow-x-auto text-left text-[10px] sm:text-xs">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-stone-50 border-t border-b border-stone-200">
-                  <th className="py-md px-sm font-bold text-stone-500 uppercase tracking-wider text-[10px]">Plan Description</th>
-                  <th className="py-md px-sm font-bold text-stone-500 uppercase tracking-wider text-[10px]">Duration</th>
-                  <th className="py-md px-sm font-bold text-stone-500 uppercase tracking-wider text-[10px]">Validity Period</th>
-                  <th className="py-md px-sm font-bold text-stone-500 uppercase tracking-wider text-right text-[10px]">Amount</th>
+                  <th className="py-md px-xs sm:px-sm font-bold text-stone-500 uppercase tracking-wider text-[9px] sm:text-[10px]">Plan Description</th>
+                  <th className="py-md px-xs sm:px-sm font-bold text-stone-500 uppercase tracking-wider text-[9px] sm:text-[10px]">Duration</th>
+                  <th className="py-md px-xs sm:px-sm font-bold text-stone-500 uppercase tracking-wider text-[9px] sm:text-[10px]">Validity Period</th>
+                  <th className="py-md px-xs sm:px-sm font-bold text-stone-500 uppercase tracking-wider text-right text-[9px] sm:text-[10px]">Amount</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-stone-100">
                 <tr>
-                  <td className="py-lg px-sm">
+                  <td className="py-md px-xs sm:py-lg sm:px-sm">
                     <div className="font-semibold text-stone-900">
                       {membershipPlan?.name || membership.customPlanName || "Custom Plan"}
                     </div>
-                    <div className="text-stone-500 text-[10px] mt-0.5">
+                    <div className="text-stone-500 text-[9px] sm:text-[10px] mt-0.5">
                       {partner ? "Couple Membership Plan" : "Single Membership Plan"}
                     </div>
                   </td>
-                  <td className="py-lg px-sm text-stone-600">{durationText}</td>
-                  <td className="py-lg px-sm text-stone-600">{startDateFormatted} - {endDateFormatted}</td>
-                  <td className="py-lg px-sm text-stone-900 font-semibold text-right">
+                  <td className="py-md px-xs sm:py-lg sm:px-sm text-stone-600">{durationText}</td>
+                  <td className="py-md px-xs sm:py-lg sm:px-sm text-stone-600">{startDateFormatted} - {endDateFormatted}</td>
+                  <td className="py-md px-xs sm:py-lg sm:px-sm text-stone-900 font-semibold text-right">
                     ₹{baseAmount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                   </td>
                 </tr>
                 {regFee > 0 && (
                   <tr>
-                    <td className="py-md px-sm">
+                    <td className="py-sm px-xs sm:py-md sm:px-sm">
                       <div className="text-stone-900 font-medium">One-time Registration Fee</div>
                     </td>
-                    <td className="py-md px-sm text-stone-600">N/A</td>
-                    <td className="py-md px-sm text-stone-600">Immediate</td>
-                    <td className="py-md px-sm text-stone-900 font-semibold text-right">
+                    <td className="py-sm px-xs sm:py-md sm:px-sm text-stone-600">N/A</td>
+                    <td className="py-sm px-xs sm:py-md sm:px-sm text-stone-600">Immediate</td>
+                    <td className="py-sm px-xs sm:py-md sm:px-sm text-stone-900 font-semibold text-right">
                       ₹{regFee.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                     </td>
                   </tr>
@@ -212,34 +271,34 @@ export default async function ReceiptPage({ params }: PageProps) {
           </section>
 
           {/* Financials & Payment Info */}
-          <section className="flex flex-col md:flex-row justify-between items-start gap-xl pt-lg border-t-2 border-stone-100 text-left text-xs">
-            <div className="flex-1 space-y-md w-full">
-              <div className="p-md bg-stone-50 rounded-lg border border-stone-100">
-                <h4 className="font-bold text-stone-400 uppercase mb-xs text-[10px]">Payment Information</h4>
-                <div className="grid grid-cols-2 gap-sm text-stone-600 text-xs">
+          <section className="receipt-financials flex flex-row justify-between items-start gap-md pt-md border-t-2 border-stone-100 text-left text-[10px] sm:text-xs">
+            <div className="receipt-payment-info w-[50%] space-y-sm">
+              <div className="p-sm sm:p-md bg-stone-50 rounded-lg border border-stone-100">
+                <h4 className="font-bold text-stone-400 uppercase mb-xs text-[9px] sm:text-[10px]">Payment Information</h4>
+                <div className="grid grid-cols-2 gap-xs sm:gap-sm text-stone-600 text-[10px] sm:text-xs">
                   <span className="font-semibold">Method:</span>
                   <span className="text-stone-900 font-semibold uppercase">{membership.paymentMethod}</span>
-                  <span className="font-semibold">Reference ID:</span>
-                  <span className="text-stone-900 font-medium truncate max-w-[150px]">{membership.paymentReference || "-"}</span>
-                  <span className="font-semibold">Transaction:</span>
+                  <span className="font-semibold">Ref ID:</span>
+                  <span className="text-stone-900 font-medium truncate max-w-[100px]">{membership.paymentReference || "-"}</span>
+                  <span className="font-semibold">Type:</span>
                   <span className="text-stone-900 font-medium">{transactionType}</span>
                 </div>
               </div>
             </div>
-            <div className="w-full md:w-80 space-y-sm">
+            <div className="receipt-summary w-[45%] space-y-xs">
               <div className="flex justify-between text-stone-600">
-                <span className="font-semibold">Membership Fee</span>
+                <span className="font-semibold">Fee</span>
                 <span className="font-medium">₹{baseAmount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
               </div>
               {regFee > 0 && (
                 <div className="flex justify-between text-stone-600">
-                  <span className="font-semibold">Registration Fee</span>
+                  <span className="font-semibold">Reg Fee</span>
                   <span className="font-medium">₹{regFee.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
                 </div>
               )}
-              <div className="flex justify-between items-center py-sm border-t-2 border-stone-900 mt-md">
-                <span className="font-bold text-stone-900 text-sm">Total Paid</span>
-                <span className="font-bold text-[#f59e0b] text-base">
+              <div className="flex justify-between items-center py-sm border-t-2 border-stone-900 mt-xs">
+                <span className="font-bold text-stone-900 text-[11px] sm:text-sm">Total Paid</span>
+                <span className="font-bold text-[#f59e0b] text-xs sm:text-base">
                   ₹{totalAmount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                 </span>
               </div>
@@ -247,9 +306,9 @@ export default async function ReceiptPage({ params }: PageProps) {
           </section>
 
           {/* Footer Section */}
-          <footer className="mt-2xl text-center pt-xl border-t border-dashed border-stone-200 text-xs">
+          <footer className="receipt-footer mt-xl text-center pt-lg border-t border-dashed border-stone-200 text-xs">
             <p className="text-stone-900 mb-xs italic font-semibold text-sm">Stay Consistent. Stay Fit.</p>
-            <p className="text-stone-500 mb-lg">Thank you for choosing The FitHub Gym. Your progress is our mission.</p>
+            <p className="text-stone-500 mb-lg text-[10px] sm:text-xs">Thank you for choosing The FitHub Gym. Your progress is our mission.</p>
             <div className="flex justify-center gap-xl opacity-20 grayscale no-print">
               <span className="material-symbols-outlined text-[48px]">fitness_center</span>
               <span className="material-symbols-outlined text-[48px]">monitor_heart</span>
@@ -264,4 +323,3 @@ export default async function ReceiptPage({ params }: PageProps) {
     </div>
   );
 }
-
