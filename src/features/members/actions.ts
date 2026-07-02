@@ -12,6 +12,7 @@ import {
   createCoupleMemberSchema,
   updateMemberSchema,
 } from "./schemas";
+import { formatAppError } from "@/lib/utils";
 
 
 
@@ -65,7 +66,7 @@ export async function createSingleMemberAction(data: any) {
     return { success: true };
   } catch (error: any) {
     console.error("Error creating single member:", error);
-    return { error: error.message || "An unexpected error occurred." };
+    return { error: formatAppError(error) };
   }
 }
 
@@ -193,7 +194,7 @@ export async function createCoupleMemberAction(data: any) {
     return { success: true };
   } catch (error: any) {
     console.error("Error creating couple member:", error);
-    return { error: error.message || "An unexpected error occurred." };
+    return { error: formatAppError(error) };
   }
 }
 
@@ -207,7 +208,7 @@ export async function updateMemberAction(id: string, data: any) {
     return { success: true };
   } catch (error: any) {
     console.error("Error updating member:", error);
-    return { error: error.message || "An unexpected error occurred." };
+    return { error: formatAppError(error) };
   }
 }
 
@@ -451,7 +452,7 @@ export async function renewMembershipAction(memberId: string, data: any) {
     return { success: true };
   } catch (error: any) {
     console.error("Error renewing membership:", error);
-    return { error: error.message || "An unexpected error occurred." };
+    return { error: formatAppError(error) };
   }
 }
 

@@ -423,9 +423,19 @@ export class MemberService {
 
     if (membershipsCount > 0) {
       // Soft delete only
+      const member = await prisma.member.findUnique({
+        where: { id },
+        select: { phone: true },
+      });
+      const suffix = `_deleted_${Date.now()}`;
+      const newPhone = member ? `${member.phone}${suffix}` : `deleted_${id.substring(0, 8)}${suffix}`;
+
       return prisma.member.update({
         where: { id },
-        data: { isDeleted: true },
+        data: { 
+          isDeleted: true, 
+          phone: newPhone 
+        },
       });
     } else {
       // Hard delete if no history exists

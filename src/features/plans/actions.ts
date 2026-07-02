@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { PlanService } from "@/services/plan.service";
 import { MemberType } from "@prisma/client";
 import { z } from "zod";
+import { formatAppError } from "@/lib/utils";
 
 const createPlanSchema = z.object({
   name: z.string().min(1, "Plan name is required").trim(),
@@ -29,7 +30,7 @@ export async function createPlanAction(data: any) {
     return { success: true };
   } catch (error: any) {
     console.error("Error creating plan:", error);
-    return { error: error.message || "An unexpected error occurred." };
+    return { error: formatAppError(error) };
   }
 }
 
@@ -41,7 +42,7 @@ export async function updatePlanAction(id: string, data: any) {
     return { success: true };
   } catch (error: any) {
     console.error("Error updating plan:", error);
-    return { error: error.message || "An unexpected error occurred." };
+    return { error: formatAppError(error) };
   }
 }
 
@@ -52,7 +53,7 @@ export async function togglePlanAction(id: string, isActive: boolean) {
     return { success: true };
   } catch (error: any) {
     console.error("Error toggling plan:", error);
-    return { error: error.message || "An unexpected error occurred." };
+    return { error: formatAppError(error) };
   }
 }
 
@@ -63,6 +64,6 @@ export async function deletePlanAction(id: string) {
     return { success: true };
   } catch (error: any) {
     console.error("Error deleting plan:", error);
-    return { error: error.message || "An unexpected error occurred." };
+    return { error: formatAppError(error) };
   }
 }

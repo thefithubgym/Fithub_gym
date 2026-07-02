@@ -41,12 +41,10 @@ interface StatsSectionProps {
 }
 
 export default function StatsSection({ memberCount }: StatsSectionProps) {
-  const activeMembersTarget = Math.max(memberCount, 150);
-
   const stats = [
     {
       icon: <Users className="w-5 h-5 text-primary-container" />,
-      value: activeMembersTarget,
+      value: memberCount,
       suffix: "+",
       label: "Active Members",
       description: "Consistent fitness enthusiasts",

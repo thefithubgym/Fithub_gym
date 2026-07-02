@@ -483,6 +483,16 @@ export class MembershipService {
       },
     }) + 1;
 
+    // Get count of memberships for this specific member created on or before this one
+    const memberMembershipsCount = await prisma.membership.count({
+      where: {
+        memberId: membership.memberId,
+        createdAt: {
+          lte: membership.createdAt,
+        },
+      },
+    });
+
     const partner = membership.coupleGroup?.members.find(
       (m) => m.id !== membership.memberId
     ) || null;
@@ -490,6 +500,7 @@ export class MembershipService {
     return {
       ...membership,
       partner,
+      isFirstTime: memberMembershipsCount === 1,
       receiptNo: `REC_${new Date(membership.createdAt).getFullYear()}_${String(count).padStart(6, "0")}`,
     };
   }

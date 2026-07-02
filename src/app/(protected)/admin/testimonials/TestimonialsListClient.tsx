@@ -12,10 +12,12 @@ import {
   AlertTriangle,
   Loader2,
   X,
-  XCircle
+  XCircle,
+  MessageSquare
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { approveTestimonialAction, deleteTestimonialAction, unapproveTestimonialAction } from "@/features/testimonials/actions";
+import EmptyState from "@/components/common/EmptyState";
 
 interface Testimonial {
   id: string;
@@ -280,8 +282,12 @@ export default function TestimonialsListClient({
             <tbody className="divide-y divide-outline-variant font-body-md text-sm bg-surface">
               {testimonials.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-2xl text-center text-on-surface-variant font-medium">
-                    No testimonials found.
+                  <td colSpan={7}>
+                    <EmptyState
+                      icon={MessageSquare}
+                      title={search ? "No testimonials match your search" : filter !== "all" ? `No ${filter} testimonials` : "No testimonials yet"}
+                      description={search ? "Try a different search term." : "Testimonials submitted by members will appear here for moderation."}
+                    />
                   </td>
                 </tr>
               ) : (

@@ -15,7 +15,7 @@ export default async function ReceiptPage({ params }: PageProps) {
     notFound();
   }
 
-  const { member, membershipPlan, partner, receiptNo, ...membership } = data;
+  const { member, membershipPlan, partner, receiptNo, isFirstTime, ...membership } = data;
 
   // Format Dates
   const paymentDate = new Date(membership.createdAt);
@@ -55,7 +55,6 @@ export default async function ReceiptPage({ params }: PageProps) {
   }
 
   // Check Registration vs Renewal
-  const isFirstTime = Number(membership.registrationFee) > 0;
   const transactionType = isFirstTime ? "First Time" : "Renewal";
 
   // Financial values

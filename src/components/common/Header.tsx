@@ -72,7 +72,6 @@ export default function Header({ isLoggedIn }: HeaderProps) {
             className="md:hidden text-on-surface-variant hover:text-on-surface p-sm focus:outline-none"
             onClick={() => {
               setIsMobileMenuOpen(!isMobileMenuOpen);
-              console.log("drawer ===>>>", !isMobileMenuOpen);
             }}
           >
             {isMobileMenuOpen ? (
