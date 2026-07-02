@@ -3,8 +3,12 @@ import AboutContainer from "@/components/about/AboutContainer";
 import StandardOfExcellence from "@/components/landing/StandardOfExcellence";
 
 export const metadata: Metadata = {
-  title: "About Us | The FitHub Gym",
+  title: "About Us",
   description: "Learn more about The FitHub Gym, our trainers, facilities, mission, vision, and commitment to helping the Narkhed community achieve their fitness goals.",
+  keywords: [
+    "about FitHub Gym", "gym trainers Narkhed", "gym facilities", "fitness mission",
+    "unisex gym Narkhed", "gym history", "professional trainers", "gym vision Maharashtra"
+  ],
   alternates: {
     canonical: "/about",
   },

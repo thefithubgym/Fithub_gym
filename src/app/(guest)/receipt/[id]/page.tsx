@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { headers } from "next/headers";
 import { MembershipService } from "@/services/membership.service";
@@ -6,6 +7,28 @@ import ReceiptControls from "./ReceiptControls";
 interface PageProps {
   params: Promise<{ id: string }>;
 }
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { id } = await params;
+  const data = await MembershipService.getMembershipReceiptDetails(id);
+
+  if (!data) {
+    return {
+      title: "Receipt Not Found",
+      robots: { index: false, follow: false },
+    };
+  }
+
+  return {
+    title: `Receipt #${data.receiptNo} | The FitHub Gym`,
+    description: `Membership payment receipt for a member at The FitHub Gym, Narkhed. Receipt number: ${data.receiptNo}.`,
+    robots: {
+      index: false,
+      follow: false,
+    },
+  };
+}
+
 
 export default async function ReceiptPage({ params }: PageProps) {
   const { id } = await params;
@@ -78,7 +101,8 @@ export default async function ReceiptPage({ params }: PageProps) {
 
   return (
     <div className="min-h-screen bg-[#131313] text-[#e5e2e1] px-md py-xl md:py-2xl flex flex-col justify-start items-center selection:bg-amber-100 print:bg-white print:p-0 print:py-0 font-sans antialiased">
-      <style dangerouslySetInnerHTML={{ __html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         @media print {
           @page {
             size: A5 portrait;

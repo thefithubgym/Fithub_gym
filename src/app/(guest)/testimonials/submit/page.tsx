@@ -3,9 +3,41 @@ import Logo from "@/components/common/Logo";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
-export const metadata = {
-  title: "Submit Testimonial | The FitHub Gym",
-  description: "Share your fitness journey and review your training experience at The FitHub Gym.",
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Submit a Testimonial",
+  description: "Share your fitness journey with The FitHub Gym community. Tell us how training at our gym in Narkhed helped you reach your health and fitness goals.",
+  keywords: [
+    "gym testimonial", "FitHub Gym review", "share fitness journey", "gym feedback Narkhed",
+    "gym member review", "submit review"
+  ],
+  alternates: {
+    canonical: "/testimonials/submit",
+  },
+  robots: {
+    index: false,
+    follow: false,
+  },
+  openGraph: {
+    title: "Submit a Testimonial | The FitHub Gym",
+    description: "Share your fitness journey with The FitHub Gym community. Tell us how training at our gym in Narkhed helped you reach your goals.",
+    url: "https://fithubgym.in/testimonials/submit",
+    images: [
+      {
+        url: "/assets/gallery/hero.webp",
+        width: 1200,
+        height: 630,
+        alt: "Share Your FitHub Gym Story",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Submit a Testimonial | The FitHub Gym",
+    description: "Share your fitness journey with The FitHub Gym community in Narkhed.",
+    images: ["/assets/gallery/hero.webp"],
+  },
 };
 
 export default function TestimonialSubmitPage() {
