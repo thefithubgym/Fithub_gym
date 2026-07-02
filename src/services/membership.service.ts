@@ -261,6 +261,8 @@ export class MembershipService {
     planId = "",
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     dateRange = "all_time",
+    sortBy = "",
+    sortOrder = "",
   }: {
     page?: number;
     limit?: number;
@@ -268,6 +270,8 @@ export class MembershipService {
     status?: string;
     planId?: string;
     dateRange?: string;
+    sortBy?: string;
+    sortOrder?: string;
   }) {
     const skip = (page - 1) * limit;
 
@@ -353,10 +357,6 @@ export class MembershipService {
           },
         });
       } else if (status === "expired") {
-        conditions.push({
-          endDate: { lt: todayStart },
-        });
-      } else if (status === "expired_last_30_days") {
         const thirtyDaysAgo = new Date(todayStart);
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
@@ -364,6 +364,15 @@ export class MembershipService {
           endDate: {
             lt: todayStart,
             gte: thirtyDaysAgo,
+          },
+        });
+      } else if (status === "inactive") {
+        const thirtyDaysAgo = new Date(todayStart);
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+        conditions.push({
+          endDate: {
+            lt: thirtyDaysAgo,
           },
         });
       } else if (status === "upcoming") {
@@ -381,10 +390,29 @@ export class MembershipService {
       where.AND = conditions;
     }
 
+    let orderBy: any = { createdAt: "desc" };
+    if (sortBy && (sortOrder === "asc" || sortOrder === "desc")) {
+      if (sortBy === "memberName") {
+        orderBy = [
+          { member: { firstName: sortOrder } },
+          { member: { lastName: sortOrder } },
+        ];
+      } else if (sortBy === "period") {
+        orderBy = { startDate: sortOrder };
+      } else if (sortBy === "daysToExpire") {
+        orderBy = { endDate: sortOrder };
+      } else if (sortBy === "paidAmount") {
+        orderBy = [
+          { amount: sortOrder },
+          { registrationFee: sortOrder },
+        ];
+      }
+    }
+
     const [data, total] = await prisma.$transaction([
       prisma.membership.findMany({
         where,
-        orderBy: { createdAt: "desc" },
+        orderBy,
         skip,
         take: limit,
         include: {

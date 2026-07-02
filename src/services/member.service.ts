@@ -23,6 +23,16 @@ export class MemberService {
     search = "",
     status = "",
     planId = "",
+    sortBy = "",
+    sortOrder = "",
+  }: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    status?: string;
+    planId?: string;
+    sortBy?: string;
+    sortOrder?: string;
   }) {
     const skip = (page - 1) * limit;
 
@@ -78,12 +88,27 @@ export class MemberService {
           },
         };
       } else if (status === "expired") {
+        const thirtyDaysAgo = new Date(todayStart);
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
         where.memberships = {
           some: {
-            endDate: { lt: todayStart },
+            endDate: {
+              lt: todayStart,
+              gte: thirtyDaysAgo,
+            },
           },
           none: {
             endDate: { gte: todayStart },
+          },
+        };
+      } else if (status === "inactive") {
+        const thirtyDaysAgo = new Date(todayStart);
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+        where.memberships = {
+          none: {
+            endDate: { gte: thirtyDaysAgo },
           },
         };
       } else if (status === "upcoming") {
@@ -119,12 +144,50 @@ export class MemberService {
       };
     }
 
-    const [data, total] = await prisma.$transaction([
-      prisma.member.findMany({
+    let data: any[] = [];
+    let total = 0;
+
+    if (sortBy === "expiresIn" && (sortOrder === "asc" || sortOrder === "desc")) {
+      // 1. Fetch matching members with their latest membership end date
+      const matchingMembers = await prisma.member.findMany({
         where,
-        orderBy: { createdAt: "desc" },
-        skip,
-        take: limit,
+        select: {
+          id: true,
+          memberships: {
+            select: { endDate: true },
+            orderBy: { endDate: "desc" },
+            take: 1,
+          },
+        },
+      });
+
+      // 2. Sort matching members in memory based on membership end date
+      matchingMembers.sort((a, b) => {
+        const timeA = a.memberships[0]?.endDate ? new Date(a.memberships[0].endDate).getTime() : 0;
+        const timeB = b.memberships[0]?.endDate ? new Date(b.memberships[0].endDate).getTime() : 0;
+
+        if (sortOrder === "asc") {
+          if (timeA === 0) return 1;
+          if (timeB === 0) return -1;
+          return timeA - timeB;
+        } else {
+          if (timeA === 0) return 1;
+          if (timeB === 0) return -1;
+          return timeB - timeA;
+        }
+      });
+
+      total = matchingMembers.length;
+
+      // 3. Slice for the current page
+      const paginatedMembers = matchingMembers.slice(skip, skip + limit);
+      const paginatedIds = paginatedMembers.map((m) => m.id);
+
+      // 4. Fetch full details for the paginated page
+      const rawData = await prisma.member.findMany({
+        where: {
+          id: { in: paginatedIds },
+        },
         include: {
           memberships: {
             orderBy: { endDate: "desc" },
@@ -142,9 +205,52 @@ export class MemberService {
             },
           },
         },
-      }),
-      prisma.member.count({ where }),
-    ]);
+      });
+
+      // 5. Re-sort fetched records to match the order of paginatedIds
+      data = paginatedIds
+        .map((id) => rawData.find((m) => m.id === id))
+        .filter((m): m is Exclude<typeof m, undefined> => !!m);
+    } else {
+      // Standard database path
+      let orderBy: any = { createdAt: "desc" };
+      if (sortBy === "memberName" && (sortOrder === "asc" || sortOrder === "desc")) {
+        orderBy = [
+          { firstName: sortOrder },
+          { lastName: sortOrder },
+        ];
+      }
+
+      const [dbData, dbTotal] = await prisma.$transaction([
+        prisma.member.findMany({
+          where,
+          orderBy,
+          skip,
+          take: limit,
+          include: {
+            memberships: {
+              orderBy: { endDate: "desc" },
+              take: 1,
+              include: { membershipPlan: true },
+            },
+            coupleGroup: {
+              include: {
+                members: true,
+                memberships: {
+                  orderBy: { endDate: "desc" },
+                  take: 1,
+                  include: { membershipPlan: true },
+                },
+              },
+            },
+          },
+        }),
+        prisma.member.count({ where }),
+      ]);
+
+      data = dbData;
+      total = dbTotal;
+    }
 
     const totalPages = Math.ceil(total / limit);
 
@@ -163,7 +269,13 @@ export class MemberService {
           if (start > today) {
             status = "UPCOMING";
           } else if (end < today) {
-            status = "EXPIRED";
+            const thirtyDaysAgo = new Date(today);
+            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+            if (end >= thirtyDaysAgo) {
+              status = "EXPIRED";
+            } else {
+              status = "INACTIVE";
+            }
           } else {
             const diffTime = end.getTime() - today.getTime();
             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -241,7 +353,13 @@ export class MemberService {
       if (start > today) {
         status = "UPCOMING";
       } else if (end < today) {
-        status = "EXPIRED";
+        const thirtyDaysAgo = new Date(today);
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        if (end >= thirtyDaysAgo) {
+          status = "EXPIRED";
+        } else {
+          status = "INACTIVE";
+        }
       } else {
         const diffTime = end.getTime() - today.getTime();
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));

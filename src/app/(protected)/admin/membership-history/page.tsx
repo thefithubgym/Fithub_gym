@@ -1,0 +1,208 @@
+import Link from "next/link";
+import { MembershipService } from "@/services/membership.service";
+import { prisma } from "@/lib/prisma";
+import HistoryTableControls from "./HistoryTableControls";
+import ReceiptButton from "./ReceiptButton";
+import ExportPDFButton from "./ExportPDFButton";
+import SortableHeader from "./SortableHeader";
+import { TableTransitionProvider, TableTransitionBody, HistorySkeletonRows, TablePagination } from "@/components/ui/table-transition";
+
+
+interface PageProps {
+  searchParams: Promise<{
+    page?: string;
+    search?: string;
+    status?: string;
+    planId?: string;
+    dateRange?: string;
+    sortBy?: string;
+    sortOrder?: string;
+  }>;
+}
+
+import { Suspense } from "react";
+import MembershipHistoryLoading from "./loading";
+
+export const unstable_instant = { prefetch: "static", unstable_disableValidation: true };
+
+export default function MembershipHistoryPage({ searchParams }: PageProps) {
+  return (
+    <Suspense fallback={<MembershipHistoryLoading />}>
+      <MembershipHistoryContent searchParams={searchParams} />
+    </Suspense>
+  );
+}
+
+const formatDate = (dateInput: Date | string) => {
+  const d = new Date(dateInput);
+  const day = String(d.getDate()).padStart(2, "0");
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const year = d.getFullYear();
+  return `${day}-${month}-${year}`;
+};
+
+async function MembershipHistoryContent({ searchParams }: PageProps) {
+  const params = await searchParams;
+  const page = Number(params.page || "1");
+  const search = params.search || "";
+  const status = params.status || "";
+  const planId = params.planId || "";
+  const sortBy = params.sortBy || "";
+  const sortOrder = params.sortOrder || "";
+
+  const result = await MembershipService.getMembershipHistoryLog({
+    page,
+    limit: 10,
+    search,
+    status,
+    planId,
+    sortBy,
+    sortOrder,
+  });
+
+  const activePlans = await prisma.membershipPlan.findMany({
+    where: { isDeleted: false },
+    select: { id: true, name: true, memberType: true },
+  });
+
+  const prevPage = page > 1 ? page - 1 : 1;
+  const nextPage = page < result.totalPages ? page + 1 : result.totalPages;
+
+  return (
+    <TableTransitionProvider>
+      <div className="flex flex-col gap-lg w-full">
+      {/* Page Header */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-md w-full">
+        <div>
+          <h2 className="font-display text-4xl font-extrabold text-on-background uppercase tracking-tight">Membership History</h2>
+          <p className="font-body-md text-body-md text-on-surface-variant mt-sm">
+            Audit log of all registered membership transactions, renewals, and fees.
+          </p>
+        </div>
+        <div className="shrink-0 md:self-start">
+          <ExportPDFButton search={search} status={status} planId={planId} plans={activePlans} />
+        </div>
+      </div>
+
+      {/* Table Card */}
+      <div className="bg-surface border border-outline-variant rounded-xl flex flex-col shadow-sm mt-md w-full max-w-full">
+        {/* Table Header toolbar with filters */}
+        <HistoryTableControls plans={activePlans} />
+
+        {/* Table Wrapper */}
+        <div className={`overflow-x-auto w-full max-w-full scrollbar-themed ${result.totalPages <= 1 ? "rounded-b-xl" : ""}`}>
+          <table className="w-full text-left border-collapse min-w-[900px]">
+            <thead className="bg-surface-container border-b border-outline-variant">
+              <tr>
+                <th className="py-md px-lg font-label-sm text-xs text-on-surface-variant uppercase tracking-widest font-semibold">Date</th>
+                <th className="py-md px-lg font-label-sm text-xs text-on-surface-variant uppercase tracking-widest font-semibold">
+                  <SortableHeader column="memberName" label="Member" />
+                </th>
+                <th className="py-md px-lg font-label-sm text-xs text-on-surface-variant uppercase tracking-widest font-semibold">Plan Name</th>
+                <th className="py-md px-lg font-label-sm text-xs text-on-surface-variant uppercase tracking-widest font-semibold">
+                  <SortableHeader column="period" label="Period" />
+                </th>
+                <th className="py-md px-lg font-label-sm text-xs text-on-surface-variant uppercase tracking-widest font-semibold">
+                  <SortableHeader column="daysToExpire" label="Days to Expire" />
+                </th>
+                <th className="py-md px-lg font-label-sm text-xs text-on-surface-variant uppercase tracking-widest font-semibold">Method</th>
+                <th className="py-md px-lg font-label-sm text-xs text-on-surface-variant uppercase tracking-widest font-semibold">Reg. Fee</th>
+                <th className="py-md px-lg font-label-sm text-xs text-on-surface-variant uppercase tracking-widest font-semibold text-right">
+                  <SortableHeader column="paidAmount" label="Paid Amount" align="right" />
+                </th>
+                <th className="py-md px-lg font-label-sm text-xs text-on-surface-variant uppercase tracking-widest font-semibold text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-outline-variant font-body-md text-sm bg-surface">
+              <TableTransitionBody fallback={<HistorySkeletonRows />}>
+                {result.data.length === 0 ? (
+                <tr>
+                  <td colSpan={9} className="py-xl text-center text-on-surface-variant">
+                    No transactions found matching the filters.
+                  </td>
+                </tr>
+              ) : (
+                result.data.map((log) => {
+                  // Days to expire calculation
+                  const today = new Date();
+                  today.setHours(0, 0, 0, 0);
+                  const end = new Date(log.endDate);
+                  end.setHours(0, 0, 0, 0);
+                  
+                  const diffTime = end.getTime() - today.getTime();
+                  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                  
+                  return (
+                    <tr key={log.id} className="hover:bg-surface-container-lowest transition-colors">
+                      <td className="py-md px-lg text-on-surface-variant">
+                        {formatDate(log.createdAt)}
+                      </td>
+                      <td className="py-md px-lg font-medium text-white">
+                        <Link href={`/admin/members/${log.memberId}`} prefetch={false} className="hover:text-primary transition-colors">
+                          {log.memberName}
+                        </Link>
+                      </td>
+                      <td className="py-md px-lg text-on-surface">
+                        {log.planName}
+                      </td>
+                      <td className="py-md px-lg text-on-surface-variant">
+                        {formatDate(log.startDate)} to {formatDate(log.endDate)}
+                      </td>
+                      <td className="py-md px-lg">
+                        {diffDays < 0 ? (
+                          <span className="inline-flex items-center gap-xs px-sm py-xs rounded-full border text-xs font-semibold whitespace-nowrap border-error text-error bg-error/10">
+                            <span className="w-1.5 h-1.5 rounded-full bg-error"></span>
+                            Expired
+                          </span>
+                        ) : diffDays === 0 ? (
+                          <span className="inline-flex items-center gap-xs px-sm py-xs rounded-full border text-xs font-semibold whitespace-nowrap border-primary-container text-primary-container bg-primary-container/10 animate-pulse">
+                            <span className="w-1.5 h-1.5 rounded-full bg-primary-container"></span>
+                            Expires Today
+                          </span>
+                        ) : (
+                          <span className="text-white">
+                            {diffDays} {diffDays === 1 ? "day" : "days"}
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-md px-lg text-on-surface-variant font-semibold">
+                        {log.paymentMethod}
+                      </td>
+                      <td className="py-md px-lg text-on-surface-variant">
+                        {log.registrationFee > 0 ? (
+                          <span className="inline-flex items-center gap-xs px-sm py-xs rounded-full border text-xs font-semibold whitespace-nowrap border-primary text-primary bg-primary/10">
+                            ₹{log.registrationFee.toLocaleString("en-IN")}
+                          </span>
+                        ) : (
+                          <span className="text-secondary text-xs">-</span>
+                        )}
+                      </td>
+                      <td className="py-md px-lg text-right font-bold text-primary-container">
+                        ₹{(log.amount + log.registrationFee).toLocaleString("en-IN")}
+                      </td>
+                      <td className="py-md px-lg text-right">
+                        <ReceiptButton membershipId={log.id} />
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+              </TableTransitionBody>
+            </tbody>
+          </table>
+        </div>
+
+        <TablePagination
+          currentPage={page}
+          totalPages={result.totalPages}
+          totalItems={result.total}
+          itemsPerPage={10}
+          baseUrl="/admin/membership-history"
+          searchParams={{ search, status, planId, sortBy, sortOrder }}
+          itemLabel="transactions"
+        />
+      </div>
+    </div>
+    </TableTransitionProvider>
+  );
+}

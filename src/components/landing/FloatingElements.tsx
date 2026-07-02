@@ -34,15 +34,17 @@ export default function FloatingElements() {
     return null;
   }
 
-  // Exclude admin dashboard, login, and receipt pages completely
+  // Exclude admin dashboard, login, receipt, and testimonials pages completely
   if (
     pathname &&
     (pathname.startsWith("/admin") ||
       pathname.startsWith("/auth") ||
-      pathname.startsWith("/receipt"))
+      pathname.startsWith("/receipt") ||
+      pathname.startsWith("/testimonials"))
   ) {
     return null;
   }
+
 
   const handleScrollAction = () => {
     if (hasScrolled) {
