@@ -3,6 +3,7 @@ import { MemberService } from "@/services/member.service";
 import { prisma } from "@/lib/prisma";
 import MembersTableControls from "./MembersTableControls";
 import MemberTableRow from "./MemberTableRow";
+import SortableHeader from "./SortableHeader";
 import { TableTransitionProvider, TableTransitionBody, MembersSkeletonRows, TablePagination } from "@/components/ui/table-transition";
 
 import {
@@ -21,6 +22,8 @@ interface PageProps {
     search?: string;
     status?: string;
     planId?: string;
+    sortBy?: string;
+    sortOrder?: string;
   }>;
 }
 
@@ -43,6 +46,8 @@ async function MembersContent({ searchParams }: PageProps) {
   const search = params.search || "";
   const status = params.status || "";
   const planId = params.planId || "";
+  const sortBy = params.sortBy || "";
+  const sortOrder = params.sortOrder || "";
 
   // 1. Fetch dynamic members
   const result = await MemberService.getMembers({
@@ -51,6 +56,8 @@ async function MembersContent({ searchParams }: PageProps) {
     search,
     status,
     planId,
+    sortBy,
+    sortOrder,
   });
 
   // 2. Fetch active plans for dropdown
@@ -95,10 +102,14 @@ async function MembersContent({ searchParams }: PageProps) {
             {/* Sticky Header */}
             <thead className="bg-surface-container border-b border-outline-variant">
               <tr>
-                <th className="py-md px-lg font-label-sm text-xs text-on-surface-variant uppercase tracking-widest font-semibold">Member Name</th>
+                <th className="py-md px-lg font-label-sm text-xs text-on-surface-variant uppercase tracking-widest font-semibold">
+                  <SortableHeader column="memberName" label="Member Name" />
+                </th>
                 <th className="py-md px-lg font-label-sm text-xs text-on-surface-variant uppercase tracking-widest font-semibold">Contacts</th>
                 <th className="py-md px-lg font-label-sm text-xs text-on-surface-variant uppercase tracking-widest font-semibold">Plan Type</th>
-                <th className="py-md px-lg font-label-sm text-xs text-on-surface-variant uppercase tracking-widest font-semibold">Expires In</th>
+                <th className="py-md px-lg font-label-sm text-xs text-on-surface-variant uppercase tracking-widest font-semibold">
+                  <SortableHeader column="expiresIn" label="Expires In" />
+                </th>
                 <th className="py-md px-lg font-label-sm text-xs text-on-surface-variant uppercase tracking-widest font-semibold">Status</th>
               </tr>
             </thead>
@@ -215,7 +226,7 @@ async function MembersContent({ searchParams }: PageProps) {
           totalItems={result.total}
           itemsPerPage={10}
           baseUrl="/admin/members"
-          searchParams={{ search, status, planId }}
+          searchParams={{ search, status, planId, sortBy, sortOrder }}
           itemLabel="members"
         />
       </div>

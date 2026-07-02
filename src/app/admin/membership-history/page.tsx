@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import HistoryTableControls from "./HistoryTableControls";
 import ReceiptButton from "./ReceiptButton";
 import ExportPDFButton from "./ExportPDFButton";
+import SortableHeader from "./SortableHeader";
 import { TableTransitionProvider, TableTransitionBody, HistorySkeletonRows, TablePagination } from "@/components/ui/table-transition";
 
 
@@ -14,6 +15,8 @@ interface PageProps {
     status?: string;
     planId?: string;
     dateRange?: string;
+    sortBy?: string;
+    sortOrder?: string;
   }>;
 }
 
@@ -44,6 +47,8 @@ async function MembershipHistoryContent({ searchParams }: PageProps) {
   const search = params.search || "";
   const status = params.status || "";
   const planId = params.planId || "";
+  const sortBy = params.sortBy || "";
+  const sortOrder = params.sortOrder || "";
 
   const result = await MembershipService.getMembershipHistoryLog({
     page,
@@ -51,6 +56,8 @@ async function MembershipHistoryContent({ searchParams }: PageProps) {
     search,
     status,
     planId,
+    sortBy,
+    sortOrder,
   });
 
   const activePlans = await prisma.membershipPlan.findMany({
@@ -88,13 +95,21 @@ async function MembershipHistoryContent({ searchParams }: PageProps) {
             <thead className="bg-surface-container border-b border-outline-variant">
               <tr>
                 <th className="py-md px-lg font-label-sm text-xs text-on-surface-variant uppercase tracking-widest font-semibold">Date</th>
-                <th className="py-md px-lg font-label-sm text-xs text-on-surface-variant uppercase tracking-widest font-semibold">Member</th>
+                <th className="py-md px-lg font-label-sm text-xs text-on-surface-variant uppercase tracking-widest font-semibold">
+                  <SortableHeader column="memberName" label="Member" />
+                </th>
                 <th className="py-md px-lg font-label-sm text-xs text-on-surface-variant uppercase tracking-widest font-semibold">Plan Name</th>
-                <th className="py-md px-lg font-label-sm text-xs text-on-surface-variant uppercase tracking-widest font-semibold">Period</th>
-                <th className="py-md px-lg font-label-sm text-xs text-on-surface-variant uppercase tracking-widest font-semibold">Days to Expire</th>
+                <th className="py-md px-lg font-label-sm text-xs text-on-surface-variant uppercase tracking-widest font-semibold">
+                  <SortableHeader column="period" label="Period" />
+                </th>
+                <th className="py-md px-lg font-label-sm text-xs text-on-surface-variant uppercase tracking-widest font-semibold">
+                  <SortableHeader column="daysToExpire" label="Days to Expire" />
+                </th>
                 <th className="py-md px-lg font-label-sm text-xs text-on-surface-variant uppercase tracking-widest font-semibold">Method</th>
                 <th className="py-md px-lg font-label-sm text-xs text-on-surface-variant uppercase tracking-widest font-semibold">Reg. Fee</th>
-                <th className="py-md px-lg font-label-sm text-xs text-on-surface-variant uppercase tracking-widest font-semibold text-right">Paid Amount</th>
+                <th className="py-md px-lg font-label-sm text-xs text-on-surface-variant uppercase tracking-widest font-semibold text-right">
+                  <SortableHeader column="paidAmount" label="Paid Amount" align="right" />
+                </th>
                 <th className="py-md px-lg font-label-sm text-xs text-on-surface-variant uppercase tracking-widest font-semibold text-right">Actions</th>
               </tr>
             </thead>
@@ -183,7 +198,7 @@ async function MembershipHistoryContent({ searchParams }: PageProps) {
           totalItems={result.total}
           itemsPerPage={10}
           baseUrl="/admin/membership-history"
-          searchParams={{ search, status, planId }}
+          searchParams={{ search, status, planId, sortBy, sortOrder }}
           itemLabel="transactions"
         />
       </div>

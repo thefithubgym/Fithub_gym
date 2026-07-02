@@ -261,6 +261,8 @@ export class MembershipService {
     planId = "",
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     dateRange = "all_time",
+    sortBy = "",
+    sortOrder = "",
   }: {
     page?: number;
     limit?: number;
@@ -268,6 +270,8 @@ export class MembershipService {
     status?: string;
     planId?: string;
     dateRange?: string;
+    sortBy?: string;
+    sortOrder?: string;
   }) {
     const skip = (page - 1) * limit;
 
@@ -386,10 +390,29 @@ export class MembershipService {
       where.AND = conditions;
     }
 
+    let orderBy: any = { createdAt: "desc" };
+    if (sortBy && (sortOrder === "asc" || sortOrder === "desc")) {
+      if (sortBy === "memberName") {
+        orderBy = [
+          { member: { firstName: sortOrder } },
+          { member: { lastName: sortOrder } },
+        ];
+      } else if (sortBy === "period") {
+        orderBy = { startDate: sortOrder };
+      } else if (sortBy === "daysToExpire") {
+        orderBy = { endDate: sortOrder };
+      } else if (sortBy === "paidAmount") {
+        orderBy = [
+          { amount: sortOrder },
+          { registrationFee: sortOrder },
+        ];
+      }
+    }
+
     const [data, total] = await prisma.$transaction([
       prisma.membership.findMany({
         where,
-        orderBy: { createdAt: "desc" },
+        orderBy,
         skip,
         take: limit,
         include: {
