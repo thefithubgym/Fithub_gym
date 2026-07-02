@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Star, CheckCircle2, Loader2, ArrowLeft } from "lucide-react";
+import { Star, CheckCircle2, Loader2 } from "lucide-react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { submitTestimonialAction } from "@/features/testimonials/actions";
 
 export default function TestimonialForm() {
@@ -55,15 +55,11 @@ export default function TestimonialForm() {
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="max-w-xl mx-auto bg-surface-container border border-primary/20 rounded-2xl p-8 md:p-12 text-center shadow-2xl relative overflow-hidden"
+        className="max-w-xl mx-auto bg-[#181818]/70 backdrop-blur-md border border-[#323232] rounded-2xl p-8 md:p-12 text-center shadow-2xl relative overflow-hidden"
       >
         {/* Glow effect */}
         <div className="absolute -top-24 -left-24 w-48 h-48 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -bottom-24 -right-24 w-48 h-48 bg-primary-container/10 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="w-20 h-20 bg-primary/10 border border-primary/30 rounded-full flex items-center justify-center mx-auto mb-6">
-          <CheckCircle2 className="w-10 h-10 text-primary" />
-        </div>
 
         <h2 className="font-display text-2xl md:text-3xl font-extrabold text-white uppercase tracking-wider mb-4">
           Thank you!
@@ -72,13 +68,13 @@ export default function TestimonialForm() {
           Thank you for sharing your experience! Your testimonial has been submitted successfully and will appear on our website once approved by our team.
         </p>
 
-        <div className="flex flex-col sm:flex-row justify-center gap-4">
+        <div className="flex flex-col items-center gap-3">
           <Link
             href="/"
             prefetch={false}
-            className="px-6 py-3 rounded-xl bg-primary-container text-on-primary-container font-label-md font-bold hover:bg-primary active:scale-95 transition-all text-center"
+            className="w-full max-w-[200px] py-3 rounded-xl bg-primary-container text-on-primary-container font-label-md font-bold hover:bg-primary active:scale-95 transition-all text-center border-none cursor-pointer"
           >
-            Back to Home
+            Go Home
           </Link>
           <button
             onClick={() => {
@@ -89,76 +85,66 @@ export default function TestimonialForm() {
               setConsent(false);
               setSuccess(false);
             }}
-            className="px-6 py-3 rounded-xl border border-outline-variant hover:border-primary/50 text-white font-label-md font-bold active:scale-95 transition-all text-center"
+            className="w-full max-w-[200px] py-3 rounded-xl border border-[#323232] hover:border-primary/50 text-white font-label-md font-bold active:scale-95 transition-all text-center bg-transparent cursor-pointer"
           >
-            Submit Another
+            Submit Again
           </button>
         </div>
+
+
       </motion.div>
     );
   }
 
   return (
-    <div className="max-w-xl mx-auto bg-surface border border-outline-variant rounded-2xl p-6 md:p-8 shadow-xl relative">
-      <div className="flex items-center gap-2 mb-6">
-        <Link href="/" prefetch={false} className="text-secondary hover:text-white transition-colors flex items-center gap-1 text-xs">
-          <ArrowLeft className="w-4.5 h-4.5" /> Back to Home
-        </Link>
-      </div>
-
-      <div className="text-center mb-8">
-        <h2 className="font-display text-2xl md:text-3xl font-extrabold text-white uppercase tracking-tight">
-          Share Your Journey
-        </h2>
-        <p className="font-body-md text-sm text-secondary mt-2">
-          Tell others how The FitHub Gym helped you smash your fitness goals!
-        </p>
-      </div>
-
-      <form onSubmit={handleSubmit} className="space-y-md">
+    <div className="w-full max-w-xl bg-[#181818]/70 backdrop-blur-md border border-[#323232] rounded-xl p-4 sm:p-6 shadow-2xl relative">
+      <form onSubmit={handleSubmit} className="space-y-md" id="testimonialForm">
         {error && (
-          <div className="bg-error/10 border border-error/20 text-error rounded-xl p-4 text-sm font-semibold">
+          <div className="bg-error/10 border border-error/20 text-error rounded-xl p-3 text-sm font-semibold">
             {error}
           </div>
         )}
 
-        <div>
-          <label className="input-label" htmlFor="name">
-            Full Name
-          </label>
-          <input
-            id="name"
-            type="text"
-            className="input-field"
-            placeholder="John Doe"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-            disabled={isSubmitting}
-          />
+        {/* Personal Info Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
+          <div className="space-y-1">
+            <label className="font-label-md text-label-md text-secondary block" htmlFor="name">
+              Full Name
+            </label>
+            <input
+              id="name"
+              type="text"
+              className="w-full bg-[#1c1b1b] border border-[#323232] rounded-lg px-md py-sm text-white placeholder:text-secondary-container focus:border-primary-container focus:outline-none focus:ring-1 focus:ring-primary-container transition-all font-body-md text-sm h-[44px]"
+              placeholder="John Doe"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              disabled={isSubmitting}
+            />
+          </div>
+          <div className="space-y-1">
+            <label className="font-label-md text-label-md text-secondary block" htmlFor="email">
+              Email Address
+            </label>
+            <input
+              id="email"
+              type="email"
+              className="w-full bg-[#1c1b1b] border border-[#323232] rounded-lg px-md py-sm text-white placeholder:text-secondary-container focus:border-primary-container focus:outline-none focus:ring-1 focus:ring-primary-container transition-all font-body-md text-sm h-[44px]"
+              placeholder="john@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              disabled={isSubmitting}
+            />
+          </div>
         </div>
 
-        <div>
-          <label className="input-label" htmlFor="email">
-            Email Address
+        {/* Rating System */}
+        <div className="space-y-1">
+          <label className="font-label-md text-label-md text-secondary block">
+            Overall Rating
           </label>
-          <input
-            id="email"
-            type="email"
-            className="input-field"
-            placeholder="john.doe@example.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            disabled={isSubmitting}
-          />
-        </div>
-
-        <div>
-          <label className="input-label">
-            Your Rating
-          </label>
-          <div className="flex items-center gap-2 py-1">
+          <div className="flex gap-xs" id="ratingContainer">
             {[1, 2, 3, 4, 5].map((star) => {
               const active = star <= (hoveredRating || rating);
               return (
@@ -168,43 +154,39 @@ export default function TestimonialForm() {
                   onClick={() => setRating(star)}
                   onMouseEnter={() => setHoveredRating(star)}
                   onMouseLeave={() => setHoveredRating(0)}
-                  className="p-1 focus:outline-none transition-transform hover:scale-110 active:scale-95"
+                  className="p-0.5 focus:outline-none transition-transform hover:scale-110 active:scale-95 border-none bg-transparent cursor-pointer"
                   disabled={isSubmitting}
                 >
                   <Star
-                    className={`w-8 h-8 transition-colors ${
-                      active ? "fill-primary text-primary" : "text-[#2e2e2d] fill-none"
-                    }`}
+                    className={`w-7 h-7 transition-colors ${active ? "fill-primary text-primary" : "text-[#2e2e2d] fill-none"
+                      }`}
                   />
                 </button>
               );
             })}
             {rating > 0 && (
-              <span className="text-primary font-bold ml-2 text-sm uppercase font-display">
+              <span className="text-primary font-bold ml-2 text-xs uppercase font-display self-center">
                 {rating === 5 ? "Elite" : rating === 4 ? "Strong" : rating === 3 ? "Good" : rating === 2 ? "Fair" : "Poor"}
               </span>
             )}
           </div>
         </div>
 
-        <div>
-          <div className="flex justify-between items-center mb-2">
-            <label className="input-label !mb-0" htmlFor="review">
-              Testimonial / Review
+        {/* Testimonial Textarea */}
+        <div className="space-y-1">
+          <div className="flex justify-between items-center">
+            <label className="font-label-md text-label-md text-secondary block" htmlFor="review">
+              Testimonial
             </label>
-            <span
-              className={`text-xs font-semibold ${
-                review.length > 450 ? "text-error" : "text-on-surface-variant"
-              }`}
-            >
+            <span className={`font-label-md text-xs font-semibold ${review.length > 450 ? "text-error" : "text-[#a08e7a]"}`} id="charCounter">
               {review.length} / 500
             </span>
           </div>
           <textarea
             id="review"
-            rows={5}
-            className="input-field min-h-[120px] py-3 leading-relaxed resize-none !h-auto scrollbar-themed"
-            placeholder="Write your experience here (e.g. details about training quality, facility setup, or staff attitude)..."
+            maxLength={500}
+            className="w-full h-32 bg-[#1c1b1b] border border-[#323232] rounded-lg px-md py-2 text-white placeholder:text-secondary-container focus:border-primary-container focus:outline-none focus:ring-1 focus:ring-primary-container transition-all font-body-md resize-none leading-relaxed text-sm"
+            placeholder="Share the details of your transformation, favorite classes, or how our trainers helped you..."
             value={review}
             onChange={(e) => setReview(e.target.value.slice(0, 500))}
             required
@@ -212,40 +194,50 @@ export default function TestimonialForm() {
           />
         </div>
 
-        <div className="flex items-start gap-3 py-2">
-          <input
-            id="consent"
-            type="checkbox"
-            className="w-5 h-5 rounded border-[#323232] bg-[#181818] text-primary focus:ring-primary focus:ring-offset-background cursor-pointer mt-1"
-            checked={consent}
-            onChange={(e) => setConsent(e.target.checked)}
-            required
-            disabled={isSubmitting}
-          />
-          <label htmlFor="consent" className="text-secondary text-xs leading-relaxed cursor-pointer select-none">
-            I agree that The FitHub Gym may publish my testimonial on its website and promotional materials.
-          </label>
-        </div>
+        {/* Consent Checkbox */}
+        <label className="flex items-start gap-sm cursor-pointer group select-none">
+          <div className="relative flex items-center mt-0.5">
+            <input
+              id="consent"
+              type="checkbox"
+              className="peer appearance-none w-[18px] h-[18px] border border-[#323232] rounded bg-[#181818] checked:bg-primary-container checked:border-primary-container transition-all cursor-pointer"
+              checked={consent}
+              onChange={(e) => setConsent(e.target.checked)}
+              required
+              disabled={isSubmitting}
+            />
+            <span className="material-symbols-outlined absolute opacity-0 peer-checked:opacity-100 text-on-primary-fixed text-[14px] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none" style={{ fontVariationSettings: "'wght' 700" }}>
+              check
+            </span>
+          </div>
+          <span className="font-body-md text-xs text-secondary group-hover:text-on-surface transition-colors leading-relaxed">
+            I agree that my testimonial may be published on The FitHub Gym website and promotional materials.
+          </span>
+        </label>
 
+        {/* Submit Button */}
         <button
           type="submit"
-          className={`w-full py-4 rounded-xl font-label-md font-extrabold flex items-center justify-center gap-2 active:scale-[0.98] transition-all cursor-pointer ${
-            consent && !isSubmitting
-              ? "bg-primary-container text-on-primary-container hover:bg-primary"
-              : "bg-surface-container-highest text-on-surface-variant/40 border border-outline-variant/50 cursor-not-allowed"
-          }`}
+          className={`w-full py-3 rounded-xl font-headline-md text-sm font-bold flex items-center justify-center gap-sm active:scale-[0.98] transition-all cursor-pointer border-none ${consent && !isSubmitting
+            ? "bg-primary-container text-on-primary-container hover:bg-primary hover:opacity-90"
+            : "bg-surface-container-highest text-on-surface-variant/40 border border-outline-variant/50 cursor-not-allowed"
+            }`}
           disabled={!consent || isSubmitting}
         >
           {isSubmitting ? (
             <>
-              <Loader2 className="w-5 h-5 animate-spin" />
+              <Loader2 className="w-4 h-4 animate-spin" />
               Submitting Testimonial...
             </>
           ) : (
-            "Submit Testimonial"
+            <>
+              <span>Submit Testimonial</span>
+              <span className="material-symbols-outlined text-[16px]">send</span>
+            </>
           )}
         </button>
       </form>
     </div>
   );
 }
+

@@ -78,12 +78,11 @@ export default async function ReceiptPage({ params }: PageProps) {
   const whatsappUrl = `https://api.whatsapp.com/send?phone=${whatsappPhone}&text=${encodeURIComponent(whatsappMessage)}`;
 
   return (
-    <div className="min-h-screen bg-[#0F0F0F] text-[#131313] p-md flex flex-col justify-start items-center selection:bg-amber-100 print:bg-white print:p-0">
+    <div className="min-h-screen bg-[#131313] text-[#e5e2e1] px-md py-xl md:py-2xl flex flex-col justify-start items-center selection:bg-amber-100 print:bg-white print:p-0 print:py-0 font-sans antialiased">
       <style dangerouslySetInnerHTML={{ __html: `
         @media print {
-          @page {
-            size: A5 portrait;
-            margin: 8mm;
+          .no-print {
+            display: none !important;
           }
           body {
             background-color: white !important;
@@ -91,181 +90,178 @@ export default async function ReceiptPage({ params }: PageProps) {
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
           }
-          .no-print {
-            display: none !important;
-          }
-          .receipt-box {
+          .receipt-container {
+            box-shadow: none !important;
+            border: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
             width: 100% !important;
             max-width: 100% !important;
-            border: none !important;
-            box-shadow: none !important;
-            padding: 0 !important;
-            margin: 0 !important;
             background-color: white !important;
             color: black !important;
-          }
-          .divider-line {
-            border-color: #000000 !important;
           }
         }
       `}} />
 
-      {/* Action Controls - Hidden on Print */}
-      <ReceiptControls whatsappUrl={whatsappUrl} />
+      <div className="w-full max-w-4xl mx-auto">
+        {/* Top Navigation & Actions */}
+        <ReceiptControls whatsappUrl={whatsappUrl} />
 
-      {/* A5 Receipt Page Card Container */}
-      <div className="receipt-box w-full max-w-[148mm] min-h-[210mm] bg-white rounded-2xl border border-neutral-800 shadow-2xl p-lg flex flex-col justify-between text-[11px] font-sans antialiased text-neutral-800 print:border-none print:shadow-none">
-        
-        <div>
-          {/* Gym Header */}
-          <div className="text-center flex flex-col items-center gap-xs">
-            <div className="flex flex-col items-center leading-none select-none">
-              <div className="font-sans font-black text-xl tracking-tight uppercase">
-                <span className="text-neutral-950">THE FITHUB</span>{" "}
-                <span className="text-primary-container">GYM</span>
+        {/* Main Receipt Card */}
+        <main className="receipt-container w-full max-w-4xl bg-white text-stone-900 rounded-xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] p-lg md:p-2xl border border-stone-200 print:border-none print:shadow-none">
+          {/* Header Section */}
+          <header className="flex flex-col md:flex-row justify-between items-start md:items-center border-b-2 border-stone-100 pb-lg mb-lg gap-lg">
+            <div className="flex flex-col gap-xs text-left">
+              <div className="font-sans font-black text-2xl sm:text-3xl tracking-tight uppercase text-stone-900 leading-none select-none">
+                THE FITHUB <span className="text-[#f59e0b]">GYM</span>
               </div>
-              <span className="text-[8px] font-semibold tracking-[0.22em] uppercase text-neutral-500 pl-[1px] mt-1.5">
+              <div className="font-semibold text-[8px] sm:text-[9px] font-medium tracking-[0.22em] uppercase text-stone-500 mt-1 pl-[1px]">
                 Unisex Fitness Center
+              </div>
+              <div className="font-sans text-xs font-bold text-stone-500 uppercase tracking-widest mt-2">
+                Membership Payment Receipt
+              </div>
+            </div>
+            <div className="text-right flex flex-col items-end text-xs">
+              <span className="inline-flex items-center px-sm py-xs rounded bg-green-100 text-green-700 font-bold mb-xs text-[10px]">
+                <span className="material-symbols-outlined text-[14px] mr-1" style={{ fontVariationSettings: "'FILL' 1" }}>
+                  check_circle
+                </span>
+                PAID
               </span>
+              <p className="text-stone-500 mt-1">Receipt #: <span className="text-stone-900 font-semibold">{receiptNo}</span></p>
+              <p className="text-stone-500">Date: <span className="text-stone-900">{formattedDate}</span></p>
+              <p className="text-stone-500">Time: <span className="text-stone-900">{formattedTime}</span></p>
             </div>
-            
-            <div className="w-full my-sm border-t border-dashed border-neutral-300 divider-line" />
-            <h2 className="text-sm font-bold uppercase tracking-wider text-neutral-950">Membership Payment Receipt</h2>
-            <div className="w-full my-sm border-t border-dashed border-neutral-300 divider-line" />
-          </div>
+          </header>
 
-          {/* Receipt Info Section */}
-          <div className="grid grid-cols-2 gap-sm my-md">
-            <div className="flex flex-col gap-xs">
-              <div className="flex items-center gap-xs">
-                <span className="font-bold text-neutral-400 uppercase text-[8px]">Receipt No:</span>
-                <span className="font-extrabold text-neutral-950 text-xs">{receiptNo}</span>
-              </div>
-              <div className="flex items-center gap-xs">
-                <span className="font-bold text-neutral-400 uppercase text-[8px]">Payment Date:</span>
-                <span className="font-medium text-neutral-950">{formattedDate}</span>
-              </div>
-              <div className="flex items-center gap-xs">
-                <span className="font-bold text-neutral-400 uppercase text-[8px]">Payment Time:</span>
-                <span className="font-medium text-neutral-950">{formattedTime}</span>
-              </div>
-            </div>
-            
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-xl mb-xl text-left">
             {/* Gym Details */}
-            <div className="text-right flex flex-col gap-2px justify-start text-[10px]">
-              <span className="font-bold text-neutral-900">THE FITHUB GYM</span>
-              <span className="text-neutral-500">Plot no 6456, Ward no 17, opp Govt ITI, Kalambha Road, Narkhed - 441304</span>
-              <span className="text-neutral-500">PH: +91 8788849529</span>
-              <span className="text-neutral-500">EMAIL: millennialcorpllp@gmail.com</span>
-            </div>
+            <section className="text-xs">
+              <h3 className="font-bold text-stone-400 uppercase tracking-wider mb-sm text-[10px]">Facility Information</h3>
+              <div className="space-y-xs">
+                <p className="font-bold text-stone-900 text-sm">The FitHub Gym</p>
+                <p className="text-stone-600 leading-relaxed">
+                  Plot no 6456, Ward no 17, opp Govt ITI,<br />
+                  Kalambha Road, Narkhed - 441304
+                </p>
+                <p className="text-stone-600">PH: +91 8788849529</p>
+                <p className="text-stone-600 underline">millennialcorpllp@gmail.com</p>
+              </div>
+            </section>
+
+            {/* Member Details */}
+            <section className="text-xs">
+              <h3 className="font-bold text-stone-400 uppercase tracking-wider mb-sm text-[10px]">Member Information</h3>
+              <div className="space-y-xs">
+                <p className="font-bold text-stone-900 text-sm">
+                  {member.firstName} {member.lastName}
+                </p>
+                {partner && (
+                  <p className="text-stone-600">
+                    Partner: <span className="text-stone-950 font-semibold">{partner.firstName} {partner.lastName}</span> (Couple Add-on)
+                  </p>
+                )}
+                <p className="text-stone-600">Phone: {member.phone}</p>
+                <p className="text-stone-600">Email: {member.email || "N/A"}</p>
+              </div>
+            </section>
           </div>
 
-          <div className="w-full my-md border-t border-neutral-200 divider-line" />
+          {/* Membership Info Table */}
+          <section className="mb-xl overflow-x-auto text-left text-xs">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-stone-50 border-t border-b border-stone-200">
+                  <th className="py-md px-sm font-bold text-stone-500 uppercase tracking-wider text-[10px]">Plan Description</th>
+                  <th className="py-md px-sm font-bold text-stone-500 uppercase tracking-wider text-[10px]">Duration</th>
+                  <th className="py-md px-sm font-bold text-stone-500 uppercase tracking-wider text-[10px]">Validity Period</th>
+                  <th className="py-md px-sm font-bold text-stone-500 uppercase tracking-wider text-right text-[10px]">Amount</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-stone-100">
+                <tr>
+                  <td className="py-lg px-sm">
+                    <div className="font-semibold text-stone-900">
+                      {membershipPlan?.name || membership.customPlanName || "Custom Plan"}
+                    </div>
+                    <div className="text-stone-500 text-[10px] mt-0.5">
+                      {partner ? "Couple Membership Plan" : "Single Membership Plan"}
+                    </div>
+                  </td>
+                  <td className="py-lg px-sm text-stone-600">{durationText}</td>
+                  <td className="py-lg px-sm text-stone-600">{startDateFormatted} - {endDateFormatted}</td>
+                  <td className="py-lg px-sm text-stone-900 font-semibold text-right">
+                    ₹{baseAmount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                  </td>
+                </tr>
+                {regFee > 0 && (
+                  <tr>
+                    <td className="py-md px-sm">
+                      <div className="text-stone-900 font-medium">One-time Registration Fee</div>
+                    </td>
+                    <td className="py-md px-sm text-stone-600">N/A</td>
+                    <td className="py-md px-sm text-stone-600">Immediate</td>
+                    <td className="py-md px-sm text-stone-900 font-semibold text-right">
+                      ₹{regFee.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </section>
 
-          {/* Membership Details Section */}
-          <div>
-            <h3 className="font-bold text-neutral-950 text-xs uppercase mb-sm tracking-wide">Membership Details</h3>
-            <div className="grid grid-cols-2 gap-x-md gap-y-sm text-neutral-700 bg-neutral-50 p-sm rounded-xl print:bg-transparent">
-              
-              <div className="flex flex-col">
-                <span className="text-[8px] font-bold text-neutral-400 uppercase">Primary Member</span>
-                <span className="font-extrabold text-neutral-900 text-xs">{member.firstName} {member.lastName}</span>
+          {/* Financials & Payment Info */}
+          <section className="flex flex-col md:flex-row justify-between items-start gap-xl pt-lg border-t-2 border-stone-100 text-left text-xs">
+            <div className="flex-1 space-y-md w-full">
+              <div className="p-md bg-stone-50 rounded-lg border border-stone-100">
+                <h4 className="font-bold text-stone-400 uppercase mb-xs text-[10px]">Payment Information</h4>
+                <div className="grid grid-cols-2 gap-sm text-stone-600 text-xs">
+                  <span className="font-semibold">Method:</span>
+                  <span className="text-stone-900 font-semibold uppercase">{membership.paymentMethod}</span>
+                  <span className="font-semibold">Reference ID:</span>
+                  <span className="text-stone-900 font-medium truncate max-w-[150px]">{membership.paymentReference || "-"}</span>
+                  <span className="font-semibold">Transaction:</span>
+                  <span className="text-stone-900 font-medium">{transactionType}</span>
+                </div>
               </div>
-
-              {partner && (
-                <div className="flex flex-col">
-                  <span className="text-[8px] font-bold text-neutral-400 uppercase">Partner Member</span>
-                  <span className="font-extrabold text-neutral-900 text-xs">{partner.firstName} {partner.lastName}</span>
+            </div>
+            <div className="w-full md:w-80 space-y-sm">
+              <div className="flex justify-between text-stone-600">
+                <span className="font-semibold">Membership Fee</span>
+                <span className="font-medium">₹{baseAmount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
+              </div>
+              {regFee > 0 && (
+                <div className="flex justify-between text-stone-600">
+                  <span className="font-semibold">Registration Fee</span>
+                  <span className="font-medium">₹{regFee.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
                 </div>
               )}
-
-              <div className="flex flex-col">
-                <span className="text-[8px] font-bold text-neutral-400 uppercase">Contact Number</span>
-                <span className="font-semibold text-neutral-900">{member.phone}</span>
+              <div className="flex justify-between items-center py-sm border-t-2 border-stone-900 mt-md">
+                <span className="font-bold text-stone-900 text-sm">Total Paid</span>
+                <span className="font-bold text-[#f59e0b] text-base">
+                  ₹{totalAmount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                </span>
               </div>
-
-              <div className="flex flex-col">
-                <span className="text-[8px] font-bold text-neutral-400 uppercase">Email Address</span>
-                <span className="font-semibold text-neutral-900 truncate">{member.email || "N/A"}</span>
-              </div>
-
-              <div className="flex flex-col">
-                <span className="text-[8px] font-bold text-neutral-400 uppercase">Membership Plan</span>
-                <span className="font-semibold text-neutral-900">{membershipPlan?.name || membership.customPlanName || "Custom Plan"}</span>
-              </div>
-
-              <div className="flex flex-col">
-                <span className="text-[8px] font-bold text-neutral-400 uppercase">Plan Type / Duration</span>
-                <span className="font-semibold text-neutral-900">{membershipPlan?.memberType || "SINGLE"} / {durationText}</span>
-              </div>
-
-              <div className="flex flex-col">
-                <span className="text-[8px] font-bold text-neutral-400 uppercase">Validity Period</span>
-                <span className="font-bold text-neutral-900">{startDateFormatted} to {endDateFormatted}</span>
-              </div>
-
-              <div className="flex flex-col">
-                <span className="text-[8px] font-bold text-neutral-400 uppercase">Transaction Type</span>
-                <span className="font-semibold text-neutral-900">{transactionType}</span>
-              </div>
-
             </div>
-          </div>
+          </section>
 
-          <div className="w-full my-md border-t border-neutral-200 divider-line" />
-
-          {/* Payment Details Section */}
-          <div>
-            <h3 className="font-bold text-neutral-950 text-xs uppercase mb-sm tracking-wide">Payment Summary</h3>
-            <div className="flex flex-col gap-xs text-[10px]">
-              <div className="flex justify-between items-center text-neutral-600">
-                <span>Membership Fee:</span>
-                <span className="font-semibold">₹{baseAmount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
-              </div>
-              <div className="flex justify-between items-center text-neutral-600">
-                <span>Registration Fee:</span>
-                <span className="font-semibold">₹{regFee.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
-              </div>
-              
-              <div className="w-full my-xs border-t border-neutral-200 divider-line" />
-              
-              <div className="flex justify-between items-center p-sm bg-amber-50/80 border border-amber-100 text-neutral-950 rounded-xl my-xs">
-                <span className="font-bold text-xs uppercase text-amber-800">Total Amount Paid</span>
-                <span className="font-black text-sm text-neutral-950">₹{totalAmount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
-              </div>
-
-              <div className="grid grid-cols-3 gap-xs text-[9px] mt-xs bg-neutral-100 p-sm rounded-lg border border-neutral-200 text-neutral-600 print:bg-transparent">
-                <div className="flex flex-col items-center">
-                  <span className="text-[7px] font-bold text-neutral-400 uppercase">Payment Mode</span>
-                  <span className="font-extrabold text-neutral-800 uppercase mt-2px">{membership.paymentMethod}</span>
-                </div>
-                <div className="flex flex-col items-center border-x border-neutral-200">
-                  <span className="text-[7px] font-bold text-neutral-400 uppercase">Reference No.</span>
-                  <span className="font-semibold text-neutral-800 mt-2px truncate max-w-[80px]">{membership.paymentReference || "-"}</span>
-                </div>
-                <div className="flex flex-col items-center">
-                  <span className="text-[7px] font-bold text-neutral-400 uppercase">Payment Status</span>
-                  <span className="inline-flex items-center gap-2px px-sm py-[2px] rounded bg-green-100 text-green-800 text-[8px] font-bold uppercase mt-2px print:bg-transparent print:p-0">
-                    Paid
-                  </span>
-                </div>
-              </div>
-
+          {/* Footer Section */}
+          <footer className="mt-2xl text-center pt-xl border-t border-dashed border-stone-200 text-xs">
+            <p className="text-stone-900 mb-xs italic font-semibold text-sm">Stay Consistent. Stay Fit.</p>
+            <p className="text-stone-500 mb-lg">Thank you for choosing The FitHub Gym. Your progress is our mission.</p>
+            <div className="flex justify-center gap-xl opacity-20 grayscale no-print">
+              <span className="material-symbols-outlined text-[48px]">fitness_center</span>
+              <span className="material-symbols-outlined text-[48px]">monitor_heart</span>
+              <span className="material-symbols-outlined text-[48px]">nutrition</span>
             </div>
-          </div>
-
-        </div>
-
-        {/* Footer */}
-        <div className="mt-lg">
-          <div className="w-full my-sm border-t border-dashed border-neutral-300 divider-line" />
-          <div className="text-center flex flex-col gap-2px">
-            <p className="text-[10px] font-bold text-neutral-900">Thank you for choosing us!</p>
-            <p className="text-[8px] font-extrabold text-amber-600 tracking-wider uppercase">Stay consistent, stay fit</p>
-          </div>
-        </div>
-
+            <p className="mt-xl font-semibold text-stone-300 uppercase tracking-widest no-print text-[9px]">
+              Electronic Copy • No Signature Required
+            </p>
+          </footer>
+        </main>
       </div>
     </div>
   );
 }
+
