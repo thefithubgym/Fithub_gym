@@ -6,6 +6,8 @@ import ReceiptButton from "./ReceiptButton";
 import ExportPDFButton from "./ExportPDFButton";
 import SortableHeader from "./SortableHeader";
 import { TableTransitionProvider, TableTransitionBody, HistorySkeletonRows, TablePagination } from "@/components/ui/table-transition";
+import { History } from "lucide-react";
+import EmptyState from "@/components/common/EmptyState";
 
 
 interface PageProps {
@@ -117,8 +119,12 @@ async function MembershipHistoryContent({ searchParams }: PageProps) {
               <TableTransitionBody fallback={<HistorySkeletonRows />}>
                 {result.data.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="py-xl text-center text-on-surface-variant">
-                    No transactions found matching the filters.
+                  <td colSpan={9}>
+                    <EmptyState
+                      icon={History}
+                      title={search || status || planId ? "No records match your filters" : "No membership transactions yet"}
+                      description={search || status || planId ? "Try adjusting your search or filters." : "All membership purchases and renewals will appear here."}
+                    />
                   </td>
                 </tr>
               ) : (

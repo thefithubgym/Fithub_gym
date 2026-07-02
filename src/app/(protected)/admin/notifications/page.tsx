@@ -10,8 +10,10 @@ import {
   Clock, 
   MessageSquare,
   FileText,
-  Megaphone
+  Megaphone,
+  Bell
 } from "lucide-react";
+import EmptyState from "@/components/common/EmptyState";
 
 interface PageProps {
   searchParams: Promise<{
@@ -84,8 +86,12 @@ async function NotificationsContent({ searchParams }: PageProps) {
             <tbody className="divide-y divide-[#323232] font-body-md text-sm bg-surface">
               {result.data.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="py-xl text-center text-on-surface-variant">
-                    No notification logs found.
+                  <td colSpan={5}>
+                    <EmptyState
+                      icon={Bell}
+                      title={search || type ? "No logs match your filters" : "No notification logs yet"}
+                      description={search || type ? "Try adjusting your search or type filter." : "WhatsApp receipts, expiry reminders, and broadcasts will be logged here once sent."}
+                    />
                   </td>
                 </tr>
               ) : (

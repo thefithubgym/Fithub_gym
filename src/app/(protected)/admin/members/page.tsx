@@ -8,13 +8,9 @@ import { TableTransitionProvider, TableTransitionBody, MembersSkeletonRows, Tabl
 
 import {
   UserPlus,
-  Eye,
-  Edit,
-  AlertTriangle,
-  CheckCircle,
-  HelpCircle,
-  XCircle
+  Users,
 } from "lucide-react";
+import EmptyState from "@/components/common/EmptyState";
 
 interface PageProps {
   searchParams: Promise<{
@@ -117,8 +113,23 @@ async function MembersContent({ searchParams }: PageProps) {
               <TableTransitionBody fallback={<MembersSkeletonRows />}>
                 {result.data.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="py-xl text-center text-on-surface-variant">
-                    No members found matching the filters.
+                  <td colSpan={5}>
+                    <EmptyState
+                      icon={Users}
+                      title={search || status || planId ? "No members match your filters" : "No members yet"}
+                      description={search || status || planId ? "Try adjusting your search or filters to find what you're looking for." : "Get started by adding your first gym member."}
+                      action={
+                        !search && !status && !planId ? (
+                          <a
+                            href="/admin/members/new"
+                            className="inline-flex items-center gap-xs bg-primary-container text-on-primary-container font-bold rounded-xl px-lg py-sm text-sm hover:bg-primary transition-colors"
+                          >
+                            <UserPlus className="w-4 h-4" />
+                            Add First Member
+                          </a>
+                        ) : undefined
+                      }
+                    />
                   </td>
                 </tr>
               ) : (

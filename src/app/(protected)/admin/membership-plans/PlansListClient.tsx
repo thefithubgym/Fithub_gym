@@ -5,6 +5,7 @@ import { createPlanAction, togglePlanAction, deletePlanAction, updatePlanAction 
 import { MemberType } from "@prisma/client";
 import { Plus, ToggleLeft, ToggleRight, Trash2, X, Pencil } from "lucide-react";
 import { useSearchParams } from "next/navigation";
+import ConfirmationModal from "@/components/common/ConfirmationModal";
 
 interface Plan {
   id: string;
@@ -33,6 +34,10 @@ export default function PlansListClient({ plans }: PlansListClientProps) {
   const [editingPlan, setEditingPlan] = useState<Plan | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Confirmation modal state
+  const [toggleConfirm, setToggleConfirm] = useState<{ id: string; currentStatus: boolean } | null>(null);
+  const [archiveConfirm, setArchiveConfirm] = useState<string | null>(null);
 
   // Split plans
   const singlePlans = plans.filter(p => p.memberType === MemberType.SINGLE);
@@ -108,18 +113,26 @@ export default function PlansListClient({ plans }: PlansListClientProps) {
     }
   };
 
-  const handleToggleActive = async (id: string, currentStatus: boolean) => {
-    if (confirm(`Are you sure you want to ${currentStatus ? "deactivate" : "activate"} this plan?`)) {
-      const res = await togglePlanAction(id, !currentStatus);
-      if (res.error) alert(res.error);
-    }
+  const handleToggleActive = (id: string, currentStatus: boolean) => {
+    setToggleConfirm({ id, currentStatus });
   };
 
-  const handleDeletePlan = async (id: string) => {
-    if (confirm("Are you sure you want to archive this plan? It will be soft-deleted and hidden from registration options.")) {
-      const res = await deletePlanAction(id);
-      if (res.error) alert(res.error);
-    }
+  const confirmToggle = async () => {
+    if (!toggleConfirm) return;
+    setToggleConfirm(null);
+    const res = await togglePlanAction(toggleConfirm.id, !toggleConfirm.currentStatus);
+    if (res.error) alert(res.error);
+  };
+
+  const handleDeletePlan = (id: string) => {
+    setArchiveConfirm(id);
+  };
+
+  const confirmArchive = async () => {
+    if (!archiveConfirm) return;
+    setArchiveConfirm(null);
+    const res = await deletePlanAction(archiveConfirm);
+    if (res.error) alert(res.error);
   };
 
   return (
@@ -411,6 +424,29 @@ export default function PlansListClient({ plans }: PlansListClientProps) {
           </div>
         </div>
       )}
+
+      {/* Toggle Plan Active Confirmation */}
+      <ConfirmationModal
+        isOpen={toggleConfirm !== null}
+        title={toggleConfirm?.currentStatus ? "Deactivate Plan" : "Activate Plan"}
+        message={`Are you sure you want to ${toggleConfirm?.currentStatus ? "deactivate" : "activate"} this plan?`}
+        confirmText={toggleConfirm?.currentStatus ? "Yes, Deactivate" : "Yes, Activate"}
+        cancelText="Cancel"
+        onConfirm={confirmToggle}
+        onCancel={() => setToggleConfirm(null)}
+      />
+
+      {/* Archive Plan Confirmation */}
+      <ConfirmationModal
+        isOpen={archiveConfirm !== null}
+        title="Archive Plan"
+        message="Are you sure you want to archive this plan? It will be soft-deleted and hidden from registration options."
+        confirmText="Yes, Archive"
+        cancelText="Cancel"
+        isDestructive={true}
+        onConfirm={confirmArchive}
+        onCancel={() => setArchiveConfirm(null)}
+      />
     </div>
   );
 }

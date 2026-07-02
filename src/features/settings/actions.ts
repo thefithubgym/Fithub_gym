@@ -71,9 +71,7 @@ export async function getSettingsAction() {
 
 export async function updateSettingsAction(data: any) {
   try {
-    console.log("[Settings] Incoming save data:", JSON.stringify(data, null, 2));
     const validated = settingsSchema.parse(data);
-    console.log("[Settings] Validated data:", JSON.stringify(validated, null, 2));
     let settings = await prisma.settings.findFirst();
 
     if (!settings) {

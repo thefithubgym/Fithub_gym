@@ -29,6 +29,7 @@ interface PageProps {
 
 import { Suspense } from "react";
 import MemberDetailLoading from "./loading";
+// import DeleteMemberButton from "./DeleteMemberButton";
 
 export const unstable_instant = { prefetch: "static", unstable_disableValidation: true };
 

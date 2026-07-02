@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { createSingleMemberAction, createCoupleMemberAction, searchMembersAction } from "@/features/members/actions";
@@ -78,6 +78,7 @@ export default function MemberForm({ plans, defaultRegistrationFee = 200 }: Memb
       // Membership details
       membershipPlanId: "",
       customPlanName: "",
+      customPlanDuration: 1,
       amount: 0,
       registrationFee: defaultRegistrationFee, // Default fee
       paymentMethod: PaymentMethod.UPI as PaymentMethod,
@@ -90,27 +91,45 @@ export default function MemberForm({ plans, defaultRegistrationFee = 200 }: Memb
 
   const selectedPlanId = watch("membershipPlanId");
   const selectedStartDate = watch("startDate");
+  const customPlanDuration = watch("customPlanDuration");
 
   // Handle plan change to set default price & calculate end date
   const handlePlanChange = (planId: string) => {
     if (!planId) {
       setValue("amount", 0);
-      setValue("endDate", "");
       return;
     }
 
     const plan = plans.find(p => p.id === planId);
     if (plan) {
       setValue("amount", plan.price);
+    }
+  };
 
-      // Calculate end date based on duration
-      if (selectedStartDate) {
-        const start = new Date(selectedStartDate);
+  useEffect(() => {
+    if (!selectedStartDate) {
+      setValue("endDate", "");
+      return;
+    }
+
+    const start = new Date(selectedStartDate);
+    if (isNaN(start.getTime())) {
+      setValue("endDate", "");
+      return;
+    }
+
+    if (selectedPlanId) {
+      const plan = plans.find(p => p.id === selectedPlanId);
+      if (plan) {
         start.setMonth(start.getMonth() + plan.durationMonths);
         setValue("endDate", start.toISOString().split("T")[0]);
       }
+    } else {
+      const duration = Number(customPlanDuration || 1);
+      start.setMonth(start.getMonth() + (duration > 0 ? duration : 1));
+      setValue("endDate", start.toISOString().split("T")[0]);
     }
-  };
+  }, [selectedPlanId, selectedStartDate, customPlanDuration, plans, setValue]);
 
   const handlePrimarySearch = async (query: string) => {
     setPrimarySearchQuery(query);
@@ -653,10 +672,16 @@ export default function MemberForm({ plans, defaultRegistrationFee = 200 }: Memb
             </div>
 
             {!selectedPlanId && (
-              <div className="flex flex-col gap-xs">
-                <label className="input-label" htmlFor="customPlanName">Custom Plan Name</label>
-                <input className="input-field h-[40px] text-sm py-2" id="customPlanName" placeholder="e.g. Special Offer 2 Months" {...register("customPlanName")} />
-              </div>
+              <>
+                <div className="flex flex-col gap-xs">
+                  <label className="input-label" htmlFor="customPlanName">Custom Plan Name</label>
+                  <input className="input-field h-[40px] text-sm py-2" id="customPlanName" placeholder="e.g. Special Offer 2 Months" {...register("customPlanName", { required: !selectedPlanId })} />
+                </div>
+                <div className="flex flex-col gap-xs">
+                  <label className="input-label" htmlFor="customPlanDuration">Duration (Months)</label>
+                  <input className="input-field h-[40px] text-sm py-2" id="customPlanDuration" type="number" min={1} placeholder="e.g. 1" {...register("customPlanDuration", { required: !selectedPlanId })} />
+                </div>
+              </>
             )}
 
             <div className="flex flex-col gap-xs">
@@ -685,15 +710,6 @@ export default function MemberForm({ plans, defaultRegistrationFee = 200 }: Memb
                 {...register("startDate")}
                 onChange={(e) => {
                   setValue("startDate", e.target.value);
-                  const planId = watch("membershipPlanId");
-                  if (planId) {
-                    const plan = plans.find(p => p.id === planId);
-                    if (plan && e.target.value) {
-                      const start = new Date(e.target.value);
-                      start.setMonth(start.getMonth() + plan.durationMonths);
-                      setValue("endDate", start.toISOString().split("T")[0]);
-                    }
-                  }
                 }}
               />
             </div>
