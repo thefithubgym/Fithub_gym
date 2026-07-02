@@ -12,7 +12,7 @@ const FooterLinks = [
   { label: "About Us", href: "/about" },
   { label: "Memberships", href: "/memberships" },
   { label: "Gallery", href: "/gallery" },
-  { label: "Contact", href: "/#contact" },
+  { label: "Contact", href: "/contact" },
 ];
 
 export default async function Footer({ isLoggedIn }: FooterProps) {

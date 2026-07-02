@@ -10,7 +10,7 @@ const navLinks = [
   { label: "About Us", href: "/about" },
   { label: "Memberships", href: "/memberships" },
   { label: "Gallery", href: "/gallery" },
-  { label: "Contact", href: "/#contact" },
+  { label: "Contact", href: "/contact" },
 ];
 interface HeaderProps {
   isLoggedIn?: boolean;

@@ -433,7 +433,7 @@ export default function AboutContainer({ whyChooseSection }: AboutContainerProps
               <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
-              href="/#contact"
+              href="/contact"
               prefetch={false}
               className="bg-transparent border border-outline-variant text-on-surface font-bold py-3 px-8 rounded-xl hover:border-primary-container hover:text-primary transition-colors font-label-md text-sm active:scale-98 transition-transform w-full sm:w-auto justify-center"
             >

@@ -33,7 +33,7 @@ export default function CTASection() {
               View Membership Plans
             </Link>
             <Link
-              href="/#contact"
+              href="/contact"
               prefetch={false}
               className="inline-flex items-center justify-center bg-transparent border border-outline-variant text-on-surface font-bold py-3.5 px-6 rounded-xl hover:border-primary-container hover:text-primary transition-all font-label-md text-sm scale-95 active:scale-90 transition-transform duration-200 text-center w-full sm:w-auto"
             >
