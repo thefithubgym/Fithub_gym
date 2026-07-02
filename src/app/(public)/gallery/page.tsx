@@ -1,7 +1,4 @@
 import { Metadata } from "next";
-import { auth } from "@/auth";
-import Header from "@/components/common/Header";
-import Footer from "@/components/common/Footer";
 import FAQSection from "@/components/common/FAQSection";
 import GalleryContainer from "@/components/gallery/GalleryContainer";
 import { galleryItems } from "@/data/galleryData";
@@ -34,25 +31,13 @@ export const metadata: Metadata = {
 };
 
 export default async function GalleryPage() {
-  const session = await auth();
-  const isLoggedIn = !!session?.user;
-
   return (
-    <div className="bg-background text-on-background min-h-screen font-sans antialiased overflow-x-hidden relative selection:bg-primary-container selection:text-on-primary-container flex flex-col justify-between">
-      {/* Global Header */}
-      <Header isLoggedIn={isLoggedIn} />
+    <>
+      {/* Core Gallery Component */}
+      <GalleryContainer initialItems={galleryItems} />
 
-      {/* Main Content Area */}
-      <main className="pt-20 flex-grow">
-        {/* Core Gallery Component */}
-        <GalleryContainer initialItems={galleryItems} />
-
-        {/* Reusable FAQ Section */}
-        <FAQSection />
-      </main>
-
-      {/* Global Footer */}
-      <Footer isLoggedIn={isLoggedIn} />
-    </div>
+      {/* Reusable FAQ Section */}
+      <FAQSection />
+    </>
   );
 }

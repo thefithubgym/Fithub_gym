@@ -1,5 +1,4 @@
 import { prisma } from "@/lib/prisma";
-import Header from "@/components/common/Header";
 import HeroSection from "@/components/landing/HeroSection";
 import StatsSection from "@/components/landing/StatsSection";
 import StandardOfExcellence from "@/components/landing/StandardOfExcellence";
@@ -9,14 +8,9 @@ import AccessTiers from "@/components/landing/AccessTiers";
 import TestimonialsSection from "@/components/landing/TestimonialsSection";
 import FAQSection from "@/components/common/FAQSection";
 import ConnectWithUs from "@/components/landing/ConnectWithUs";
-import Footer from "@/components/common/Footer";
-import { auth } from "@/auth";
 
 
 export default async function LandingPage() {
-  const session = await auth();
-  const isLoggedIn = !!session?.user;
-
   // Fetch unique active member count for statistics
   const memberCount = await prisma.member.count({
     where: { isDeleted: false },
@@ -48,31 +42,25 @@ export default async function LandingPage() {
   const plans = [monthlyPlan, quarterlyPlan, yearlyPlan].filter((plan): plan is NonNullable<typeof plan> => plan !== null);
 
   return (
-    <div className="bg-background text-on-background min-h-screen font-sans antialiased overflow-x-hidden relative selection:bg-primary-container selection:text-on-primary-container">
-      <Header isLoggedIn={isLoggedIn} />
+    <>
+      <HeroSection />
 
-      <main className="pt-20">
-        <HeroSection />
+      <StatsSection memberCount={memberCount} />
 
-        <StatsSection memberCount={memberCount} />
+      <StandardOfExcellence />
 
-        <StandardOfExcellence />
+      <PerformanceFramework />
 
-        <PerformanceFramework />
+      <ProvingGrounds />
 
-        <ProvingGrounds />
+      <AccessTiers plans={plans} />
 
-        <AccessTiers plans={plans} />
+      <TestimonialsSection testimonials={testimonials} />
 
-        <TestimonialsSection testimonials={testimonials} />
+      <FAQSection />
 
-        <FAQSection />
-
-        <ConnectWithUs />
-      </main>
-
-      <Footer isLoggedIn={isLoggedIn} />
-    </div>
+      <ConnectWithUs />
+    </>
   );
 }
 
