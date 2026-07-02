@@ -1,6 +1,6 @@
 export default function HeroSection() {
   return (
-    <section className="relative w-full min-h-[400px] md:aspect-16/5 items-center flex justify-center overflow-hidden px-container-margin py-xl">
+    <section className="relative w-full h-fit items-center flex justify-center overflow-hidden px-container-margin py-12 md:py-12">
       {/* Background Image with Overlay */}
       <div className="absolute inset-0 z-0">
         <div
@@ -13,12 +13,12 @@ export default function HeroSection() {
 
       <div className="max-w-7xl mx-auto w-full relative z-10 flex flex-col items-center justify-center">
         <div className="text-center px-2 max-w-4xl mx-auto flex flex-col items-center gap-sm">
-          <div className="inline-flex items-center gap-xs px-3 py-1 rounded-full border border-outline-variant bg-surface-container-low/60 backdrop-blur-sm">
+          {/* <div className="inline-flex items-center gap-xs px-3 py-1 rounded-full border border-outline-variant bg-surface-container-low/60 backdrop-blur-sm">
             <span className="w-2 h-2 rounded-full bg-primary-container animate-pulse"></span>
             <span className="font-label-sm text-xs text-on-surface-variant uppercase tracking-wider">
               PRICING & PACKAGES
             </span>
-          </div>
+          </div> */}
 
           <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-extrabold uppercase text-on-surface tracking-tight leading-tight text-center">
             MEMBERSHIP <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-container to-primary">PLANS</span>

@@ -127,7 +127,7 @@ export default function AboutContainer({ whyChooseSection }: AboutContainerProps
       className="space-y-0"
     >
       {/* 1. HERO SECTION */}
-      <section className="relative w-full min-h-[480px] md:h-[600px] flex items-center justify-center overflow-hidden px-container-margin py-0">
+      <section className="relative w-full h-fit flex items-center justify-center overflow-hidden px-container-margin py-12 md:py-12">
         {/* Background Image with Overlays */}
         <div className="absolute inset-0 z-0">
           <Image
@@ -142,7 +142,7 @@ export default function AboutContainer({ whyChooseSection }: AboutContainerProps
         </div>
 
         <div className="max-w-4xl mx-auto w-full relative z-10 text-center flex flex-col items-center gap-md">
-          <motion.div
+          {/* <motion.div
             variants={fadeInUp}
             className="inline-flex items-center gap-xs px-3 py-1 rounded-full border border-outline-variant bg-surface-container-low/60 backdrop-blur-sm"
           >
@@ -150,7 +150,7 @@ export default function AboutContainer({ whyChooseSection }: AboutContainerProps
             <span className="font-label-sm text-xs text-on-surface-variant uppercase tracking-wider">
               Narkhed's Premium Fitness Center
             </span>
-          </motion.div>
+          </motion.div> */}
 
           <motion.h1
             variants={fadeInUp}
