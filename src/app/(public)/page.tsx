@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import HeroSection from "@/components/landing/HeroSection";
 import StatsSection from "@/components/landing/StatsSection";
@@ -8,6 +9,12 @@ import AccessTiers from "@/components/landing/AccessTiers";
 import TestimonialsSection from "@/components/landing/TestimonialsSection";
 import FAQSection from "@/components/common/FAQSection";
 import ConnectWithUs from "@/components/landing/ConnectWithUs";
+
+export const metadata: Metadata = {
+  alternates: {
+    canonical: "/",
+  },
+};
 
 
 export default async function LandingPage() {

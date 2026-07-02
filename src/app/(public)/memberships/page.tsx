@@ -5,9 +5,37 @@ import OverviewSection from "@/components/membership-plans/OverviewSection";
 import PlansTables from "@/components/membership-plans/PlansTables";
 import CTASection from "@/components/membership-plans/CTASection";
 
-export const metadata = {
-  title: "Membership Plans | The FitHub Gym",
-  description: "Choose the membership plan that best suits your fitness goals. All plans displayed are always updated directly from our latest pricing. Premium fitness facility in Narkhed.",
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Membership Plans",
+  description: "Choose the perfect gym membership plan at The FitHub Gym, Narkhed. View monthly, quarterly, and annual pricing for single and couple memberships. Transparent, up-to-date pricing with no hidden fees.",
+  keywords: [
+    "gym membership plans", "gym fees Narkhed", "monthly gym membership", "couple gym membership",
+    "annual gym membership", "FitHub Gym pricing", "affordable gym Narkhed", "fitness plans Maharashtra"
+  ],
+  alternates: {
+    canonical: "/memberships",
+  },
+  openGraph: {
+    title: "Membership Plans | The FitHub Gym",
+    description: "Explore transparent monthly, quarterly, and annual gym membership plans at The FitHub Gym in Narkhed. Single and couple options available.",
+    url: "https://fithubgym.in/memberships",
+    images: [
+      {
+        url: "/assets/gallery/hero.webp",
+        width: 1200,
+        height: 630,
+        alt: "FitHub Gym Membership Plans",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Membership Plans | The FitHub Gym",
+    description: "Explore transparent monthly, quarterly, and annual gym membership plans at The FitHub Gym in Narkhed. Single and couple options available.",
+    images: ["/assets/gallery/hero.webp"],
+  },
 };
 
 export default async function MembershipsPage() {

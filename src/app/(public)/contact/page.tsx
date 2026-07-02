@@ -2,8 +2,12 @@ import { Metadata } from "next";
 import ConnectWithUs from "@/components/landing/ConnectWithUs";
 
 export const metadata: Metadata = {
-  title: "Contact Us | The FitHub Gym",
+  title: "Contact Us",
   description: "Get in touch with The FitHub Gym in Narkhed. View our operating hours, location on Google Maps, phone number, and social links to start your fitness journey today.",
+  keywords: [
+    "contact FitHub Gym", "gym location Narkhed", "gym phone number", "gym hours",
+    "gym address Narkhed", "FitHub contact", "gym WhatsApp", "gym Instagram"
+  ],
   alternates: {
     canonical: "/contact",
   },

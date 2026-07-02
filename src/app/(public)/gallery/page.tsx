@@ -6,6 +6,10 @@ import { galleryItems } from "@/data/galleryData";
 export const metadata: Metadata = {
   title: "Gallery",
   description: "Explore The FitHub Gym through our photo gallery. Discover modern gym equipment, training spaces, cardio zone, strength area, and the motivating fitness environment in Narkhed.",
+  keywords: [
+    "gym gallery", "FitHub Gym photos", "gym equipment Narkhed", "gym interior", "cardio zone",
+    "strength training area", "fitness center photos", "gym images Maharashtra"
+  ],
   alternates: {
     canonical: "/gallery",
   },
