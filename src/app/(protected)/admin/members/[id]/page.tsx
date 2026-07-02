@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MemberService } from "@/services/member.service";
-import ReceiptButton from "@/app/admin/membership-history/ReceiptButton";
+import ReceiptButton from "@/app/(protected)/admin/membership-history/ReceiptButton";
 // import DeleteMemberButton from "./DeleteMemberButton";
 import {
   ArrowLeft,
