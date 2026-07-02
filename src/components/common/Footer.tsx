@@ -8,6 +8,7 @@ interface FooterProps {
 }
 
 const FooterLinks = [
+  { label: "Home", href: "/" },
   { label: "About Us", href: "/about" },
   { label: "Memberships", href: "/memberships" },
   { label: "Gallery", href: "/gallery" },
