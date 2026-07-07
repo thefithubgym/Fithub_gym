@@ -36,7 +36,11 @@ export class MembershipService {
     });
 
     // Check for overlapping membership dates for this member or their couple group
-    const whereConditions: any = {
+    const whereObj: any = {
+      OR: [
+        { memberId },
+        member?.coupleGroupId ? { coupleGroupId: member.coupleGroupId } : {},
+      ],
       id: currentMembershipId ? { not: currentMembershipId } : undefined,
       AND: [
         {
@@ -61,21 +65,39 @@ export class MembershipService {
       ],
     };
 
-    if (member?.coupleGroupId) {
-      whereConditions.OR = [
-        { memberId },
-        { coupleGroupId: member.coupleGroupId },
-      ];
-    } else {
-      whereConditions.memberId = memberId;
-    }
-
-    const overlapping = await txClient.membership.findFirst({
-      where: whereConditions,
+    const overlappingList = await txClient.membership.findMany({
+      where: whereObj,
+      select: {
+        id: true,
+        memberId: true,
+        coupleGroupId: true,
+        startDate: true,
+        endDate: true,
+      },
     });
 
-    if (overlapping) {
-      throw new Error(`The membership dates overlap with an existing membership (${overlapping.startDate.toLocaleDateString()} to ${overlapping.endDate.toLocaleDateString()}).`);
+    if (overlappingList.length > 0) {
+      console.log("=== MEMBERSHIP OVERLAP VALIDATION INSTRUMENTATION ===");
+      console.log("currentMembershipId:", currentMembershipId);
+      console.log("memberId:", memberId);
+      console.log("coupleGroupId:", member?.coupleGroupId);
+      console.log("startDate:", startDate);
+      console.log("endDate:", endDate);
+      console.log("Prisma where object:", JSON.stringify(whereObj, null, 2));
+      console.log("Overlapping memberships found:");
+      overlappingList.forEach((m: any, index: number) => {
+        const isCurrent = m.id === currentMembershipId;
+        console.log(`[${index}] ID: ${m.id}`);
+        console.log(`    memberId: ${m.memberId}`);
+        console.log(`    coupleGroupId: ${m.coupleGroupId}`);
+        console.log(`    startDate: ${m.startDate}`);
+        console.log(`    endDate: ${m.endDate}`);
+        console.log(`    Is current membership being edited? ${isCurrent}`);
+      });
+      console.log("=====================================================");
+
+      const conflictIds = overlappingList.map((m: any) => m.id).join(", ");
+      throw new Error(`The membership dates overlap with an existing membership. Conflicting membership ID(s): ${conflictIds} (Interval: ${overlappingList[0].startDate.toLocaleDateString()} to ${overlappingList[0].endDate.toLocaleDateString()}).`);
     }
   }
 
