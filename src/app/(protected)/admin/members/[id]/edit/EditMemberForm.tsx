@@ -18,7 +18,7 @@ interface Member {
   id: string;
   firstName: string;
   lastName: string;
-  phone: string;
+  phone?: string | null;
   gender: Gender;
   email?: string | null;
   dateOfBirth?: Date | null;
@@ -43,7 +43,7 @@ export default function EditMemberForm({ member }: EditMemberFormProps) {
     defaultValues: {
       firstName: member.firstName,
       lastName: member.lastName,
-      phone: member.phone,
+      phone: member.phone || "",
       gender: member.gender,
       email: member.email || "",
       dateOfBirth: member.dateOfBirth ? new Date(member.dateOfBirth).toISOString().split("T")[0] : "",
@@ -135,7 +135,7 @@ export default function EditMemberForm({ member }: EditMemberFormProps) {
 
           <div className="flex flex-col gap-xs">
             <label className="input-label" htmlFor="phone">Phone Number</label>
-            <input className="input-field h-[40px] text-sm py-2" id="phone" {...register("phone")} required />
+            <input className="input-field h-[40px] text-sm py-2" id="phone" {...register("phone")} />
           </div>
 
           <div className="grid grid-cols-2 gap-sm">

@@ -7,7 +7,7 @@ import { getBroadcastRecipientsAction, sendBroadcastAction } from "@/features/no
 interface Recipient {
   id: string;
   name: string;
-  phone: string;
+  phone: string | null;
 }
 
 interface BroadcastModalProps {
@@ -51,7 +51,7 @@ export default function BroadcastModal({ isOpen, onClose, onSuccess }: Broadcast
 
   const filteredRecipients = recipients.filter(r =>
     r.name.toLowerCase().includes(search.toLowerCase()) ||
-    r.phone.includes(search)
+    (r.phone && r.phone.includes(search))
   );
 
   const toggleSelectAll = () => {
@@ -205,7 +205,7 @@ export default function BroadcastModal({ isOpen, onClose, onSuccess }: Broadcast
                           </button>
                           <div className="flex flex-col text-left">
                             <span className="text-white text-xs font-bold">{rec.name}</span>
-                            <span className="text-[#B3B3B3] text-[10px]">{rec.phone}</span>
+                            <span className="text-[#B3B3B3] text-[10px]">{rec.phone || "No Phone"}</span>
                           </div>
                         </div>
                       );

@@ -91,13 +91,18 @@ export default async function ReceiptPage({ params }: PageProps) {
   const protocol = host.includes("localhost") ? "http" : "https";
   const receiptLink = `${protocol}://${host}/receipt/${id}`;
 
-  let whatsappPhone = member.phone.replace(/[^0-9]/g, "");
-  if (whatsappPhone.length === 10) {
-    whatsappPhone = "91" + whatsappPhone;
+  let whatsappPhone = "";
+  if (member.phone) {
+    whatsappPhone = member.phone.replace(/[^0-9]/g, "");
+    if (whatsappPhone.length === 10) {
+      whatsappPhone = "91" + whatsappPhone;
+    }
   }
 
   const whatsappMessage = `Hello ${member.firstName},\n\nThank you for choosing *The Fit Hub Gym*! Here is your payment receipt.\n\n*Receipt No:* ${receiptNo}\n*Plan:* ${membershipPlan?.name || membership.customPlanName || "Custom Plan"}\n*Amount Paid:* ₹${totalAmount.toLocaleString("en-IN")}\n*Validity:* ${startDateFormatted} to ${endDateFormatted}\n\n*View Receipt online:* ${receiptLink}\n\nStay consistent, stay fit! 💪🏼💥`;
-  const whatsappUrl = `https://api.whatsapp.com/send?phone=${whatsappPhone}&text=${encodeURIComponent(whatsappMessage)}`;
+  const whatsappUrl = whatsappPhone 
+    ? `https://api.whatsapp.com/send?phone=${whatsappPhone}&text=${encodeURIComponent(whatsappMessage)}`
+    : "";
 
   return (
     <div className="min-h-screen bg-[#131313] text-[#e5e2e1] px-md py-xl md:py-2xl flex flex-col justify-start items-center selection:bg-amber-100 print:bg-white print:p-0 print:py-0 font-sans antialiased">
@@ -244,7 +249,7 @@ export default async function ReceiptPage({ params }: PageProps) {
                     Partner: <span className="text-stone-950 font-semibold">{partner.firstName} {partner.lastName}</span> (Couple Add-on)
                   </p>
                 )}
-                <p className="text-stone-600">Phone: {member.phone}</p>
+                <p className="text-stone-600">Phone: {member.phone || "Not Provided"}</p>
                 <p className="text-stone-600 underline break-all">Email: {member.email || "N/A"}</p>
               </div>
             </section>

@@ -82,7 +82,7 @@ export class WhatsAppService {
         include: { membershipPlan: true },
       });
 
-      if (!member || !membership) return false;
+      if (!member || !membership || !member.phone) return false;
 
       const settings = await getSettings();
 
@@ -166,7 +166,7 @@ export class WhatsAppService {
         include: { membershipPlan: true },
       });
 
-      if (!member || !membership) return false;
+      if (!member || !membership || !member.phone) return false;
 
       const settings = await getSettings();
 
@@ -244,7 +244,7 @@ export class WhatsAppService {
     for (const id of memberIds) {
       try {
         const member = await prisma.member.findUnique({ where: { id } });
-        if (!member) {
+        if (!member || !member.phone) {
           failed++;
           continue;
         }

@@ -7,11 +7,16 @@ const memberProfileFields = {
   lastName: z.string().min(1, "Last name is required").trim(),
   phone: z
     .string()
-    .regex(
-      /^\+?[1-9]\d{1,14}$/,
+    .optional()
+    .or(z.literal(""))
+    .refine(
+      (val) => !val || /^\+?[1-9]\d{1,14}$/.test(val),
       "Please enter a valid phone number (e.g. +919876543210)"
     )
-    .min(10, "Phone number must be at least 10 digits"),
+    .refine(
+      (val) => !val || val.length >= 10,
+      "Phone number must be at least 10 digits"
+    ),
   gender: z.nativeEnum(Gender),
   email: z.string().email("Invalid email address").optional().or(z.literal("")),
   dateOfBirth: z
@@ -49,7 +54,18 @@ export const createCoupleMemberSchema = z.object({
   memberOne: z.object({
     firstName: z.string().min(1, "First name is required").trim(),
     lastName: z.string().min(1, "Last name is required").trim(),
-    phone: z.string().min(10, "Phone must be at least 10 digits"),
+    phone: z
+      .string()
+      .optional()
+      .or(z.literal(""))
+      .refine(
+        (val) => !val || /^\+?[1-9]\d{1,14}$/.test(val),
+        "Please enter a valid phone number (e.g. +919876543210)"
+      )
+      .refine(
+        (val) => !val || val.length >= 10,
+        "Phone must be at least 10 digits"
+      ),
     gender: z.nativeEnum(Gender),
     email: z
       .string()
@@ -65,7 +81,18 @@ export const createCoupleMemberSchema = z.object({
   memberTwo: z.object({
     firstName: z.string().min(1, "First name is required").trim(),
     lastName: z.string().min(1, "Last name is required").trim(),
-    phone: z.string().min(10, "Phone must be at least 10 digits"),
+    phone: z
+      .string()
+      .optional()
+      .or(z.literal(""))
+      .refine(
+        (val) => !val || /^\+?[1-9]\d{1,14}$/.test(val),
+        "Please enter a valid phone number (e.g. +919876543210)"
+      )
+      .refine(
+        (val) => !val || val.length >= 10,
+        "Phone must be at least 10 digits"
+      ),
     gender: z.nativeEnum(Gender),
     email: z
       .string()
@@ -104,7 +131,18 @@ export const createCoupleMemberSchema = z.object({
 export const updateMemberSchema = z.object({
   firstName: z.string().min(1, "First name is required").trim(),
   lastName: z.string().min(1, "Last name is required").trim(),
-  phone: z.string().min(10, "Phone must be at least 10 digits"),
+  phone: z
+    .string()
+    .optional()
+    .or(z.literal(""))
+    .refine(
+      (val) => !val || /^\+?[1-9]\d{1,14}$/.test(val),
+      "Please enter a valid phone number (e.g. +919876543210)"
+    )
+    .refine(
+      (val) => !val || val.length >= 10,
+      "Phone must be at least 10 digits"
+    ),
   gender: z.nativeEnum(Gender),
   email: z.string().email("Invalid email").optional().or(z.literal("")),
   dateOfBirth: z
@@ -116,4 +154,16 @@ export const updateMemberSchema = z.object({
   emergencyPhone: z.string().optional(),
   notes: z.string().optional(),
   avatarUrl: z.string().optional(),
+});
+
+export const updateMembershipSchema = z.object({
+  membershipPlanId: z.string().uuid().optional().or(z.literal("")).nullable(),
+  customPlanName: z.string().optional().nullable(),
+  amount: z.coerce.number().min(0, "Amount cannot be negative"),
+  registrationFee: z.coerce.number().min(0, "Registration fee cannot be negative"),
+  paymentMethod: z.nativeEnum(PaymentMethod),
+  paymentReference: z.string().optional().nullable(),
+  startDate: z.string().transform((v) => new Date(v)),
+  endDate: z.string().transform((v) => new Date(v)),
+  remarks: z.string().optional().nullable(),
 });

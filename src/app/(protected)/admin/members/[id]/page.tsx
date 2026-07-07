@@ -80,7 +80,7 @@ async function MemberDetailContent({ params }: PageProps) {
         </Link>
         <div className="flex gap-sm self-end sm:self-auto">
           <Link
-            href={`/admin/membership-history?search=${encodeURIComponent(member.phone)}`}
+            href={`/admin/membership-history?search=${encodeURIComponent(member.phone || member.name)}`}
             prefetch={false}
             className="border border-[#323232] text-white hover:bg-surface-container-high font-bold rounded-xl px-lg py-3 transition-colors font-label-md text-sm flex items-center gap-xs cursor-pointer"
           >
@@ -154,26 +154,28 @@ async function MemberDetailContent({ params }: PageProps) {
                 <div className="flex items-center gap-sm">
                   <span className="text-white text-sm flex items-center gap-xs">
                     <Phone className="w-4 h-4 text-primary-container" />
-                    {member.phone}
+                    {member.phone || "Not Provided"}
                   </span>
-                  <div className="flex items-center gap-xs">
-                    <a
-                      href={`tel:${member.phone}`}
-                      className="w-7 h-7 flex items-center justify-center rounded-lg bg-surface-container border border-outline-variant hover:bg-surface-container-high text-on-surface hover:text-white transition-colors cursor-pointer"
-                      title="Call member"
-                    >
-                      <Phone className="w-3.5 h-3.5 text-primary" />
-                    </a>
-                    <a
-                      href={member.phone.replace(/\D/g, '').length === 10 ? `https://wa.me/91${member.phone.replace(/\D/g, '')}` : `https://wa.me/${member.phone.replace(/\D/g, '')}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-7 h-7 flex items-center justify-center rounded-lg bg-green-500/10 border border-green-500/30 hover:bg-green-500/20 text-green-500 hover:text-green-400 transition-colors cursor-pointer"
-                      title="WhatsApp message"
-                    >
-                      <MessageSquare className="w-3.5 h-3.5" />
-                    </a>
-                  </div>
+                  {member.phone && (
+                    <div className="flex items-center gap-xs">
+                      <a
+                        href={`tel:${member.phone}`}
+                        className="w-7 h-7 flex items-center justify-center rounded-lg bg-surface-container border border-outline-variant hover:bg-surface-container-high text-on-surface hover:text-white transition-colors cursor-pointer"
+                        title="Call member"
+                      >
+                        <Phone className="w-3.5 h-3.5 text-primary" />
+                      </a>
+                      <a
+                        href={member.phone.replace(/\D/g, '').length === 10 ? `https://wa.me/91${member.phone.replace(/\D/g, '')}` : `https://wa.me/${member.phone.replace(/\D/g, '')}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-7 h-7 flex items-center justify-center rounded-lg bg-green-500/10 border border-green-500/30 hover:bg-green-500/20 text-green-500 hover:text-green-400 transition-colors cursor-pointer"
+                        title="WhatsApp message"
+                      >
+                        <MessageSquare className="w-3.5 h-3.5" />
+                      </a>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -363,7 +365,15 @@ async function MemberDetailContent({ params }: PageProps) {
                   </div>
 
                   {/* Receipt Action */}
-                  <div className="flex justify-end pt-sm border-t border-[#323232]">
+                  <div className="flex justify-end gap-sm pt-sm border-t border-[#323232]">
+                    <Link
+                      href={`/admin/membership-history/${latestMembership.id}/edit`}
+                      prefetch={false}
+                      className="border border-[#323232] text-white hover:bg-surface-container-high font-bold rounded-xl px-md py-2 transition-colors font-label-md text-xs flex items-center gap-xs cursor-pointer"
+                    >
+                      <Edit className="w-3 h-3" />
+                      Edit Membership
+                    </Link>
                     <ReceiptButton membershipId={latestMembership.id} />
                   </div>
                 </div>
@@ -385,7 +395,7 @@ async function MemberDetailContent({ params }: PageProps) {
                 <h3 className="text-lg font-bold text-white">{partner.firstName} {partner.lastName}</h3>
                 <p className="text-secondary text-sm flex items-center gap-xs">
                   <Phone className="w-4 h-4" />
-                  {partner.phone}
+                  {partner.phone || "Not Provided"}
                 </p>
                 <Link
                   href={`/admin/members/${partner.id}`}

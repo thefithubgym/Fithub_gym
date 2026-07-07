@@ -504,4 +504,57 @@ export class MembershipService {
       receiptNo: `REC_${new Date(membership.createdAt).getFullYear()}_${String(count).padStart(6, "0")}`,
     };
   }
+
+  static async updateMembership(id: string, data: {
+    membershipPlanId?: string | null;
+    customPlanName?: string | null;
+    amount: number;
+    registrationFee: number;
+    paymentMethod: PaymentMethod;
+    paymentReference?: string | null;
+    startDate: Date;
+    endDate: Date;
+    remarks?: string | null;
+  }) {
+    if (data.amount < 0) throw new Error("Amount cannot be negative.");
+    if (data.registrationFee < 0) throw new Error("Registration fee cannot be negative.");
+
+    const current = await prisma.membership.findUnique({
+      where: { id },
+    });
+    if (!current) throw new Error("Membership record not found.");
+
+    await this.validateDates(current.memberId, data.startDate, data.endDate, id);
+
+    const start = new Date(data.startDate);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(data.endDate);
+    end.setHours(0, 0, 0, 0);
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    let status: MembershipStatus = MembershipStatus.ACTIVE;
+    
+    if (start > today) {
+      status = MembershipStatus.UPCOMING;
+    } else if (end < today) {
+      status = MembershipStatus.EXPIRED;
+    }
+
+    return prisma.membership.update({
+      where: { id },
+      data: {
+        membershipPlanId: data.membershipPlanId || null,
+        customPlanName: data.customPlanName || null,
+        amount: data.amount,
+        registrationFee: data.registrationFee,
+        paymentMethod: data.paymentMethod,
+        paymentReference: data.paymentReference || null,
+        startDate: data.startDate,
+        endDate: data.endDate,
+        status,
+        remarks: data.remarks || null,
+      },
+    });
+  }
 }

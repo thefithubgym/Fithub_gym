@@ -5,7 +5,7 @@ import { getSettings } from "@/features/settings/actions";
 export interface CreateMemberInput {
   firstName: string;
   lastName: string;
-  phone: string;
+  phone?: string | null;
   gender: Gender;
   email?: string;
   dateOfBirth?: Date;
@@ -380,37 +380,43 @@ export class MemberService {
   }
 
   static async createMember(data: CreateMemberInput, coupleGroupId?: string) {
-    // Validate phone number uniqueness
-    const existing = await prisma.member.findUnique({
-      where: { phone: data.phone },
-    });
+    const phone = data.phone?.trim() || null;
+    if (phone) {
+      const existing = await prisma.member.findUnique({
+        where: { phone },
+      });
 
-    if (existing && !existing.isDeleted) {
-      throw new Error(`Phone number ${data.phone} is already registered to an active member.`);
+      if (existing && !existing.isDeleted) {
+        throw new Error(`Phone number ${phone} is already registered to an active member.`);
+      }
     }
 
-    // If member was soft deleted, we can reactivate or create new. Let's create new.
     return prisma.member.create({
       data: {
         ...data,
+        phone,
         coupleGroupId,
       },
     });
   }
 
   static async updateMember(id: string, data: Partial<CreateMemberInput>) {
-    if (data.phone) {
+    const phone = data.phone === undefined ? undefined : (data.phone?.trim() || null);
+    if (phone) {
       const existing = await prisma.member.findUnique({
-        where: { phone: data.phone },
+        where: { phone },
       });
       if (existing && existing.id !== id && !existing.isDeleted) {
-        throw new Error(`Phone number ${data.phone} is already in use.`);
+        throw new Error(`Phone number ${phone} is already in use.`);
       }
     }
 
     return prisma.member.update({
       where: { id },
-      data,
+      data: {
+        ...data,
+        ...(phone !== undefined ? { phone } : {}),
+      },
     });
   }
 

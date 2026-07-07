@@ -11,6 +11,7 @@ import {
   createSingleMemberSchema,
   createCoupleMemberSchema,
   updateMemberSchema,
+  updateMembershipSchema,
 } from "./schemas";
 import { formatAppError } from "@/lib/utils";
 
@@ -74,7 +75,10 @@ export async function createCoupleMemberAction(data: any) {
   try {
     const validated = createCoupleMemberSchema.parse(data);
 
-    if (validated.memberOne.phone === validated.memberTwo.phone) {
+    const phoneOne = validated.memberOne.phone?.trim() || null;
+    const phoneTwo = validated.memberTwo.phone?.trim() || null;
+
+    if (phoneOne && phoneTwo && phoneOne === phoneTwo) {
       throw new Error("Partner phone numbers must be unique.");
     }
 
@@ -82,25 +86,25 @@ export async function createCoupleMemberAction(data: any) {
       // 1. Uniqueness check for member one
       const existingOne = validated.existingMemberId
         ? await tx.member.findUnique({ where: { id: validated.existingMemberId } })
-        : await tx.member.findUnique({ where: { phone: validated.memberOne.phone } });
+        : (phoneOne ? await tx.member.findUnique({ where: { phone: phoneOne } }) : null);
 
       if (validated.existingMemberId && (!existingOne || existingOne.isDeleted)) {
         throw new Error("Primary member not found.");
       }
       if (!validated.existingMemberId && existingOne && !existingOne.isDeleted) {
-        throw new Error(`Phone number ${validated.memberOne.phone} is already registered to an active member.`);
+        throw new Error(`Phone number ${phoneOne} is already registered to an active member.`);
       }
 
       // Uniqueness check for member two
       const existingTwo = validated.existingPartnerId
         ? await tx.member.findUnique({ where: { id: validated.existingPartnerId } })
-        : await tx.member.findUnique({ where: { phone: validated.memberTwo.phone } });
+        : (phoneTwo ? await tx.member.findUnique({ where: { phone: phoneTwo } }) : null);
 
       if (validated.existingPartnerId && (!existingTwo || existingTwo.isDeleted)) {
         throw new Error("Partner member not found.");
       }
       if (!validated.existingPartnerId && existingTwo && !existingTwo.isDeleted) {
-        throw new Error(`Phone number ${validated.memberTwo.phone} is already registered to an active member.`);
+        throw new Error(`Phone number ${phoneTwo} is already registered to an active member.`);
       }
 
       // 2. Create/Update member one
@@ -108,7 +112,7 @@ export async function createCoupleMemberAction(data: any) {
       const m1Data = {
         firstName: validated.memberOne.firstName,
         lastName: validated.memberOne.lastName,
-        phone: validated.memberOne.phone,
+        phone: phoneOne,
         gender: validated.memberOne.gender,
         email: validated.memberOne.email || null,
         dateOfBirth: validated.memberOne.dateOfBirth || null,
@@ -134,7 +138,7 @@ export async function createCoupleMemberAction(data: any) {
       const m2Data = {
         firstName: validated.memberTwo.firstName,
         lastName: validated.memberTwo.lastName,
-        phone: validated.memberTwo.phone,
+        phone: phoneTwo,
         gender: validated.memberTwo.gender,
         email: validated.memberTwo.email || null,
         dateOfBirth: validated.memberTwo.dateOfBirth || null,
@@ -533,6 +537,19 @@ export async function getMembershipHistoryForExportAction(filters: { search?: st
   } catch (error: any) {
     console.error("Error fetching membership history for export:", error);
     return { error: error.message || "An unexpected error occurred." };
+  }
+}
+
+export async function updateMembershipAction(id: string, data: any) {
+  try {
+    const validated = updateMembershipSchema.parse(data);
+    const membership = await MembershipService.updateMembership(id, validated);
+    revalidatePath(`/admin/members/${membership.memberId}`);
+    revalidatePath("/admin/membership-history");
+    return { success: true };
+  } catch (error: any) {
+    console.error("Error updating membership:", error);
+    return { error: formatAppError(error) };
   }
 }
 

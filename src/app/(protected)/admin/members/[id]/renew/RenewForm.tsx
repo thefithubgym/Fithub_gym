@@ -31,7 +31,7 @@ interface Member {
     id: string;
     firstName: string;
     lastName: string;
-    phone: string;
+    phone: string | null;
   } | null;
   latestMembership?: {
     endDate: Date;
@@ -60,7 +60,7 @@ export default function RenewForm({ member, plans }: RenewFormProps) {
   );
 
   // If linking an existing member as partner
-  const [selectedPartner, setSelectedPartner] = useState<{ id: string; firstName: string; lastName: string; phone: string } | null>(
+  const [selectedPartner, setSelectedPartner] = useState<{ id: string; firstName: string; lastName: string; phone: string | null } | null>(
     member.partner || null
   );
 
@@ -411,7 +411,7 @@ export default function RenewForm({ member, plans }: RenewFormProps) {
 
                 <div className="flex flex-col gap-xs">
                   <label className="input-label" htmlFor="partnerPhone">Partner Phone Number</label>
-                  <input className="input-field h-[40px] text-sm py-2" id="partnerPhone" placeholder="+919876543211" {...register("partnerPhone", { required: partnerOption === "new" })} />
+                  <input className="input-field h-[40px] text-sm py-2" id="partnerPhone" placeholder="+919876543211" {...register("partnerPhone")} />
                 </div>
 
                 <div className="grid grid-cols-2 gap-sm">

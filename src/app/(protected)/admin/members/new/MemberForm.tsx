@@ -459,7 +459,7 @@ export default function MemberForm({ plans, defaultRegistrationFee = 200 }: Memb
 
             <div className="flex flex-col gap-xs">
               <label className="input-label" htmlFor="phone">Phone Number</label>
-              <input className="input-field h-[40px] text-sm py-2" id="phone" placeholder="+919876543210" {...register("phone")} required />
+              <input className="input-field h-[40px] text-sm py-2" id="phone" placeholder="+919876543210" {...register("phone")} />
             </div>
 
             <div className="grid grid-cols-2 gap-sm">
@@ -577,7 +577,7 @@ export default function MemberForm({ plans, defaultRegistrationFee = 200 }: Memb
 
               <div className="flex flex-col gap-xs">
                 <label className="input-label" htmlFor="partnerPhone">Phone Number</label>
-                <input className="input-field h-[40px] text-sm py-2" id="partnerPhone" placeholder="+919876543211" {...register("partnerPhone")} required />
+                <input className="input-field h-[40px] text-sm py-2" id="partnerPhone" placeholder="+919876543211" {...register("partnerPhone")} />
               </div>
 
               <div className="grid grid-cols-2 gap-sm">

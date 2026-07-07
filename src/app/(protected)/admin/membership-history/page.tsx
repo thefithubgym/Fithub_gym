@@ -6,7 +6,7 @@ import ReceiptButton from "./ReceiptButton";
 import ExportPDFButton from "./ExportPDFButton";
 import SortableHeader from "./SortableHeader";
 import { TableTransitionProvider, TableTransitionBody, HistorySkeletonRows, TablePagination } from "@/components/ui/table-transition";
-import { History } from "lucide-react";
+import { History, Edit } from "lucide-react";
 import EmptyState from "@/components/common/EmptyState";
 
 
@@ -186,7 +186,15 @@ async function MembershipHistoryContent({ searchParams }: PageProps) {
                       <td className="py-md px-lg text-right font-bold text-primary-container">
                         ₹{(log.amount + log.registrationFee).toLocaleString("en-IN")}
                       </td>
-                      <td className="py-md px-lg text-right">
+                      <td className="py-md px-lg text-right flex items-center justify-end gap-sm">
+                        <Link
+                          href={`/admin/membership-history/${log.id}/edit`}
+                          prefetch={false}
+                          className="w-8 h-8 flex items-center justify-center rounded-lg bg-surface-container border border-outline-variant hover:bg-surface-container-high text-on-surface hover:text-white transition-colors cursor-pointer"
+                          title="Edit Membership"
+                        >
+                          <Edit className="w-3.5 h-3.5 text-primary" />
+                        </Link>
                         <ReceiptButton membershipId={log.id} />
                       </td>
                     </tr>
