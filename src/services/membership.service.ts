@@ -36,35 +36,42 @@ export class MembershipService {
     });
 
     // Check for overlapping membership dates for this member or their couple group
+    const whereConditions: any = {
+      id: currentMembershipId ? { not: currentMembershipId } : undefined,
+      AND: [
+        {
+          OR: [
+            {
+              // New startDate is within an existing membership
+              startDate: { lte: startDate },
+              endDate: { gte: startDate },
+            },
+            {
+              // New endDate is within an existing membership
+              startDate: { lte: endDate },
+              endDate: { gte: endDate },
+            },
+            {
+              // Existing membership is fully inside new membership
+              startDate: { gte: startDate },
+              endDate: { lte: endDate },
+            },
+          ],
+        },
+      ],
+    };
+
+    if (member?.coupleGroupId) {
+      whereConditions.OR = [
+        { memberId },
+        { coupleGroupId: member.coupleGroupId },
+      ];
+    } else {
+      whereConditions.memberId = memberId;
+    }
+
     const overlapping = await txClient.membership.findFirst({
-      where: {
-        OR: [
-          { memberId },
-          member?.coupleGroupId ? { coupleGroupId: member.coupleGroupId } : {},
-        ],
-        id: currentMembershipId ? { not: currentMembershipId } : undefined,
-        AND: [
-          {
-            OR: [
-              {
-                // New startDate is within an existing membership
-                startDate: { lte: startDate },
-                endDate: { gte: startDate },
-              },
-              {
-                // New endDate is within an existing membership
-                startDate: { lte: endDate },
-                endDate: { gte: endDate },
-              },
-              {
-                // Existing membership is fully inside new membership
-                startDate: { gte: startDate },
-                endDate: { lte: endDate },
-              },
-            ],
-          },
-        ],
-      },
+      where: whereConditions,
     });
 
     if (overlapping) {
